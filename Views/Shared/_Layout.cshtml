@@ -1,51 +1,120 @@
-﻿<!DOCTYPE html>
+﻿
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Library_Management_system</title>
-    <script type="importmap"></script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/Library_Management_system.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/users/Navbar.css" asp-append-version="true" />
+
+    
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Library_Management_system</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                    <partial name="_LoginPartial" />
+        <div class="top-header">
+            <div class="top-header-content">
+                <div class="logo-section">
+                    <img src="~/images/logo.png" alt="ACLEDA University Logo" />
+                </div>
+                <div class="user-info">
+                    <a href="mailto:aub168@gmail.com">
+                        <i class="bi bi-envelope"></i>
+                        aub168@gmail.com
+                    </a>
+                    <span>
+                        <i class="bi bi-person"></i>
+                        Choun Theachumnith
+                    </span>
+                </div>
+            </div>
+        </div>
+        <nav class="main-navbar">
+            <div class="main-navbar-content">
+                <ul class="nav-links">
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/Event">Event</a></li>
+                    <li><a href="/Contact">Contact</a></li>
+                    <li><a href="/About">About Library</a></li>
+                </ul>
+
+                <div class="nav-right">
+                    <div class="search-box">
+                        <input type="text" placeholder="Search" />
+                    </div>
+
+                    <a href="/BookMark" class="book-mark-text">Book Mark</a>
+
+                    <div class="icon-buttons">
+                        <button class="icon-btn" title="Shopping Cart">
+                            <svg viewBox="0 0 24 24">
+                                <circle cx="9" cy="21" r="1"></circle>
+                                <circle cx="20" cy="21" r="1"></circle>
+                                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                            </svg>
+                            <span class="badge">2</span>
+                        </button>
+
+                        <button class="icon-btn" title="Notifications">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                            </svg>
+                            <span class="badge">3</span>
+                        </button>
+
+                        <button class="icon-btn" title="History">
+                            <svg viewBox="0 0 24 24">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
             </div>
         </nav>
     </header>
+
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
+    <footer>
         <div class="container">
-            &copy; 2025 - Library_Management_system - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            <div class="footer-content">
+                <div class="footer-left">
+                    <img src="~/images/logo.png" alt="ACLEDA University Logo" />
+                    <p>The library preserves knowledge and makes it available to future generations — knowledge never dies here.</p>
+                </div>
+                <div class="footer-right">
+                    <div class="footer-links">
+                        <h3>About Library</h3>
+                        <a href="/FAQ">FAQ</a>
+                        <a href="/Support">Support</a>
+                        <a href="/Policies">Policies</a>
+                        <a href="/Account">Account & Login</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p class="copyright">&copy; 2025 ACLEDA Univeristy of Business's Library. All right reserved</p>
+                <div class="footer-bottom-links">
+                    <a href="/Terms">Terms of service</a>
+                    <a href="/Privacy">Privacy Policy</a>
+                    <a href="/Cookies">Cookie Setting</a>
+                </div>
+            </div>
         </div>
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/users/navbar.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
