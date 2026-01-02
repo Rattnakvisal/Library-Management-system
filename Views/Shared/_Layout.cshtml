@@ -13,14 +13,16 @@
     
 </head>
 <body>
-    <header>
+    <header id="main-header">
+        
         <div class="top-header">
             <div class="top-header-content">
                 <div class="logo-section">
-                    <img src="~/images/logo.png" alt="ACLEDA University Logo" />
+                    
+                    <img src="/images/logo.png" class="navbar-logo"/>
                 </div>
                 <div class="user-info">
-                    <a href="mailto:aub168@gmail.com">
+                    <a href="mailto:aub168@gmail.com" class="email-address">
                         <i class="bi bi-envelope"></i>
                         aub168@gmail.com
                     </a>
@@ -31,8 +33,15 @@
                 </div>
             </div>
         </div>
+
+    
         <nav class="main-navbar">
             <div class="main-navbar-content">
+
+                <button class="mobile-menu-toggle" aria-label="Toggle navigation">
+                    <i class="bi bi-list"></i>
+                </button>
+
                 <ul class="nav-links">
                     <li><a href="/">Home</a></li>
                     <li><a href="/Event">Event</a></li>
@@ -42,6 +51,7 @@
 
                 <div class="nav-right">
                     <div class="search-box">
+                        <i class="bi bi-search"></i>
                         <input type="text" placeholder="Search" />
                     </div>
 
@@ -76,18 +86,18 @@
             </div>
         </nav>
     </header>
-
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
+  
 
     <footer>
         <div class="container">
             <div class="footer-content">
                 <div class="footer-left">
-                    <img src="~/images/logo.png" alt="ACLEDA University Logo" />
+                    <img src="/images/logo.png" />
                     <p>The library preserves knowledge and makes it available to future generations — knowledge never dies here.</p>
                 </div>
                 <div class="footer-right">
@@ -101,7 +111,7 @@
                 </div>
             </div>
             <div class="footer-bottom">
-                <p class="copyright">&copy; 2025 ACLEDA Univeristy of Business's Library. All right reserved</p>
+                <p class="copyright">&copy; 2025 ACLEDA University of Business's Library. All right reserved</p>
                 <div class="footer-bottom-links">
                     <a href="/Terms">Terms of service</a>
                     <a href="/Privacy">Privacy Policy</a>
@@ -110,6 +120,9 @@
             </div>
         </div>
     </footer>
+ 
+
+ 
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
