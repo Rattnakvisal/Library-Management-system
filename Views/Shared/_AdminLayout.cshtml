@@ -1,4 +1,101 @@
-﻿@page
-@model Library_Management_system.Views.Shared._AdminLayoutModel
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
 @{
 }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Management System</title>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="~/css/admin/AdminLayout.css">
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <script src="~/lib/jquery/dist/jquery.slim.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <header class="header d-flex justify-content-between align-items-center px-4">
+        <div class="logo">
+            <img src="~/images/Admin/logo.png" alt="Logo">
+            <h1 class="libraryName fw-semibold">Library Management System</h1>
+        </div>
+
+        <div class="information d-flex align-items-center gap-3">
+            <i class="bi bi-bell-fill"></i>
+            <i class="bi bi-person-circle ml-3" data-toggle="dropdown" aria-expanded="false"></i>
+            <div class="dropdown-menu">
+                <a class="dropdown-item" href="#">
+                    <i class="bi bi-arrow-counterclockwise"></i>
+                    <span>Forget Password</span>
+                </a>
+                <a class="dropdown-item" href="#">
+                    <i class="bi bi-box-arrow-right"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+            <div class="ml-3">
+                <span class="d-block fw-semibold" style="color: black;">Pros Smos</span>
+                <span class="text-muted">Admin</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTENT -->
+    <div class="content d-flex">
+        <!-- SIDEBAR -->
+        <nav class="sidebar">
+            <ul class="menu-link">
+                <li class="link active">
+                    <i class="bi bi-speedometer2"></i>
+                    <a href="#">Dashboard</a>
+                </li>
+                <li class="link">
+                    <i class="bi bi-book"></i>
+                    <a href="#" class="fw-semibold">Manage Books</a>
+                </li>
+                <li class="link">
+                    <i class="bi bi-journals"></i>
+                    <a href="#" class="fw-semibold">Borrowing Book</a>
+                </li>
+                <li class="link">
+                    <i class="bi bi-people"></i>
+                    <a href="#" class="fw-semibold">Manage User</a>
+                </li>
+                <li class="link">
+                    <i class="bi bi-calendar-event"></i>
+                    <a href="#" class="fw-semibold">Event</a>
+                </li>
+                <li class="link">
+                    <i class="bi bi-envelope-exclamation"></i>
+                    <a href="#" class="fw-semibold">Feedbacks</a>
+                </li>
+                <li class="link">
+                    <i class="bi bi-receipt"></i>
+                    <a href="#" class="fw-semibold">Report</a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- MAIN -->
+        <main class="main-content">
+            @RenderBody()
+        </main>
+    </div>
+
+    <!-- Bootstrap JS -->
+    
+
+</body>
+</html>
