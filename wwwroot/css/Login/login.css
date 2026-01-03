@@ -1,0 +1,256 @@
+﻿
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", sans-serif;
+}
+
+body {
+    background-color: #eef3f7;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 10px;
+}
+
+.container {
+    width: 100%;
+    max-width: 1150px;
+    height: auto;
+    margin: auto;
+    padding: 15px;
+}
+
+.card {
+    background: #fff;
+    display: flex;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    overflow: hidden;
+    flex-wrap: wrap;
+}
+
+/* LEFT */
+.left {
+    width: 50%;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+@media (max-width: 768px) {
+    .left {
+        width: 100%;
+        padding: 30px;
+    }
+}
+
+@media (max-width: 480px) {
+    .left {
+        padding: 20px;
+        display: none;
+    }
+}
+
+.logo img {
+    height: 50px;
+}
+
+.illustration {
+    text-align: center;
+}
+
+    .illustration img {
+        max-width: 90%;
+    }
+
+/* RIGHT */
+.right {
+    width: 50%;
+    padding: 60px 50px;
+}
+
+@media (max-width: 768px) {
+    .right {
+        width: 100%;
+        padding: 40px 30px;
+    }
+}
+
+@media (max-width: 480px) {
+    .right {
+        width: 100%;
+        padding: 25px 20px;
+    }
+}
+
+.right h2 {
+    margin-bottom: 30px;
+    color: #102a43;
+    font-size: 32px;
+}
+
+@media (max-width: 768px) {
+    .right h2 {
+        font-size: 28px;
+        margin-bottom: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .right h2 {
+        font-size: 22px;
+        margin-bottom: 15px;
+    }
+}
+
+.btn-login-student img {
+    height: 30px;
+    margin-right: 2px;
+    vertical-align: middle;
+    padding: 0px;
+    width: 30px;
+}
+
+.btn-login-student {
+    width: 100%;
+    background: #102a43;
+    color: #fff;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    margin-bottom: 10px;
+    font-size: 16px;
+    transition: background 0.3s ease;
+}
+
+    .btn-login-student:hover {
+        background: #1B3452;
+    }
+
+@media (max-width: 480px) {
+    .btn-login-student {
+        font-size: 14px;
+        padding: 10px;
+        margin-bottom: 20px;
+    }
+}
+
+.divider {
+    text-align: center;
+    margin: 21px 0;
+    position: relative;
+    margin-bottom: 31px;
+}
+
+    .divider::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        width: 100%;
+        height: 1px;
+        background: #ddd;
+    }
+
+    .divider span {
+        background: white;
+        padding: 0 15px;
+        position: relative;
+        color: #999;
+        font-size: 14px;
+    }
+
+form input {
+    width: 100%;
+    padding: 14px;
+    margin-bottom: 12px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+.input-group {
+    position: relative;
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+    .input-group input {
+        width: 100%;
+        padding: 12px 12px 12px 45px; /* space for icon */
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 12px;
+        outline: none;
+    }
+
+@media (max-width: 480px) {
+    .input-group input {
+        font-size: 14px;
+        padding: 10px 10px 10px 40px;
+    }
+}
+
+.input-group i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%); /* center vertically */
+    font-size: 18px;
+    color: #9aa0a6;
+}
+
+
+.input-group input {
+    padding-left: 36px;
+}
+
+.password {
+    margin-bottom: 30px;
+}
+
+.btn-signin {
+    width: 100%;
+    background: #a27c19;
+    color: #fff;
+    padding: 14px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-bottom: 28px;
+    transition: background 0.3s ease;
+    border: none;
+}
+
+    .btn-signin:hover {
+        background: #8a6815;
+    }
+
+@media (max-width: 480px) {
+    .btn-signin {
+        padding: 12px;
+        font-size: 14px;
+    }
+}
+
+.links {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 14px;
+    width: 100%;
+    margin-top: 15px;
+}
+
+.forgot {
+    margin-bottom: 18px;
+}
+
+.links a {
+    color: #1a73e8;
+    text-decoration: none;
+}
