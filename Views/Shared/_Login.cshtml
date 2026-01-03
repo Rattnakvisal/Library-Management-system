@@ -1,0 +1,77 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>ACLEDA University Library</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+        <link rel="stylesheet" href="style.css" />
+        <link rel="stylesheet" href="~/css/Login/login.css" />
+    </head>
+    <body>
+        <div class="container">
+            <div class="card">
+
+                <!-- Left Section -->
+                <div class="left">
+                    <div class="logo">
+                        <img src="~/images/Login/logo.png" alt="ACLEDA Logo" />
+                    </div>
+
+                    <div class="illustration">
+                        <img src="~/images/Login/bookicon.png" alt="Books Illustration" />
+                    </div>
+                </div>
+
+                <!-- Right Section -->
+                <div class="right">
+                    <h2>ACLEDA UNIVERSITY LIBRARY</h2>
+
+                    <button class="btn-login-student">
+                        <img class="logoac" src="~/images/Login/logoac.png" alt="Student Icon" />
+                        Login with Student Credentials
+                    </button>
+
+                    <div class="divider">
+                        <span>OR</span>
+                    </div>
+
+                    <form>
+                        <div>
+                            <div class="input-group">
+                                <i class="fa-regular fa-envelope"></i>
+                                <input type="email" placeholder="Your Email" required />
+                            </div>
+                            <div class="input-group">
+                                <i class="fa-solid fa-lock"></i>
+                                <input type="password" class="password" placeholder="Your Password" required />
+                            </div>
+                        </div>
+
+
+
+                        <button type="submit" class="btn-signin">Sign in</button>
+                    </form>
+
+                    <div class="links">
+                        <div class="forgot">
+                            <a href="#">Forgot password?</a>
+                        </div>
+
+                        <p>
+                            Don’t have an account?
+                            <a href="#">Sign up via Telegram <i class="fab fa-telegram"></i> </a>
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </body>
+    </html>
+
+}
