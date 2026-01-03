@@ -73,8 +73,8 @@ body {
 
 .custom-card-width {
     width: calc(25% - 1rem);
-    min-width: 250px;
-    /* Ensures it looks good on mobile */
+    min-width: 200px;
+/*     Ensures it looks good on mobile */
 }
 
 /* Optional: Style the scrollbar for a cleaner look */
