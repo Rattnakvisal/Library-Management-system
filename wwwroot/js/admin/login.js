@@ -3,7 +3,7 @@
     const toggleIcon = document.getElementById('togglePassword') || (toggleBtn && toggleBtn.querySelector('i'));
     const passwordInput = document.querySelector('.password');
 
-    if (!toggleBtn || !passwordInput) return; // nothing to do if elements are missing
+    if (!toggleBtn || !passwordInput) return;
 
     toggleBtn.addEventListener('click', function () {
         const isHidden = passwordInput.type === 'password';
