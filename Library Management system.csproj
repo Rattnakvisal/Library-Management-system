@@ -10,9 +10,13 @@
 
   <ItemGroup>
     <Compile Remove="wwwroot\images\NewFolder\**" />
+    <Compile Remove="wwwroot\images\User\slide_show\**" />
     <Content Remove="wwwroot\images\NewFolder\**" />
+    <Content Remove="wwwroot\images\User\slide_show\**" />
     <EmbeddedResource Remove="wwwroot\images\NewFolder\**" />
+    <EmbeddedResource Remove="wwwroot\images\User\slide_show\**" />
     <None Remove="wwwroot\images\NewFolder\**" />
+    <None Remove="wwwroot\images\User\slide_show\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -33,9 +37,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\images\User\cart\" />
-    <Folder Include="wwwroot\images\User\NewFolder\" />
-    <Folder Include="wwwroot\images\User\slide_show\" />
+    <Folder Include="wwwroot\images\User\Book\" />
   </ItemGroup>
 
 </Project>
