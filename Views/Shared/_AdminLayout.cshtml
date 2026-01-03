@@ -1,6 +1,14 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@using Microsoft.AspNetCore.Mvc.Rendering
+
+@functions {
+    string IsActive(string controller)
+    {
+        var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+        return string.Equals(currentController, controller, StringComparison.OrdinalIgnoreCase)
+            ? "active"
+            : "";
+    }
+}
 @{
 }
 <!DOCTYPE html>
@@ -57,33 +65,34 @@
         <!-- SIDEBAR -->
         <nav class="sidebar">
             <ul class="menu-link">
-                <li class="link active">
+                <li class="link @IsActive("Dashboard")">
                     <i class="bi bi-speedometer2"></i>
-                    <a href="#">Dashboard</a>
+                    <a asp-controller="Dashboard" asp-action="Index">Dashboard</a>
                 </li>
-                <li class="link">
+                <li class="link @IsActive("ManageBooks")">
                     <i class="bi bi-book"></i>
-                    <a href="#" class="fw-semibold">Manage Books</a>
+                    <a asp-controller="ManageBooks" asp-action="Index">Manage Books</a>
                 </li>
-                <li class="link">
+                <li class="link @IsActive("ManageBorrowingBook")">
                     <i class="bi bi-journals"></i>
-                    <a href="#" class="fw-semibold">Borrowing Book</a>
+                    <a asp-controller="ManageBorrowingBook" asp-action="Index">Borrowing Book</a>
                 </li>
-                <li class="link">
+
+                <li class="link @IsActive("ManageUser")">
                     <i class="bi bi-people"></i>
-                    <a href="#" class="fw-semibold">Manage User</a>
+                    <a asp-controller="ManageUser" asp-action="Index" class="fw-semibold">Manage User</a>
                 </li>
-                <li class="link">
+                <li class="link @IsActive("ManageEvent")">
                     <i class="bi bi-calendar-event"></i>
-                    <a href="#" class="fw-semibold">Event</a>
+                    <a asp-controller="ManageEvent" asp-action="Index" class="fw-semibold">Event</a>
                 </li>
-                <li class="link">
+                <li class="link @IsActive("ManageFeedback")">
                     <i class="bi bi-envelope-exclamation"></i>
-                    <a href="#" class="fw-semibold">Feedbacks</a>
+                    <a asp-controller="ManageFeedback" asp-action="Index" class="fw-semibold">Feedbacks</a>
                 </li>
-                <li class="link">
+                <li class="link @IsActive("ManageReport")">
                     <i class="bi bi-receipt"></i>
-                    <a href="#" class="fw-semibold">Report</a>
+                    <a asp-controller="ManageReport" asp-action="Index" class="fw-semibold">Report</a>
                 </li>
             </ul>
         </nav>

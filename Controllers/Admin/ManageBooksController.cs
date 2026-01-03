@@ -8,6 +8,6 @@ public class ManageBooksController : Controller
     [Route("admin/managebooks")]
     public IActionResult Index()
     {
-        return View("~/Views/Admin/ManageBooks/ManageBooks.cshtml");
+        return View("~/Views/Admin/ManageBooks/Index.cshtml");
     }
 }
