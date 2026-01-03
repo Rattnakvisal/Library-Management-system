@@ -9,7 +9,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>ACLEDA University Library</title>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-        <link rel="stylesheet" href="style.css" />
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
         <link rel="stylesheet" href="~/css/Login/login.css" />
     </head>
     <body>
@@ -43,16 +43,23 @@
                     <form>
                         <div>
                             <div class="input-group">
-                                <i class="fa-regular fa-envelope"></i>
+                                <div class="icon-email">
+                                    <i class="fa-regular fa-envelope"></i>
+                                </div>
+
                                 <input type="email" placeholder="Your Email" required />
                             </div>
                             <div class="input-group">
-                                <i class="fa-solid fa-lock"></i>
+                                <div class="icon-password">
+                                    <i class="fa-solid fa-lock"></i>
+                                </div>
                                 <input type="password" class="password" placeholder="Your Password" required />
+                                <span class="toggle-password">
+                                    <i class="bi bi-eye-slash" id="togglePassword"></i>
+                                </span>
+
                             </div>
                         </div>
-
-
 
                         <button type="submit" class="btn-signin">Sign in</button>
                     </form>
@@ -64,7 +71,7 @@
 
                         <p>
                             Don’t have an account?
-                            <a href="#">Sign up via Telegram <i class="fab fa-telegram"></i> </a>
+                            <a class="Sign-up-telegram" href="#">Sign up via Telegram <i class="fab fa-telegram"></i> </a>
                         </p>
                     </div>
                 </div>
@@ -72,6 +79,6 @@
             </div>
         </div>
     </body>
+    <script src="~/js/admin/login.js"></script>
     </html>
-
 }

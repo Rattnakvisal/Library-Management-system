@@ -163,7 +163,7 @@ body {
         padding: 0 15px;
         position: relative;
         color: #999;
-        font-size: 14px;
+        font-size: 12px;
     }
 
 form input {
@@ -185,8 +185,9 @@ form input {
         padding: 12px 12px 12px 45px; /* space for icon */
         border: 1px solid #ddd;
         border-radius: 8px;
-        font-size: 12px;
+        font-size: 14px;
         outline: none;
+        color: #464141;
     }
 
 @media (max-width: 480px) {
@@ -196,22 +197,43 @@ form input {
     }
 }
 
-.input-group i {
+.icon-email i {
     position: absolute;
     left: 15px;
     top: 50%;
-    transform: translateY(-50%); /* center vertically */
+    transform: translateY(-72%); /* center vertically */
     font-size: 18px;
     color: #9aa0a6;
 }
 
+.icon-password i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-142%); /* center vertically */
+    font-size: 18px;
+    color: #9aa0a6;
+}
+
+.toggle-password i {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-112%);
+    font-size: 18px;
+    color: #9aa0a6;
+    cursor: pointer;
+}
+
 
 .input-group input {
-    padding-left: 36px;
+    padding-left: 42px;
+    font-weight: 500;
 }
 
 .password {
     margin-bottom: 30px;
+    padding-right: 42px;
 }
 
 .btn-signin {
@@ -246,11 +268,22 @@ form input {
     margin-top: 15px;
 }
 
+.Sign-up-telegram {
+    font-weight: 500;
+}
+
 .forgot {
-    margin-bottom: 18px;
+    margin-bottom: 12px;
+    font-weight: 500;
 }
 
 .links a {
     color: #1a73e8;
     text-decoration: none;
+}
+
+.fa-telegram {
+    color: #0088cc;
+    margin-left: 5px;
+    font-size: larger;
 }
