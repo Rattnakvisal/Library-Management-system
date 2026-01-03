@@ -1,11 +1,282 @@
 ﻿<!DOCTYPE html>
-
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
     <title>@ViewBag.Title</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+
+
+        h1 {
+
+            color: #2c3e50;
+            padding: 5px;
+            text-align: center;
+            font-size: 2.2em;
+        }
+
+        .map-container {
+            width: 100%;
+            padding-bottom: 20px;
+            background: #fafafa;
+        }
+
+            .map-container iframe {
+                width: 100%;
+                height: 450px;
+                border-radius: 8px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+            }
+
+        .contacts-section {
+            padding-top: 10px;
+        }
+
+        .contact-card {
+            background: #fafafa;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #2c3e50;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+            .contact-card:hover {
+                transform: translateX(5px);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            }
+
+            .contact-card h3 {
+                color: #2c3e50;
+                margin-bottom: 12px;
+                font-size: 1.3em;
+            }
+
+            .contact-card p {
+                color: #555;
+                margin: 8px 0;
+                font-size: 1em;
+            }
+
+            .contact-card i {
+                margin-right: 10px;
+                color: #2c3e50;
+                width: 20px;
+            }
+
+        .feedback-section {
+            padding: 40px 30px;
+            background: #fafafa;
+        }
+
+            .feedback-section h2 {
+                color: #2c3e50;
+                margin-bottom: 25px;
+                text-align: center;
+                font-size: 1.8em;
+            }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+            .form-group label {
+                display: block;
+                color: #333;
+                margin-bottom: 8px;
+                font-weight: 600;
+            }
+
+            .form-group input,
+            .form-group textarea {
+                width: 100%;
+                padding: 12px;
+                border: 2px solid #ddd;
+                border-radius: 6px;
+                font-size: 1em;
+                transition: border-color 0.3s ease;
+            }
+
+                .form-group input:focus,
+                .form-group textarea:focus {
+                    outline: none;
+                    border-color: #2c3e50;
+                }
+
+            .form-group textarea {
+                resize: vertical;
+                min-height: 120px;
+            }
+
+        .submit-btn {
+            background: #2c3e50;
+            color: white;
+            padding: 14px 40px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease;
+            display: block;
+            margin: 0 auto;
+        }
+
+            .submit-btn:hover {
+                background: #34495e;
+                transform: translateY(-2px);
+            }
+
+        .social-section {
+            padding: 20px 30px;
+            text-align: center;
+
+        }
+
+            .social-section h2 {
+                color: #2c3e50;
+                margin-bottom: 30px;
+                font-size: 1.8em;
+            }
+
+        .social-icons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .social-icon {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4em;
+            color: white;
+            background: #2c3e50;
+            text-decoration: none;
+            transition: transform 0.3s ease, background 0.3s ease;
+        }
+
+            .social-icon:hover {
+                transform: translateY(-5px);
+                background: #34495e;
+            }
+
+        @@media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+                padding: 20px;
+            }
+
+            .map-container iframe {
+                height: 200px;
+            }
+
+            .contact-card {
+                padding: 20px;
+            }
+
+            .social-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 1.2em;
+            }
+            .contact-section, .feedback-section, .social-section {
+                padding: 0;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>About page</h1>
+    <div class="container">
+        <h1>About Library</h1>
+
+        <div class="map-container">
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3907.92041649309!2d104.85443537413929!3d11.629021188576345!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3109527b5a6c6599%3A0x947e61c3ff00c21d!2sACLEDA%20University%20of%20Business!5e0!3m2!1sen!2skh!4v1767418790780!5m2!1sen!2skh" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+
+        <div class="contacts-section">
+            <h1>Administrator</h1>
+            <div class="contact-card">
+                <h3>Ms. Tang Siveng</h3>
+                <p><strong>Head of AUB Career Center</strong></p>
+                <p><i class="fas fa-phone"></i>092 192 912</p>
+                <p><i class="fas fa-envelope"></i>tang.siveng@acleda.edu.kh</p>
+            </div>
+
+            <div class="contact-card">
+                <h3>Mr. Ron Namchheav</h3>
+                <p><strong>Manager of Customer Relations & Cooperation Unit</strong></p>
+                <p><i class="fas fa-phone"></i>012 345 678</p>
+                <p><i class="fas fa-envelope"></i>ron.namchheav@acleda.edu.kh</p>
+            </div>
+
+
+        </div>
+
+        <div class="feedback-section">
+            <h2>Feedback Form</h2>
+            <form id="feedbackForm">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" placeholder="Enter your email" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea id="description" name="description" placeholder="Enter your feedback or message" required></textarea>
+                </div>
+
+                <button type="submit" class="submit-btn">Submit</button>
+            </form>
+        </div>
+
+        <div class="social-section">
+            <h2>Connect With Us</h2>
+            <div class="social-icons">
+                <a href="https://facebook.com" target="_blank" class="social-icon">
+                    <i class="fab fa-facebook-f"></i>
+                </a>
+                <a href="https://youtube.com" target="_blank" class="social-icon">
+                    <i class="fab fa-youtube"></i>
+                </a>
+                <a href="mailto:info@acleda.edu.kh" class="social-icon">
+                    <i class="fas fa-envelope"></i>
+                </a>
+                <a href="https://t.me" target="_blank" class="social-icon">
+                    <i class="fab fa-telegram-plane"></i>
+                </a>
+                <a href="https://instagram.com" target="_blank" class="social-icon">
+                    <i class="fab fa-instagram"></i>
+                </a>
+                <a href="https://linkedin.com" target="_blank" class="social-icon">
+                    <i class="fab fa-linkedin-in"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('feedbackForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const description = document.getElementById('description').value;
+
+            alert('Thank you for your feedback!\n\nEmail: ' + email + '\nMessage: ' + description);
+
+            this.reset();
+        });
+    </script>
 </body>
 </html>
