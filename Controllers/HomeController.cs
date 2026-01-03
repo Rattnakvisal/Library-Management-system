@@ -18,6 +18,97 @@ namespace Library_Management_system.Controllers
             return View();
         }
 
+        [HttpGet("about")]
+        public IActionResult About()
+        {
+            ViewBag.Title = "About";
+            return View("~/Views/User/About/about.cshtml");
+        }
+
+        [HttpGet("about/faq")]
+        public IActionResult AboutFaq()
+        {
+            ViewBag.Title = "About - FAQ";
+            return View("~/Views/User/About/faq.cshtml");
+        }
+
+        [HttpGet("about/support")]
+        public IActionResult AboutSupport()
+        {
+            ViewBag.Title = "About - Support";
+            return View("~/Views/User/About/support.cshtml");
+        }
+
+        [HttpGet("about/policies")]
+        public IActionResult AboutPolicies()
+        {
+            ViewBag.Title = "About - Policies";
+            return View("~/Views/User/About/policies.cshtml");
+        }
+
+        [HttpGet("about/account")]
+        public IActionResult AboutAccount()
+        {
+            ViewBag.Title = "About - Account";
+            return View("~/Views/User/About/account.cshtml");
+        }
+
+        [HttpGet("about/login")]
+        public IActionResult AboutLogin()
+        {
+            ViewBag.Title = "About - Login";
+            return View("~/Views/User/About/login.cshtml");
+        }
+
+        [HttpGet("event")]
+        public IActionResult Event()
+        {
+            ViewBag.Title = "Events";
+            return View("~/Views/User/Event/Event.cshtml");
+        }
+
+        [HttpGet("contact")]
+        public IActionResult Contact()
+        {
+            ViewBag.Title = "Contact";
+            return View("~/Views/User/Contact/Contact.cshtml");
+        }
+
+        [HttpGet("history")]
+        public IActionResult History()
+        {
+            ViewBag.Title = "History";
+            return View("~/Views/User/History/History.cshtml");
+        }
+
+        [HttpGet("notification")]
+        public IActionResult Notification()
+        {
+            ViewBag.Title = "Notifications";
+            return View("~/Views/User/Notification/Notification.cshtml");
+        }
+
+        [HttpGet("cart")]
+        public IActionResult Cart()
+        {
+            ViewBag.Title = "Cart";
+            return View("~/Views/User/Cart/Cart.cshtml");
+        }
+
+        [HttpGet("profile")]
+        public IActionResult Profile()
+        {
+            ViewBag.Title = "Profile";
+            return View("~/Views/User/Profile/Profile.cshtml");
+        }
+
+        [HttpGet("cookie")]
+        public IActionResult Cookie()
+        {
+            ViewBag.Title = "Cookie";
+            return View("~/Views/User/Cookie/Cookie.cshtml");
+        }
+
         public IActionResult Privacy()
         {
             return View();
