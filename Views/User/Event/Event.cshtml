@@ -2,6 +2,55 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewBag.Title = "Events";
 }
+<style>
+    h1 {
+        font-size: 28px;
+        font-weight: 700;
+        margin-bottom: 20px;
+        color: #111;
+    }
 
-<h1>Events</h1>
-<p>Events page content.</p>
+    .event-card {
+        background: #0d2847;
+        border-radius: 6px;
+        overflow: hidden;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        display: flex;
+        flex-direction: row;
+
+    }
+    .event-info{
+        margin: 10px 5px;
+    }
+    .event-info> p , h3, span{
+        color: white;
+    }
+
+       
+</style>
+
+<h1>Upcoming event</h1>
+<div class="event-card">
+
+    <img src="/images/User/Contact/contact-1.png"
+         alt="Event">
+    <div class="event-info">
+        <span class="badge">HAPPENING NOW</span>
+        <h3>AFTER PARTY FOR ACLEDA UNDERGRADUATE</h3>
+        <p>
+            AContrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC,
+            making it over 2000 years old. Richard McClintock,a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words,
+            consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature,
+            discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of "de Finibus Bonorum et Malorum" (The Extremes of Good and Evil) by Cicero,
+            written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance.
+            The first line of Lorem Ipsum, "Lorem ipsum dolor sit amet..", comes from a line in section 1.10.32.
+        </p>
+        <p class="host">Host by Vised</p>
+        <p class="meta">
+            AUB University of Business &nbsp; Monday, 25th,june-29th;  Free Accommodation
+        </p>
+    </div>
+       
+
+</div>
