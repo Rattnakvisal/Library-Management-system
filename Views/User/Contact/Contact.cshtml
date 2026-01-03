@@ -1,15 +1,149 @@
-@{
-    Layout = "~/Views/Shared/_Layout.cshtml";
-    ViewBag.Title = "Contact";
-}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ACLEDA University Library</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #2c3e50;
+            padding: 30px 20px;
+            text-align: center;
+            font-size: clamp(1.8em, 5vw, 2.5em);
+            border-bottom: 3px solid #2c3e50;
+        }
+
+        /* About Section */
+        .about-section {
+            padding: 40px 5px;
+        }
+
+            .about-section h2 {
+                color: #2c3e50;
+                font-size: clamp(1.5em, 4vw, 2em);
+                margin-bottom: 20px;
+            }
+
+            .about-section p {
+                color: #555;
+                line-height: 1.8;
+                margin-bottom: 15px;
+                font-size: clamp(0.9em, 2.5vw, 1.1em);
+            }
+
+        /* Service Hours Section */
+        .service-hours {
+            padding: 40px 20px;
+        }
+
+            .service-hours h2 {
+                color: #2c3e50;
+                font-size: clamp(1.5em, 4vw, 2em);
+                margin-bottom: 20px;
+            }
+
+            .service-hours ul {
+                list-style: none;
+                color: #555;
+            }
+
+                .service-hours ul li {
+                    padding: 10px 0;
+                    border-bottom: 1px solid #ddd;
+                    font-size: clamp(0.9em, 2.5vw, 1.1em);
+                }
+
+                    .service-hours ul li i {
+                        color: #2c3e50;
+                        margin-right: 10px;
+                    }
+
+        /* Visit Us Section */
+        .visit-section {
+            padding: 40px 20px;
+        }
+
+        .visit-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            align-items: center;
+        }
+
+            .visit-content img {
+                width: 100%;
+                height: 400px;
+                object-fit: cover;
+                border-radius: 8px;
+            }
+
+        .visit-text h2 {
+            color: #2c3e50;
+            font-size: clamp(1.5em, 4vw, 2em);
+            margin-bottom: 15px;
+        }
+
+        .visit-text p {
+            color: #555;
+            line-height: 1.8;
+            font-size: clamp(0.9em, 2.5vw, 1.1em);
+        }
+
+        /* Responsive Design */
+        @@media (max-width: 968px) {
+            .visit-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @@media (max-width: 768px) {
+           
+
+            h1 {
+                padding: 5px 10px;
+            }
+
+            .about-section,
+            .service-hours,
+            .visit-section {
+                padding: 5px 10px;
+            }
+
+           
+        }
+
+        @@media (max-width: 480px) {
+            .visit-content {
+                gap: 20px;
+            }
+
+              
+
+            .about-section,
+            .service-hours,
+            .visit-section {
+                padding: 5px 10px;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-     
-
-      
-
         <!-- About Section -->
         <div class="about-section">
             <h2>About US</h2>
@@ -29,45 +163,33 @@
         <!-- Visit Us Section -->
         <div class="visit-section">
             <div class="visit-content">
-               
                 <div class="visit-text">
                     <h2>Visit Us</h2>
                     <p>At Stanford affiliates with a current and valid campus ID are invited to access the center whenever an area of Wallenberg Hall is available for roam use.</p>
                 </div>
-                <img src="/images/User/Contact/contact-2.png" alt="Alternate Text" />
+                <img src="/images/User/Contact/contact-3.png" alt="Library Visit">
             </div>
-
-    </div>
-        <div class="visit-section">
-            <div class="visit-content">
-                <img src="/images/User/Contact/contact-2.png" alt="Alternate Text" />
-                <div class="visit-text">
-                    <h2>Visit Us</h2>
-                    <p>At Stanford affiliates with a current and valid campus ID are invited to access the center whenever an area of Wallenberg Hall is available for roam use.</p>
-                </div>
-            </div>
-
         </div>
+
         <div class="visit-section">
             <div class="visit-content">
+                <img src="/images/User/Contact/contact-2.png" alt="Library Leadership">
                 <div class="visit-text">
                     <h2>LeaderShip</h2>
                     <p>Our mission is to encourage, stimulate, connect, and share. At Stanford Libraries, you will meet approachable, engaged, solution-oriented staff who are easy to talk.</p>
                 </div>
-               <img src="/images/User/Contact/contact-1.png" alt="Alternate Text" />
-                
             </div>
+        </div>
 
+        <div class="visit-section">
+            <div class="visit-content">
+                <div class="visit-text">
+                    <h2>Support the Library</h2>
+                    <p>Libraries value investing in research, preserving cultural heritage, advancing discovery using data, creating spaces that arouse curiosity, and believe in making information.</p>
+                </div>
+                <img src="/images/User/Contact/contact-1.png" alt="Library Support">
+            </div>
         </div>
     </div>
-    <script>
-        document.getElementById('feedbackForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            const email = document.getElementById('email').value;
-            const description = document.getElementById('description').value;
-
-            alert('Thank you for your feedback!\n\nEmail: ' + email + '\nMessage: ' + description);
-
-<h1>Contact</h1>
-<p>Contact page content and contact form placeholder.</p>
+</body>
+</html>
