@@ -101,6 +101,12 @@ namespace Library_Management_system.Controllers
             ViewBag.Title = "Profile";
             return View("~/Views/User/Profile/Profile.cshtml");
         }
+        [HttpGet("bookmark")]
+        public IActionResult Bookmark()
+        {
+            ViewBag.Title = "Profile";
+            return View("~/Views/User/Bookmark/Bookmark.cshtml");
+        }
 
         [HttpGet("cookie")]
         public IActionResult Cookie()
@@ -108,6 +114,7 @@ namespace Library_Management_system.Controllers
             ViewBag.Title = "Cookie";
             return View("~/Views/User/Cookie/Cookie.cshtml");
         }
+       
 
         public IActionResult Privacy()
         {
