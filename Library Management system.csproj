@@ -16,4 +16,13 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.11" />
   </ItemGroup>
 
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Views\Admin\Books\Create.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Admin\Books\Edit.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Admin\Books\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Admin\Borrow\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Admin\Report\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Admin\Users\Index.cshtml" />
+  </ItemGroup>
+
 </Project>
