@@ -1,2 +1,164 @@
-﻿body {
+﻿/* ================================
+   CONTACT PAGE – 960px LAYOUT
+================================ */
+
+* {
+    box-sizing: border-box;
+}
+
+/* MAIN WRAPPER */
+.contact-wrapper {
+    max-width: 960px;
+    margin: 50px auto;
+    padding: 0 16px;
+}
+
+/* ================================
+   MAP
+================================ */
+.contact-map iframe {
+    width: 100%;
+    height: 350px;
+    border: 0;
+    display: block;
+}
+
+/* ================================
+   CONTACT INFO
+================================ */
+.contact-info {
+    margin-top: 30px;
+}
+
+    .contact-info h4 {
+        font-weight: 600;
+        margin-top: 20px;
+    }
+
+    .contact-info p {
+        margin: 6px 0;
+        font-size: 15px;
+    }
+
+/* ================================
+   FEEDBACK FORM
+================================ */
+.contact-form {
+    margin-top: 40px;
+}
+
+    .contact-form h4 {
+        margin-bottom: 20px;
+        color: #0d2847;
+    }
+
+/* FORM ROW */
+.form-row {
+    display: flex;
+    gap: 20px;
+    align-items: flex-end;
+}
+
+/* FORM COLUMNS */
+.form-col {
+    flex: 1;
+}
+
+    .form-col label {
+        display: block;
+        margin-bottom: 6px;
+        font-weight: 500;
+    }
+
+    .form-col input,
+    .form-group textarea {
+        width: 100%;
+        padding: 10px;
+        font-size: 14px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+/* BUTTON */
+.form-btn {
+    text-align: right;
+}
+
+    .form-btn button {
+        padding: 10px 40px;
+        background: #0d2847;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+        .form-btn button:hover {
+            background: #0d2847;
+        }
+
+/* TEXTAREA */
+.form-group {
+    margin-top: 20px;
+}
+
+/* ================================
+   SOCIAL MEDIA
+================================ */
+.contact-social {
+    text-align: center;
+    margin-top: 50px;
+}
+
+    .contact-social p {
+        font-weight: 600;
+        color: #0d2847;
+        margin-bottom: 10px;
+    }
+
+    .contact-social a {
+        font-size: 28px;
+        margin: 0 10px;
+        color: inherit;
+        text-decoration: none;
+    }
+
+/* ================================
+   RESPONSIVE
+================================ */
+
+/* Tablet */
+@media (max-width: 991px) {
+    .contact-wrapper {
+        max-width: 100%;
+    }
+
+    .contact-map iframe {
+        height: 300px;
+    }
+}
+
+/* Mobile */
+@media (max-width: 767px) {
+    .contact-map iframe {
+        height: 250px;
+    }
+
+    .form-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .form-btn {
+        text-align: left;
+        margin-top: 10px;
+    }
+
+    .contact-info h4 {
+        font-size: 18px;
+    }
+
+    .contact-info p {
+        font-size: 14px;
+    }
 }

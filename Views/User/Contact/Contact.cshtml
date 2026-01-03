@@ -1,192 +1,86 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ACLEDA University Library</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Contact";
+}
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+<!-- CONTACT PAGE WRAPPER (960px) -->
+<div class="contact-wrapper">
 
-        
-
-        h1 {
-            color: #2c3e50;
-            padding: 30px 20px;
-            text-align: center;
-            font-size: clamp(1.8em, 5vw, 2.5em);
-            border-bottom: 3px solid #2c3e50;
-        }
-
-        /* About Section */
-        .about-section {
-            padding: 40px 5px;
-        }
-
-            .about-section h2 {
-                color: #2c3e50;
-                font-size: clamp(1.5em, 4vw, 2em);
-                margin-bottom: 20px;
-            }
-
-            .about-section p {
-                color: #555;
-                line-height: 1.8;
-                margin-bottom: 15px;
-                font-size: clamp(0.9em, 2.5vw, 1.1em);
-            }
-
-        /* Service Hours Section */
-        .service-hours {
-            padding: 40px 20px;
-        }
-
-            .service-hours h2 {
-                color: #2c3e50;
-                font-size: clamp(1.5em, 4vw, 2em);
-                margin-bottom: 20px;
-            }
-
-            .service-hours ul {
-                list-style: none;
-                color: #555;
-            }
-
-                .service-hours ul li {
-                    padding: 10px 0;
-                    border-bottom: 1px solid #ddd;
-                    font-size: clamp(0.9em, 2.5vw, 1.1em);
-                }
-
-                    .service-hours ul li i {
-                        color: #2c3e50;
-                        margin-right: 10px;
-                    }
-
-        /* Visit Us Section */
-        .visit-section {
-            padding: 40px 20px;
-        }
-
-        .visit-content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            align-items: center;
-        }
-
-            .visit-content img {
-                width: 100%;
-                height: 400px;
-                object-fit: cover;
-                border-radius: 8px;
-            }
-
-        .visit-text h2 {
-            color: #2c3e50;
-            font-size: clamp(1.5em, 4vw, 2em);
-            margin-bottom: 15px;
-        }
-
-        .visit-text p {
-            color: #555;
-            line-height: 1.8;
-            font-size: clamp(0.9em, 2.5vw, 1.1em);
-        }
-
-        /* Responsive Design */
-        @@media (max-width: 968px) {
-            .visit-content {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        @@media (max-width: 768px) {
-           
-
-            h1 {
-                padding: 5px 10px;
-            }
-
-            .about-section,
-            .service-hours,
-            .visit-section {
-                padding: 5px 10px;
-            }
-
-           
-        }
-
-        @@media (max-width: 480px) {
-            .visit-content {
-                gap: 20px;
-            }
-
-              
-
-            .about-section,
-            .service-hours,
-            .visit-section {
-                padding: 5px 10px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <!-- About Section -->
-        <div class="about-section">
-            <h2>About US</h2>
-            <p>ACLEDA University of Business has built a 28m x 29m library, 784 square meters in size, which can accommodate as many as 350 users at a time with high-quality standards, neat, clean, and quiet environment, fresh air, through light, wood-color tables, and seats; wide passage which is favorable for the disabled and pregnant women moving inside the library and also equipped with air-conditioners, ceiling fans, more than 2,000 titles, and more than 2,000 titles, 48% of books in Khmer and 62% in English languages which provide relevant information, focusing staffs and a benefit of Internet service and also IT equipment for service.</p>
-        </div>
-
-        <!-- Service Hours -->
-        <div class="service-hours">
-            <h2>Service Hours</h2>
-            <ul>
-                <li><i class="fas fa-clock"></i>The library is daily open with the following hours:</li>
-                <li><i class="fas fa-calendar-week"></i>For Monday to Friday from 07:30 to 17:00</li>
-                <li><i class="fas fa-calendar-day"></i>For Saturday to Sunday Morning from 07:30 to 16:30. Except for national and international holidays.</li>
-            </ul>
-        </div>
-
-        <!-- Visit Us Section -->
-        <div class="visit-section">
-            <div class="visit-content">
-                <div class="visit-text">
-                    <h2>Visit Us</h2>
-                    <p>At Stanford affiliates with a current and valid campus ID are invited to access the center whenever an area of Wallenberg Hall is available for roam use.</p>
-                </div>
-                <img src="/images/User/Contact/contact-3.png" alt="Library Visit">
-            </div>
-        </div>
-
-        <div class="visit-section">
-            <div class="visit-content">
-                <img src="/images/User/Contact/contact-2.png" alt="Library Leadership">
-                <div class="visit-text">
-                    <h2>LeaderShip</h2>
-                    <p>Our mission is to encourage, stimulate, connect, and share. At Stanford Libraries, you will meet approachable, engaged, solution-oriented staff who are easy to talk.</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="visit-section">
-            <div class="visit-content">
-                <div class="visit-text">
-                    <h2>Support the Library</h2>
-                    <p>Libraries value investing in research, preserving cultural heritage, advancing discovery using data, creating spaces that arouse curiosity, and believe in making information.</p>
-                </div>
-                <img src="/images/User/Contact/contact-1.png" alt="Library Support">
-            </div>
-        </div>
+    <!-- MAP -->
+    <div class="contact-map">
+        <iframe src="https://www.google.com/maps?q=ACLEDA%20University%20of%20Business&output=embed"
+                loading="lazy">
+        </iframe>
     </div>
-</body>
-</html>
+
+    <!-- CONTACT INFO -->
+    <div class="contact-info">
+
+        <h4>Ms. Tang Siveng – Head of AUB Career Center</h4>
+        <p><i class="bi bi-telephone"></i> 0886006130</p>
+        <p><i class="bi bi-envelope"></i> Acleda@AUB.edu.kh</p>
+
+        <hr />
+
+        <h4>Mr. Ron Namchheav – Manager of Customer Relations & Cooperation Unit</h4>
+        <p><i class="bi bi-telephone"></i> 0886006130</p>
+        <p><i class="bi bi-envelope"></i> Acleda@AUB.edu.kh</p>
+
+        <hr />
+
+        <h4>ACLEDA University of Business</h4>
+        <p>
+            <i class="bi bi-geo-alt"></i>
+            1397, Phnom Penh–Hanoi Friendship Blvd, Sangkat Khmuoch,
+            Khan Saensokh, Phnom Penh
+        </p>
+        <p><i class="bi bi-envelope"></i> ACLEDA University</p>
+        <p><i class="bi bi-telephone"></i> 0886006130</p>
+
+    </div>
+
+    <!-- FEEDBACK FORM -->
+    <div class="contact-form">
+
+        <h4>Feedback Form</h4>
+
+        <form asp-controller="Contact" asp-action="SendFeedback" method="post">
+
+            <div class="form-row">
+                <div class="form-col">
+                    <label>Email :</label>
+                    <input type="email" name="Email" required />
+                </div>
+
+                <div class="form-col form-btn">
+                    <button type="submit">Submit</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Enquiry :</label>
+                <textarea name="Message" rows="6" required></textarea>
+            </div>
+
+        </form>
+    </div>
+
+    <!-- SOCIAL MEDIA -->
+    <div class="contact-social">
+        <p>CONNECT WITH US ON</p>
+
+        <a href="https://www.facebook.com/ACLEDAUniversity" target="_blank">
+            <i class="bi bi-facebook"></i>
+        </a>
+        <a href="https://t.me/ACLEDAUniversity" target="_blank">
+            <i class="bi bi-telegram"></i>
+        </a>
+        <a href="https://www.instagram.com/acledauniversity" target="_blank">
+            <i class="bi bi-instagram"></i>
+        </a>
+        <a href= href="https://www.instagram.com/acledauniversity" target="_blank">
+            <i class="bi bi-tiktok"></i>
+        </a>
+    </div>
+
+</div>
