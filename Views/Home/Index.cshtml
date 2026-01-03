@@ -2,9 +2,74 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
+@* <div class="text-center">
     <div style="height: 2000px;">
         <h1>Scroll Down to Test</h1>
         <p>Keep scrolling...</p>
     </div>
+</div> *@
+
+<!-- Slide Show -->
+<div class="container px-0 mt-0">
+    <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel">
+
+        <div class="carousel-indicators custom-indicators">
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active"
+                    aria-current="true"></button>
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1"></button>
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2"></button>
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="3"></button>
+        </div>
+
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img src="/images/User/Slideshow/img_library1.jpg" class="d-block w-100 main-slider-img" alt="slide 1">
+            </div>
+            <div class="carousel-item">
+                <img src="/images/User/Slideshow/img_library2.jpg" class="d-block w-100 main-slider-img" alt="Slide 2">
+            </div>
+        </div>
+
+        <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        </button>
+    </div>
 </div>
+<!-- slide show end -->
+<!-- categories -->
+<section class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold text-navy">Book Categories</h3>
+        <button class="btn btn-outline-secondary btn-sm">Explore more</button>
+    </div>
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card book-card shadow-sm">
+                <img src="images/aub-slide1.jpg" class="card-img-top" alt="Accounting" height="">
+                <div class="card-body py-2">
+                    <h6 class="mb-0">ACCOUNTING</h6>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card book-card shadow-sm">
+                <img src="images/aub-slide1.jpg" class="card-img-top" alt="Accounting" height="">
+                <div class="card-body py-2">
+                    <h6 class="mb-0">ACCOUNTING</h6>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card book-card shadow-sm">
+                <img src="images/aub-slide1.jpg" class="card-img-top" alt="Accounting" height="">
+                <div class="card-body py-2">
+                    <h6 class="mb-0">ACCOUNTING</h6>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- categories end -->
