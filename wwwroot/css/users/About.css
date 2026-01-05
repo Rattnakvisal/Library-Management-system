@@ -1,0 +1,61 @@
+﻿body {
+    font-family: 'Arial', sans-serif;
+    background-color: E9EEF4;
+    color: #132A46;
+}
+
+.text-primary {
+    color: #132A46 !important; /* Bootstrap primary blue */
+    font-weight: bold;
+}
+
+
+
+nav .nav-link:hover {
+    color: #ffc107 !important; /* Yellow hover */
+}
+
+.search-bar input {
+    background-color: #fff;
+    border: 1px solid #ced4da;
+}
+/* Change color of Leadership title ONLY */
+.leadership h2 {
+    color: #94721A !important;
+}
+
+.visit-us h2 {
+    color: #94721A !important; /* light blue */
+}
+
+.support h2 {
+    color: #94721A !important;
+}
+
+
+
+.icons .badge {
+    top: -10px;
+    right: -10px;
+}
+
+.visit-us,
+.leadership,
+.support {
+    margin-bottom: 5px !important;
+    gap: 5px;
+}
+
+
+
+
+.hero {
+    background-color: #e9ecef;
+    border-radius: 3px;
+}
+
+.description, .service-hours, .visit-us, .leadership, .support {
+    background-color: #fff;
+    border-radius: 3px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
