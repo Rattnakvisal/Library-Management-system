@@ -1,2 +1,36 @@
-﻿body {
+﻿.container-event {
+    padding: 6px 7px 2px 6px; 
 }
+
+.container-event h1 {
+    font-size: 28px;
+    font-weight: 700;
+    margin: 20px auto;
+    padding-left: 5px;
+    color: #111;
+}
+
+    .container-event .event-card {
+        background: #0d2847;
+        border-radius: 6px;
+        overflow: hidden;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        display: flex;
+        gap: 15px;
+    }
+
+        .container-event .event-card img {
+            width: 220px;
+            object-fit: cover;
+        }
+
+    .container-event .event-info {
+        margin: 20px;
+    }
+
+        .container-event .event-info > p,
+        .event-info h3,
+        .event-info span {
+            color: white;
+        }

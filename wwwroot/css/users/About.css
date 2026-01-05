@@ -1,38 +1,28 @@
-﻿body {
-    font-family: 'Arial', sans-serif;
-    background-color: E9EEF4;
-    color: #132A46;
+﻿.container-about{
+    padding: 6px 7px 2px 6px;
 }
 
-.text-primary {
-    color: #132A46 !important; /* Bootstrap primary blue */
-    font-weight: bold;
+.container-about h2, h5 {
+    font-size: 24px !important;
+    margin-top: 10px !important;
+    margin-bottom: 10px !important;
 }
 
-
-
-nav .nav-link:hover {
-    color: #ffc107 !important; /* Yellow hover */
+.container-about h5 {
+    color: #C69B32;
 }
 
-.search-bar input {
-    background-color: #fff;
-    border: 1px solid #ced4da;
-}
-/* Change color of Leadership title ONLY */
 .leadership h2 {
     color: #94721A !important;
 }
 
 .visit-us h2 {
-    color: #94721A !important; /* light blue */
+    color: #94721A !important;
 }
 
 .support h2 {
     color: #94721A !important;
 }
-
-
 
 .icons .badge {
     top: -10px;
@@ -45,9 +35,6 @@ nav .nav-link:hover {
     margin-bottom: 5px !important;
     gap: 5px;
 }
-
-
-
 
 .hero {
     background-color: #e9ecef;

@@ -14,8 +14,9 @@ body {
 }
 
 .container {
-    width: 100%;
-    max-width: 960px;
+    width: 100% !important;
+    max-width: 960px !important;
+    margin: 0 auto !important;
 }
 
 .nav-link {
@@ -24,8 +25,8 @@ body {
 
 /* Square edges for the images */
 .main-slider-img {
-    width : 960px;
-    height: 400px;
+    width : 960px !important;
+    height: 400px !important;
     border-radius: 0 !important;
     /* Forces no radius */
 }
