@@ -63,62 +63,303 @@
         <input type="text" placeholder="Search books..." class="search-input">
 
     </form>
-    <button type="button" class="add-books-btn">
+    <button type="button" class="add-books-btn" data-toggle="modal" data-target="#addBookModal">
         <i class="bi bi-plus-circle-fill"></i>
         <span>Add Books</span>
     </button>
 </div>
+
+@* Modal Add books *@
+<div class="modal fade" id="addBookModal" tabindex="-1" aria-labelledby="addBookModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header d-flex justify-content-between">
+                <h5 class="modal-title" id="exampleModalLabel">Add Books</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="bookForm">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="required" for="bookCodeSelect">Book Code <span class="text-danger">*</span></label>
+                                <div class="custom-select-wrapper">
+                                    <select class="form-control" id="bookCodeSelect" required>
+                                        <option value="">eg. 1010</option>
+                                        <option value="1010">1010</option>
+                                        <option value="1011">1011</option>
+                                        <option value="1012">1012</option>
+                                        <option value="1013">1013</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="required" for="bookTitleInput">Book Title <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="bookTitleInput" placeholder="eg.Me" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="required" for="quantityInput">Quantity <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="quantityInput" placeholder="eg. 10" required>
+                            </div>
+                        </div> 
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="required" for="isbnInput">ISBN</label>
+                                <input type="text" class="form-control" id="isbnInput" placeholder="eg. 978-3-16-148410-0">
+                            </div>
+                        </div> 
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="required" for="authorInput">Author <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="authorInput" placeholder="eg. John Doe" required>
+                            </div>
+                        </div> 
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="required" for="pagesInput">Page <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="pagesInput" placeholder="eg. 250" required>
+                            </div>
+                        </div> 
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="required" for="yearInput">Year <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="yearInput" placeholder="eg. 2024" required>
+                            </div>
+                        </div> 
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="required" for="statusSelect">Status <span class="text-danger">*</span></label>
+                                <div class="custom-select-wrapper">
+                                    <select class="form-control" id="statusSelect" required>
+                                        <option value="">Select Status</option>
+                                        <option value="available">Available</option>
+                                        <option value="unavailable">Unavailable</option>
+                                        <option value="borrowed">Borrowed</option>
+                                        <option value="reserved">Reserved</option>
+                                        <option value="maintenance">Maintenance</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="bookImageInput">
+                                    Book Image:
+                                </label>
+                                <input type="file" class="form-control-file" name="" id="bookImageInput" accept="image/*">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="descriptionTextarea">Description</label>
+                                <textarea class="form-control" id="descriptionTextarea" rows="3"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-success" id="addBookBtn">Add Book</button>
+            </div>
+        </div>
+    </div>
+</div>
+@* Modal edit books *@
+<div class="modal fade" id="editBookModal" tabindex="-1" aria-labelledby="editBookModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header d-flex justify-content-between">
+                <h5 class="modal-title" id="editBookModalLabel">Edit Books</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="editBookForm">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="required" for="edit-bookCodeSelect">Book Code <span class="text-danger">*</span></label>
+                                <div class="custom-select-wrapper">
+                                    <select class="form-control" id="edit-bookCodeSelect" required>
+                                        <option value="">eg. 1010</option>
+                                        <option value="1010">1010</option>
+                                        <option value="1011">1011</option>
+                                        <option value="1012">1012</option>
+                                        <option value="1013">1013</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="required" for="edit-bookTitleInput">Book Title <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="edit-bookTitleInput" placeholder="eg.Me" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="required" for="edit-quantityInput">Quantity <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="edit-quantityInput" placeholder="eg. 10" required>
+                            </div>
+                        </div> 
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="required" for="edit-isbnInput">ISBN</label>
+                                <input type="text" class="form-control" id="edit-isbnInput" placeholder="eg. 978-3-16-148410-0">
+                            </div>
+                        </div> 
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="required" for="edit-authorInput">Author <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="edit-authorInput" placeholder="eg. John Doe" required>
+                            </div>
+                        </div> 
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="required" for="edit-pagesInput">Page <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="edit-pagesInput" placeholder="eg. 250" required>
+                            </div>
+                        </div> 
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="required" for="edit-yearInput">Year <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="edit-yearInput" placeholder="eg. 2024" required>
+                            </div>
+                        </div> 
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="required" for="edit-statusSelect">Status <span class="text-danger">*</span></label>
+                                <div class="custom-select-wrapper">
+                                    <select class="form-control" id="edit-statusSelect" required>
+                                        <option value="">Select Status</option>
+                                        <option value="available">Available</option>
+                                        <option value="unavailable">Unavailable</option>
+                                        <option value="borrowed">Borrowed</option>
+                                        <option value="reserved">Reserved</option>
+                                        <option value="maintenance">Maintenance</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="edit-bookImageInput">
+                                    Book Image:
+                                </label>
+                                <input type="file" class="form-control-file" name="" id="edit-bookImageInput" accept="image/*">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="edit-descriptionTextarea">Description</label>
+                                <textarea class="form-control" id="edit-descriptionTextarea" rows="3"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-success" id="updateBookBtn">Update Book</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@* Table *@
 <table class="table mt-3 book-table">
     <thead class="thead-dark">
-    <tr >
+    <tr>
         <th scope="col">#</th>
+        <th scope="col">Book Code</th>
         <th scope="col">Book Cover</th>
         <th scope="col">Book Title</th>
         <th scope="col">Author</th>
-        <th scope="col">Category</th>
+        <th scope="col">ISBN</th>
+        <th scope="col">Pages</th>
+        <th scope="col">Year</th>
         <th scope="col">Quantity</th>
         <th scope="col">Status</th>
         <th scope="col">Action</th>
     </tr>
     </thead>
     <tbody>
-    <tr>
+    <tr data-description="A fascinating autobiography about personal growth and self-discovery">
         <th scope="row">1</th>
-        <td>Mark</td>
-        <td>Otto</td>
-        <td>mdo</td>
-        <td>Fiction</td>
+        <td>1010</td>
+        <td>
+            <img src="~/images/User/Book/book2.png" alt="">
+        </td>
+        <td>Me: A Journey</td>
+        <td>John Doe</td>
+        <td>978-3-16-148410-0</td>
+        <td>250</td>
+        <td>2024</td>
         <td>10</td>
-        <td >
+        <td>
             <span class="table-status">Unavailable</span>
         </td>
         <td>
             <div class="action-container">
-                <button>
+                <button class="edit-book-btn" data-toggle="modal" data-target="#editBookModal">
                     <i class="bi bi-pencil-square"></i>
                 </button>
-                <button>
+                <button class="delete-book-btn">
                     <i class="bi bi-trash text-danger"></i>
                 </button>
             </div>
         </td>
     </tr>
-    <tr>
-        <th scope="row">1</th>
-        <td>Mark</td>
-        <td>Otto</td>
-        <td>mdo</td>
-        <td>Fiction</td>
-        <td>10</td>
-        <td >
+    <tr data-description="An exciting fiction novel filled with adventure">
+        <th scope="row">2</th>
+        <td>1011</td>
+        <td>
+            <img src="~/images/User/Book/book2.png" alt="">
+        </td>
+        <td>The Great Adventure</td>
+        <td>Jane Smith</td>
+        <td>978-1-23-456789-0</td>
+        <td>320</td>
+        <td>2023</td>
+        <td>15</td>
+        <td>
             <span class="table-status">Available</span>
         </td>
         <td>
             <div class="action-container">
-                <button>
+                <button class="edit-book-btn" data-toggle="modal" data-target="#editBookModal">
                     <i class="bi bi-pencil-square"></i>
                 </button>
-                <button>
+                <button class="delete-book-btn">
                     <i class="bi bi-trash text-danger"></i>
                 </button>
             </div>
@@ -126,6 +367,10 @@
     </tr>
     </tbody>
 </table>
+
+
+
+@* Paginations *@
 <nav aria-label="...">
     <ul class="pagination">
         <li class="page-item">
