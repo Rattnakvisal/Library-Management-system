@@ -1,5 +1,188 @@
 ﻿@{
-    ViewBag.Title = "Manage User";
+    ViewBag.Title = "Manage Users";
 }
 
-<h2>Manage User</h2>
+@section Styles {
+    <link rel="stylesheet" href="~/css/admin/ManageUsers.css" />
+}
+
+    <header class="page-header">
+        <h1>User Management</h1>
+    </header>
+
+    <section class="card-container">
+        <article class="stat-card">
+            <div class="icon-box"><i class="bi bi-people-fill"></i></div>
+            <div class="card-content"><span class="card-label">Total Students</span><span class="card-value">69</span></div>
+        </article>
+        <article class="stat-card">
+            <div class="icon-box"><i class="bi bi-people-fill"></i></div>
+            <div class="card-content"><span class="card-label">Total Staff</span><span class="card-value">69</span></div>
+        </article>
+        <article class="stat-card">
+            <div class="icon-box"><i class="bi bi-people-fill"></i></div>
+            <div class="card-content"><span class="card-label">Total Users</span><span class="card-value">138</span></div>
+        </article>
+    </section>
+
+    <section class="controls-section">
+        <nav class="tabs">
+            <button class="tab active" id="studentTab">Students</button>
+            <button class="tab" id="staffTab">Staffs</button>
+        </nav>
+        <div class="action-controls">
+            <button type="button" id="addStudentBtn" class="add-btn" data-bs-toggle="modal" data-bs-target="#addStudentModal">Add Student</button>
+            <button type="button" id="addStaffBtn" class="add-btn hidden" data-bs-toggle="modal" data-bs-target="#addStaffModal">Add Staff</button>
+            <form class="search-form" onsubmit="return false;">
+                <i class="bi bi-search search-icon" id="searchIcon"></i>
+                <input type="search" placeholder="Search users..." class="search-input" id="searchInput">
+            </form>
+            <button type="button" class="filter-btn" aria-label="Filter users">
+                <i class="bi bi-filter" aria-hidden="true"></i>
+                <span>Filter</span>
+            </button>
+        </div>
+    </section>
+
+    <section id="student-table-section" class="table-container">
+        <div class="table-responsive">
+            <table class="table user-table">
+                <thead>
+                    <tr><th>#</th><th>ID</th><th>Full Name</th><th>Email</th><th>Phone</th><th>Gender</th><th>Role</th><th>Action</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>STU001</td>
+                        <td>Ly Student</td>
+                        <td>ly@student.com</td>
+                        <td>0670000</td>
+                        <td>Male</td>
+                        <td>Student</td>
+                        <td>
+                            <div class="action-container">
+                                <button class="edit-user-btn" data-bs-toggle="modal" data-bs-target="#editStudentModal"><i class="bi bi-pencil-square"></i></button>
+                                <button class="delete-user-btn" onclick="handleDelete('Ly Student')"><i class="bi bi-trash"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section id="staff-table-section" class="table-container hidden">
+        <div class="table-responsive">
+            <table class="table user-table">
+                <thead>
+                    <tr><th>#</th><th>ID</th><th>Full Name</th><th>Email</th><th>Phone</th><th>Gender</th><th>Role</th><th>Action</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>STF001</td>
+                        <td>Ly Staff</td>
+                        <td>ly@staff.com</td>
+                        <td>0670001</td>
+                        <td>Male</td>
+                        <td>Admin</td>
+                        <td>
+                            <div class="action-container">
+                                <button class="edit-user-btn" data-bs-toggle="modal" data-bs-target="#editStaffModal"><i class="bi bi-pencil-square"></i></button>
+                                <button class="delete-user-btn" onclick="handleDelete('Ly Staff')"><i class="bi bi-trash"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+<div class="modal fade" id="addStudentModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header"><h5 class="modal-title">Add Student</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body">
+                <form id="formAddStudent">
+                    <div class="row">
+                        <div class="col-md-6 mb-3"><label class="form-label">ID <span class="text-danger">*</span></label><input type="text" class="form-control" name="id" placeholder="e.g. STU001"></div>
+                        <div class="col-md-6 mb-3"><label class="form-label">Full Name <span class="text-danger">*</span></label><input type="text" class="form-control" name="name" placeholder="John Doe"></div>
+                        <div class="col-md-6 mb-3"><label class="form-label">Email <span class="text-danger">*</span></label><input type="email" class="form-control" name="email"></div>
+                        <div class="col-md-6 mb-3"><label class="form-label">Phone <span class="text-danger">*</span></label><input type="tel" class="form-control" name="phone"></div>
+                        <div class="col-md-6 mb-3"><label class="form-label">Gender <span class="text-danger">*</span></label><div class="custom-select-wrapper"><select class="form-select" name="gender"><option value="">Select Gender</option><option value="M">Male</option><option value="F">Female</option></select></div></div>
+                        <div class="col-md-6 mb-3"><label class="form-label">Role <span class="text-danger">*</span></label><div class="custom-select-wrapper"><select class="form-select" name="role"><option value="Student">Student</option></select></div></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button><button type="button" class="btn btn-success" onclick="handleSave('formAddStudent', 'addStudentModal')">Add Student</button></div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editStudentModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header"><h5 class="modal-title">Edit Student</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body">
+                <form id="formEditStudent">
+                    <div class="row">
+                        <div class="col-md-6 mb-3"><label class="form-label">ID <span class="text-danger">*</span></label><input type="text" class="form-control" name="id" value="STU001" readonly></div>
+                        <div class="col-md-6 mb-3"><label class="form-label">Full Name <span class="text-danger">*</span></label><input type="text" class="form-control" name="name" value="Ly Student"></div>
+                        <div class="col-md-6 mb-3"><label class="form-label">Email <span class="text-danger">*</span></label><input type="email" class="form-control" name="email" value="ly@student.com"></div>
+                        <div class="col-md-6 mb-3"><label class="form-label">Phone <span class="text-danger">*</span></label><input type="tel" class="form-control" name="phone" value="0670000"></div>
+                        <div class="col-md-6 mb-3"><label class="form-label">Gender <span class="text-danger">*</span></label><div class="custom-select-wrapper"><select class="form-select" name="gender"><option value="M" selected>Male</option><option value="F">Female</option></select></div></div>
+                        <div class="col-md-6 mb-3"><label class="form-label">Role <span class="text-danger">*</span></label><div class="custom-select-wrapper"><select class="form-select" name="role"><option value="Student">Student</option></select></div></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button><button type="button" class="btn btn-success" onclick="handleSave('formEditStudent', 'editStudentModal', true)">Update Student</button></div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addStaffModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header"><h5 class="modal-title">Add Staff</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body">
+                <form id="formAddStaff">
+                    <div class="row">
+                        <div class="col-md-6 mb-3"><label class="form-label">ID <span class="text-danger">*</span></label><input type="text" class="form-control" name="id" placeholder="e.g. STF001"></div>
+                        <div class="col-md-6 mb-3"><label class="form-label">Full Name <span class="text-danger">*</span></label><input type="text" class="form-control" name="name" placeholder="Staff Name"></div>
+                        <div class="col-md-6 mb-3"><label class="form-label">Email <span class="text-danger">*</span></label><input type="email" class="form-control" name="email"></div>
+                        <div class="col-md-6 mb-3"><label class="form-label">Phone <span class="text-danger">*</span></label><input type="tel" class="form-control" name="phone"></div>
+                        <div class="col-md-6 mb-3"><label class="form-label">Gender <span class="text-danger">*</span></label><div class="custom-select-wrapper"><select class="form-select" name="gender"><option value="">Select Gender</option><option value="M">Male</option><option value="F">Female</option></select></div></div>
+                        <div class="col-md-6 mb-3"><label class="form-label">Role <span class="text-danger">*</span></label><div class="custom-select-wrapper"><select class="form-select" name="role"><option value="">Select Role</option><option value="Admin">Admin</option><option value="Librarian">Librarian</option></select></div></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button><button type="button" class="btn btn-success" onclick="handleSave('formAddStaff', 'addStaffModal')">Add Staff</button></div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editStaffModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header"><h5 class="modal-title">Edit Staff</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body">
+                <form id="formEditStaff">
+                    <div class="row">
+                        <div class="col-md-6 mb-3"><label class="form-label">ID <span class="text-danger">*</span></label><input type="text" class="form-control" name="id" value="STF001" readonly></div>
+                        <div class="col-md-6 mb-3"><label class="form-label">Full Name <span class="text-danger">*</span></label><input type="text" class="form-control" name="name" value="Ly Staff"></div>
+                        <div class="col-md-6 mb-3"><label class="form-label">Email <span class="text-danger">*</span></label><input type="email" class="form-control" name="email" value="ly@staff.com"></div>
+                        <div class="col-md-6 mb-3"><label class="form-label">Phone <span class="text-danger">*</span></label><input type="tel" class="form-control" name="phone" value="0670001"></div>
+                        <div class="col-md-6 mb-3"><label class="form-label">Gender <span class="text-danger">*</span></label><div class="custom-select-wrapper"><select class="form-select" name="gender"><option value="M" selected>Male</option><option value="F">Female</option></select></div></div>
+                        <div class="col-md-6 mb-3"><label class="form-label">Role <span class="text-danger">*</span></label><div class="custom-select-wrapper"><select class="form-select" name="role"><option value="Admin" selected>Admin</option><option value="Librarian">Librarian</option></select></div></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button><button type="button" class="btn btn-success" onclick="handleSave('formEditStaff', 'editStaffModal', true)">Update Staff</button></div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts{
+    <script src="~/js/admin/ManageUsers.js"></script>
+}
