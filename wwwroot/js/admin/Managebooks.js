@@ -151,7 +151,7 @@ function validateBookData(bookData) {
     return true;
 }
 
-// Show success message and close modal
+// Bootstrap 5 compatible - Show success message and close modal
 function showSuccessAndCloseModal(message, modalId, formId) {
     Swal.fire({
         title: 'Success!',
@@ -161,7 +161,12 @@ function showSuccessAndCloseModal(message, modalId, formId) {
         confirmButtonColor: '#28a745'
     }).then(function(result) {
         if (result.isConfirmed) {
-            $(modalId).modal('hide');
+            // Bootstrap 5 way to hide modal
+            const modalElement = document.querySelector(modalId);
+            const modal = bootstrap.Modal.getInstance(modalElement);
+            if (modal) {
+                modal.hide();
+            }
             $(formId)[0].reset();
         }
     });
@@ -220,6 +225,7 @@ function initializeUpdateBookButton() {
         );
     });
 }
+
 // Initialize delete book button
 function initializeDeleteBookButton() {
     $('.book-table').on('click', '.delete-book-btn', function () {
@@ -237,7 +243,6 @@ function initializeDeleteBookButton() {
             cancelButtonText: 'Cancel'
         }).then((result) => {
             if (result.isConfirmed) {
-
                 // Remove row from table
                 row.remove();
 

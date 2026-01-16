@@ -58,12 +58,10 @@
 
 <div class="d-flex justify-content-between mt-3">
     <form action="" class="search-form">
-
         <i class="bi bi-search search-icon"></i>
         <input type="text" placeholder="Search books..." class="search-input">
-
     </form>
-    <button type="button" class="add-books-btn" data-toggle="modal" data-target="#addBookModal">
+    <button type="button" class="add-books-btn" data-bs-toggle="modal" data-bs-target="#addBookModal">
         <i class="bi bi-plus-circle-fill"></i>
         <span>Add Books</span>
     </button>
@@ -73,20 +71,18 @@
 <div class="modal fade" id="addBookModal" tabindex="-1" aria-labelledby="addBookModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
-            <div class="modal-header d-flex justify-content-between">
-                <h5 class="modal-title" id="exampleModalLabel">Add Books</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+            <div class="modal-header">
+                <h5 class="modal-title" id="addBookModalLabel">Add Books</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form id="bookForm">
                     <div class="row">
                         <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="required" for="bookCodeSelect">Book Code <span class="text-danger">*</span></label>
+                            <div class="mb-3">
+                                <label class="form-label" for="bookCodeSelect">Book Code <span class="text-danger">*</span></label>
                                 <div class="custom-select-wrapper">
-                                    <select class="form-control" id="bookCodeSelect" required>
+                                    <select class="form-select" id="bookCodeSelect" required>
                                         <option value="">eg. 1010</option>
                                         <option value="1010">1010</option>
                                         <option value="1011">1011</option>
@@ -97,52 +93,52 @@
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="required" for="bookTitleInput">Book Title <span class="text-danger">*</span></label>
+                            <div class="mb-3">
+                                <label class="form-label" for="bookTitleInput">Book Title <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="bookTitleInput" placeholder="eg.Me" required>
                             </div>
                         </div>
                     </div>
-                    <div class="row mt-2">
+                    <div class="row">
                         <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="required" for="quantityInput">Quantity <span class="text-danger">*</span></label>
+                            <div class="mb-3">
+                                <label class="form-label" for="quantityInput">Quantity <span class="text-danger">*</span></label>
                                 <input type="number" class="form-control" id="quantityInput" placeholder="eg. 10" required>
                             </div>
                         </div> 
                         <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="required" for="isbnInput">ISBN</label>
+                            <div class="mb-3">
+                                <label class="form-label" for="isbnInput">ISBN</label>
                                 <input type="text" class="form-control" id="isbnInput" placeholder="eg. 978-3-16-148410-0">
                             </div>
                         </div> 
                     </div>
-                    <div class="row mt-2">
+                    <div class="row">
                         <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="required" for="authorInput">Author <span class="text-danger">*</span></label>
+                            <div class="mb-3">
+                                <label class="form-label" for="authorInput">Author <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="authorInput" placeholder="eg. John Doe" required>
                             </div>
                         </div> 
                         <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="required" for="pagesInput">Page <span class="text-danger">*</span></label>
+                            <div class="mb-3">
+                                <label class="form-label" for="pagesInput">Page <span class="text-danger">*</span></label>
                                 <input type="number" class="form-control" id="pagesInput" placeholder="eg. 250" required>
                             </div>
                         </div> 
                     </div>
-                    <div class="row mt-2">
+                    <div class="row">
                         <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="required" for="yearInput">Year <span class="text-danger">*</span></label>
+                            <div class="mb-3">
+                                <label class="form-label" for="yearInput">Year <span class="text-danger">*</span></label>
                                 <input type="number" class="form-control" id="yearInput" placeholder="eg. 2024" required>
                             </div>
                         </div> 
                         <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="required" for="statusSelect">Status <span class="text-danger">*</span></label>
+                            <div class="mb-3">
+                                <label class="form-label" for="statusSelect">Status <span class="text-danger">*</span></label>
                                 <div class="custom-select-wrapper">
-                                    <select class="form-control" id="statusSelect" required>
+                                    <select class="form-select" id="statusSelect" required>
                                         <option value="">Select Status</option>
                                         <option value="available">Available</option>
                                         <option value="unavailable">Unavailable</option>
@@ -154,20 +150,18 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row mt-2">
+                    <div class="row">
                         <div class="col-md-12">
-                            <div class="form-group">
-                                <label for="bookImageInput">
-                                    Book Image:
-                                </label>
-                                <input type="file" class="form-control-file" name="" id="bookImageInput" accept="image/*">
+                            <div class="mb-3">
+                                <label class="form-label" for="bookImageInput">Book Image:</label>
+                                <input type="file" class="form-control" id="bookImageInput" accept="image/*">
                             </div>
                         </div>
                     </div>
-                    <div class="row mt-2">
+                    <div class="row">
                         <div class="col-md-12">
-                            <div class="form-group">
-                                <label for="descriptionTextarea">Description</label>
+                            <div class="mb-3">
+                                <label class="form-label" for="descriptionTextarea">Description</label>
                                 <textarea class="form-control" id="descriptionTextarea" rows="3"></textarea>
                             </div>
                         </div>
@@ -175,30 +169,29 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 <button type="button" class="btn btn-success" id="addBookBtn">Add Book</button>
             </div>
         </div>
     </div>
 </div>
+
 @* Modal edit books *@
 <div class="modal fade" id="editBookModal" tabindex="-1" aria-labelledby="editBookModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
-            <div class="modal-header d-flex justify-content-between">
+            <div class="modal-header">
                 <h5 class="modal-title" id="editBookModalLabel">Edit Books</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form id="editBookForm">
                     <div class="row">
                         <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="required" for="edit-bookCodeSelect">Book Code <span class="text-danger">*</span></label>
+                            <div class="mb-3">
+                                <label class="form-label" for="edit-bookCodeSelect">Book Code <span class="text-danger">*</span></label>
                                 <div class="custom-select-wrapper">
-                                    <select class="form-control" id="edit-bookCodeSelect" required>
+                                    <select class="form-select" id="edit-bookCodeSelect" required>
                                         <option value="">eg. 1010</option>
                                         <option value="1010">1010</option>
                                         <option value="1011">1011</option>
@@ -209,52 +202,52 @@
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="required" for="edit-bookTitleInput">Book Title <span class="text-danger">*</span></label>
+                            <div class="mb-3">
+                                <label class="form-label" for="edit-bookTitleInput">Book Title <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="edit-bookTitleInput" placeholder="eg.Me" required>
                             </div>
                         </div>
                     </div>
-                    <div class="row mt-2">
+                    <div class="row">
                         <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="required" for="edit-quantityInput">Quantity <span class="text-danger">*</span></label>
+                            <div class="mb-3">
+                                <label class="form-label" for="edit-quantityInput">Quantity <span class="text-danger">*</span></label>
                                 <input type="number" class="form-control" id="edit-quantityInput" placeholder="eg. 10" required>
                             </div>
                         </div> 
                         <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="required" for="edit-isbnInput">ISBN</label>
+                            <div class="mb-3">
+                                <label class="form-label" for="edit-isbnInput">ISBN</label>
                                 <input type="text" class="form-control" id="edit-isbnInput" placeholder="eg. 978-3-16-148410-0">
                             </div>
                         </div> 
                     </div>
-                    <div class="row mt-2">
+                    <div class="row">
                         <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="required" for="edit-authorInput">Author <span class="text-danger">*</span></label>
+                            <div class="mb-3">
+                                <label class="form-label" for="edit-authorInput">Author <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="edit-authorInput" placeholder="eg. John Doe" required>
                             </div>
                         </div> 
                         <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="required" for="edit-pagesInput">Page <span class="text-danger">*</span></label>
+                            <div class="mb-3">
+                                <label class="form-label" for="edit-pagesInput">Page <span class="text-danger">*</span></label>
                                 <input type="number" class="form-control" id="edit-pagesInput" placeholder="eg. 250" required>
                             </div>
                         </div> 
                     </div>
-                    <div class="row mt-2">
+                    <div class="row">
                         <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="required" for="edit-yearInput">Year <span class="text-danger">*</span></label>
+                            <div class="mb-3">
+                                <label class="form-label" for="edit-yearInput">Year <span class="text-danger">*</span></label>
                                 <input type="number" class="form-control" id="edit-yearInput" placeholder="eg. 2024" required>
                             </div>
                         </div> 
                         <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="required" for="edit-statusSelect">Status <span class="text-danger">*</span></label>
+                            <div class="mb-3">
+                                <label class="form-label" for="edit-statusSelect">Status <span class="text-danger">*</span></label>
                                 <div class="custom-select-wrapper">
-                                    <select class="form-control" id="edit-statusSelect" required>
+                                    <select class="form-select" id="edit-statusSelect" required>
                                         <option value="">Select Status</option>
                                         <option value="available">Available</option>
                                         <option value="unavailable">Unavailable</option>
@@ -266,20 +259,18 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row mt-2">
+                    <div class="row">
                         <div class="col-md-12">
-                            <div class="form-group">
-                                <label for="edit-bookImageInput">
-                                    Book Image:
-                                </label>
-                                <input type="file" class="form-control-file" name="" id="edit-bookImageInput" accept="image/*">
+                            <div class="mb-3">
+                                <label class="form-label" for="edit-bookImageInput">Book Image:</label>
+                                <input type="file" class="form-control" id="edit-bookImageInput" accept="image/*">
                             </div>
                         </div>
                     </div>
-                    <div class="row mt-2">
+                    <div class="row">
                         <div class="col-md-12">
-                            <div class="form-group">
-                                <label for="edit-descriptionTextarea">Description</label>
+                            <div class="mb-3">
+                                <label class="form-label" for="edit-descriptionTextarea">Description</label>
                                 <textarea class="form-control" id="edit-descriptionTextarea" rows="3"></textarea>
                             </div>
                         </div>
@@ -287,17 +278,16 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 <button type="button" class="btn btn-success" id="updateBookBtn">Update Book</button>
             </div>
         </div>
     </div>
 </div>
 
-
 @* Table *@
 <table class="table mt-3 book-table">
-    <thead class="thead-dark">
+    <thead class="table-dark">
     <tr>
         <th scope="col">#</th>
         <th scope="col">Book Code</th>
@@ -330,7 +320,7 @@
         </td>
         <td>
             <div class="action-container">
-                <button class="edit-book-btn" data-toggle="modal" data-target="#editBookModal">
+                <button class="edit-book-btn" data-bs-toggle="modal" data-bs-target="#editBookModal">
                     <i class="bi bi-pencil-square"></i>
                 </button>
                 <button class="delete-book-btn">
@@ -356,7 +346,7 @@
         </td>
         <td>
             <div class="action-container">
-                <button class="edit-book-btn" data-toggle="modal" data-target="#editBookModal">
+                <button class="edit-book-btn" data-bs-toggle="modal" data-bs-target="#editBookModal">
                     <i class="bi bi-pencil-square"></i>
                 </button>
                 <button class="delete-book-btn">
@@ -368,12 +358,10 @@
     </tbody>
 </table>
 
-
-
 @* Paginations *@
-<nav aria-label="...">
+<nav aria-label="Book pagination">
     <ul class="pagination">
-        <li class="page-item">
+        <li class="page-item disabled">
             <a class="page-link">Previous</a>
         </li>
         <li class="page-item"><a class="page-link" href="#">1</a></li>
@@ -386,16 +374,6 @@
         </li>
     </ul>
 </nav>
-
-
-
-
-
-
-
-
-
-
 
 @section Scripts{
     <script src="~/js/admin/Managebooks.js"></script>
