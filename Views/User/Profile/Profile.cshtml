@@ -3,5 +3,250 @@
     ViewBag.Title = "Profile";
 }
 
-<h1>Profile</h1>
-<p>User profile placeholder content.</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Page</title>
+    <style>
+        /* --- Facebook Variables --- */
+        :root {
+            --fb-bg: #f0f2f5;
+            --fb-white: #ffffff;
+            --fb-blue: #1877f2;
+            --fb-blue-hover: #166fe5;
+            --fb-gray-btn: #e4e6eb;
+            --fb-gray-btn-hover: #d8dadf;
+            --fb-text-primary: #050505;
+            --fb-text-secondary: #65676b;
+            --fb-border-radius: 8px;
+            --fb-font: 'Segoe UI', Helvetica, Arial, sans-serif;
+        }
+
+        /* --- Reset & Base --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--fb-font);
+            background-color: var(--fb-bg);
+            color: var(--fb-text-primary);
+            overflow-x: hidden;
+            background-color: white;
+        }
+
+        /* --- Main Container --- */
+        .fb-container {
+            width: 100%;
+           
+            padding-bottom: 16px; /* Added padding since nav is gone */
+        }
+
+        .fb-profile-width {
+            max-width: 1095px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        /* --- Cover Photo --- */
+        .cover-container {
+            width: 100%;
+            height: 350px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cover-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+
+        /* --- Profile Header Section --- */
+        .profile-header-section {
+            padding: 0 32px;
+            position: relative;
+            display: flex;
+            flex-direction: row;
+            align-items: flex-end;
+        }
+
+        /* --- Profile Picture --- */
+        .profile-pic-container {
+            position: relative;
+            margin-top: -90px; /* Overlap cover */
+            margin-right: 20px;
+            flex-shrink: 0;
+        }
+
+        .profile-picture {
+            width: 168px;
+            height: 168px;
+            border-radius: 50%;
+            border: 5px solid var(--fb-white);
+            object-fit: cover;
+    
+        }
+
+        /* --- Text Info --- */
+        .profile-info {
+            flex: 1;
+            margin-bottom: 16px;
+            margin-top: 10px;
+        }
+
+        .profile-name {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--fb-text-primary);
+            line-height: 1.2;
+            margin-bottom: 4px;
+        }
+
+        .profile-stats {
+            font-size: 15px;
+            color: var(--fb-text-secondary);
+            font-weight: 600;
+        }
+
+        .profile-email {
+            font-weight: 400;
+            margin-bottom: 2px;
+            display: block;
+        }
+
+        /* --- Action Buttons --- */
+        .profile-actions {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 28px;
+        }
+
+        .btn {
+            padding: 0 12px;
+            height: 36px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 15px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+            font-family: inherit;
+        }
+
+        /* Blue Button */
+        .btn-primary {
+            background-color: var(--fb-blue);
+            color: #fff;
+        }
+
+            .btn-primary:hover {
+                background-color: var(--fb-blue-hover);
+            }
+
+        /* Gray Button */
+        .btn-secondary {
+            background-color: var(--fb-gray-btn);
+            color: var(--fb-text-primary);
+        }
+
+            .btn-secondary:hover {
+                background-color: var(--fb-gray-btn-hover);
+            }
+
+        /* --- Responsive Styles (Mobile View) --- */
+        @@media (max-width: 900px) {
+            .profile-header-section {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                padding-bottom: 20px;
+            }
+
+            .profile-pic-container {
+                margin-right: 0;
+                margin-top: -80px;
+            }
+
+            .profile-picture {
+                width: 160px;
+                height: 160px;
+            }
+
+            .profile-info {
+                width: 100%;
+                margin-bottom: 20px;
+            }
+
+            .profile-name {
+                font-size: 28px;
+            }
+
+            .profile-actions {
+                width: 100%;
+                flex-direction: row;
+                justify-content: center;
+                margin-bottom: 10px;
+            }
+
+            .btn {
+                height: 44px;
+                padding: 0 20px;
+                flex: 1;
+                max-width: 200px;
+            }
+
+            .cover-container {
+                height: 200px;
+                border-radius: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="fb-container">
+        <div class="fb-profile-width">
+
+            <div class="cover-container">
+                <img src="https://images.unsplash.com/photo-1485470733090-0aae1788d5af?fm=jpg&q=60&w=3000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8d2FsbHBhcGVyJTIwNGt8ZW58MHx8MHx8fDA%3D"
+                     alt="Cover Photo" class="cover-image">
+            </div>
+
+            <div class="profile-header-section">
+                <div class="profile-pic-container">
+                    <img src="https://i.redd.it/cool-pfp-type-fanart-i-made-v0-000ob270kp7e1.png?width=1100&format=png&auto=webp&s=5e3d2fb3bbafdf48c95f6516071db050b24c6aec"
+                         alt="Profile Picture" class="profile-picture">
+                </div>
+
+                <div class="profile-info">
+                    <h1 class="profile-name">Choun Theachumnith</h1>
+                    <div class="profile-stats">
+                        <span class="profile-email">ChounTheachumnith1890@Acleda.AIB@gmail.com</span>
+                        <span>Batch: 9</span>
+                    </div>
+                </div>
+
+                <div class="profile-actions">
+                    <button class="btn btn-primary">
+                        <span>Reset Password</span>
+                    </button>
+                    <button class="btn btn-secondary">
+                        <span>Logout</span>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+</html>
