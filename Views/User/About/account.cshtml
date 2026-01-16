@@ -1,7 +1,239 @@
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
-    ViewBag.Title = "Account";
+    ViewBag.Title = "Account & Settings";
 }
 
-<h1>Account</h1>
-<p>Account information and settings placeholder.</p>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Account & Settings</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        a{
+            text-decoration-line: none;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: #1A304B;
+            min-height: 100vh;
+  
+        }
+
+        .wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+            .header h1 {
+                color: #ffffff;
+                font-size: 42px;
+                font-weight: 300;
+                margin-bottom: 10px;
+            }
+
+            .header p {
+                color: rgba(255, 255, 255, 0.7);
+                font-size: 16px;
+            }
+
+        .container {
+            display: flex;
+            gap: 60px;
+            align-items: flex-start;
+        }
+
+        .sidebar {
+            width: 250px;
+            flex-shrink: 0;
+            padding-top: 20px;
+        }
+
+        .nav-button {
+            display: block;
+            width: 100%;
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            background: transparent;
+            color: #ffffff;
+            border: none;
+            text-align: left;
+            font-size: 20px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+            .nav-button:hover {
+                background: rgba(255, 255, 255, 0.1);
+            }
+
+            .nav-button.active {
+                background: rgba(255, 255, 255, 0.15);
+                font-weight: 500;
+            }
+
+        .main-content {
+            flex: 1;
+            color: rgba(255,255,255,0.85);
+            font-size: 15px;
+            line-height: 1.8;
+        }
+
+            .main-content h2 {
+                color: #ffffff;
+                font-size: 22px;
+                font-weight: 500;
+                margin: 30px 0 12px;
+            }
+
+            .main-content p {
+                margin-bottom: 15px;
+            }
+
+            .main-content ul {
+                margin: 10px 0 20px 20px;
+            }
+
+            .main-content li {
+                margin-bottom: 8px;
+            }
+
+        @@media (max-width: 768px) {
+            body {
+                padding: 30px 15px;
+            }
+
+            .container {
+                flex-direction: column;
+                gap: 30px;
+            }
+
+            .sidebar {
+                width: 100%;
+            }
+
+            .nav-button {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrapper">
+
+        <div class="header">
+            <h1>Account & Settings</h1>
+            <p>Manage your library account and access</p>
+        </div>
+
+        <div class="container">
+
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <a class="nav-button @(ViewContext.HttpContext.Request.Path == "/about/faq" ? "active" : "")"
+                   asp-controller="Home" asp-action="AboutFaq">General</a>
+
+                <a class="nav-button @(ViewContext.HttpContext.Request.Path == "/about/account" ? "active" : "")"
+                   asp-controller="Home" asp-action="AboutAccount">Account & Login</a>
+
+                <a class="nav-button @(ViewContext.HttpContext.Request.Path == "/about/support" ? "active" : "")"
+                   asp-controller="Home" asp-action="AboutSupport">Support</a>
+
+                <a class="nav-button @(ViewContext.HttpContext.Request.Path == "/about/policies" ? "active" : "")"
+                   asp-controller="Home" asp-action="AboutPolicies">Libraries Policy</a>
+
+            </aside>
+
+            <!-- Main Content -->
+            <main class="main-content">
+
+                <h2>About the Service</h2>
+                <p>
+                    This service provides online access to a digital library containing books,
+                    documents, and educational resources. Access to the platform is restricted
+                    to registered users.
+                </p>
+
+                <h2>Account Registration</h2>
+                <p>
+                    Accounts are created through the official Telegram bot.
+                    Manual registration on the website is not available.
+                </p>
+
+                <ul>
+                    <li>The user interacts with the Telegram bot</li>
+                    <li>The bot verifies the user’s Telegram account</li>
+                    <li>An account is created automatically</li>
+                </ul>
+
+                <h2>Login Process</h2>
+                <p>
+                    Login is performed using a one-time code provided by the Telegram bot.
+                </p>
+
+                <ul>
+                    <li>Open the official Telegram bot</li>
+                    <li>Request a login code</li>
+                    <li>Enter the code on the website login page</li>
+                    <li>Access is granted after verification</li>
+                </ul>
+
+                <p>
+                    Each login code is time-limited and can only be used once.
+                </p>
+
+                <h2>Security Information</h2>
+                <ul>
+                    <li>Passwords are not used or stored</li>
+                    <li>Login codes expire automatically</li>
+                    <li>Authentication is tied to the Telegram account</li>
+                    <li>Unauthorized access is prevented by Telegram verification</li>
+                </ul>
+
+                <h2>Account Management</h2>
+                <p>
+                    Account preferences and basic information can be managed within the account
+                    settings section. Telegram remains the primary authentication method.
+                </p>
+
+                <h2>Support</h2>
+                <p>
+                    For issues related to registration or login, contact support through:
+                </p>
+
+                <ul>
+                    <li>The Support page on the website</li>
+                    <li>The official Telegram bot</li>
+                </ul>
+
+            </main>
+
+        </div>
+    </div>
+
+    <script>
+        function navigateTo(section) {
+            if (section === 'General') {
+                window.location.href = '@Url.Action("Index", "FAQ")';
+            } else if (section === 'Support') {
+                window.location.href = '@Url.Action("Support", "FAQ")';
+            } else if (section === 'Libraries') {
+                window.location.href = '@Url.Action("LibrariesPolicy", "FAQ")';
+            }
+        }
+    </script>
+
+</body>
+</html>

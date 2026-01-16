@@ -283,6 +283,10 @@
                 padding: 14px 16px;
             }
         }
+
+        a {
+            text-decoration-line: none;
+        }
     </style>
 </head>
 <body>
@@ -294,10 +298,18 @@
 
         <div class="container">
             <aside class="sidebar">
-                <button class="nav-button active" onclick="navigateTo('General')">General</button>
-                <button class="nav-button" onclick="navigateTo('Account')">Account & Login</button>
-                <button class="nav-button" onclick="navigateTo('Support')">Support</button>
-                <button class="nav-button" onclick="navigateTo('Libraries')">Libraries Policy</button>
+                <a class="nav-button @(ViewContext.HttpContext.Request.Path == "/about/faq" ? "active" : "")"
+                   asp-controller="Home" asp-action="AboutFaq">General</a>
+
+                <a class="nav-button @(ViewContext.HttpContext.Request.Path == "/about/account" ? "active" : "")"
+                   asp-controller="Home" asp-action="AboutAccount">Account & Login</a>
+
+                <a class="nav-button @(ViewContext.HttpContext.Request.Path == "/about/support" ? "active" : "")"
+                   asp-controller="Home" asp-action="AboutSupport">Support</a>
+
+                <a class="nav-button @(ViewContext.HttpContext.Request.Path == "/about/policies" ? "active" : "")"
+                   asp-controller="Home" asp-action="AboutPolicies">Libraries Policy</a>
+
             </aside>
 
             <main class="main-content">
