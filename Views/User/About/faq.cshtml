@@ -3,5 +3,333 @@
     ViewBag.Title = "FAQ";
 }
 
-<h1>FAQ</h1>
-<p>Frequently asked questions placeholder.</p>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>FAQ - Your questions answered here</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: #1A304B;
+            min-height: 100vh;
+           
+
+        .wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+            .header h1 {
+                color: #ffffff;
+                font-size: 42px;
+                font-weight: 300;
+                margin-bottom: 10px;
+            }
+
+            .header p {
+                color: white;
+                font-size: 16px;
+            }
+
+        .container {
+            display: flex;
+            gap: 60px;
+            margin-bottom: 60px;
+            align-items: flex-start;
+        }
+
+        .sidebar {
+            width: 250px;
+            flex-shrink: 0;
+            padding-top: 20px;
+        }
+
+        .nav-button {
+            display: block;
+            width: 100%;
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            background: transparent;
+            color: #ffffff;
+            border: none;
+            text-align: left;
+            font-size: 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background 0.3s ease;
+          
+        }
+
+            .nav-button:hover {
+                background: rgba(255, 255, 255, 0.1);
+            }
+
+            .nav-button.active {
+                background: rgba(255, 255, 255, 0.15);
+                font-weight: 500;
+            }
+
+        .main-content {
+            flex: 1;
+        }
+
+        .faq-list {
+            width: 100%;
+        }
+
+        .faq-item {
+            background: rgba(255, 255, 255, 0.08);
+            margin-bottom: 12px;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+            .faq-item:hover {
+                background: rgba(255, 255, 255, 0.12);
+            }
+
+        .faq-question {
+            width: 100%;
+            padding: 20px 24px;
+            background: transparent;
+            border: none;
+            color: #ffffff;
+            font-size: 15px;
+            text-align: left;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+            .faq-question span {
+                flex: 1;
+            }
+
+        .faq-icon {
+            font-size: 20px;
+            color: rgba(255, 255, 255, 0.5);
+            transition: transform 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .faq-item.active .faq-icon {
+            transform: rotate(180deg);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            padding: 0 24px;
+        }
+
+        .faq-answer-content {
+            padding-bottom: 20px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .faq-item.active .faq-answer {
+            max-height: 500px;
+        }
+
+        .support-section {
+            text-align: center;
+            padding: 20px 10px;
+            background-color: #132A46;
+            border-radius: 10px
+        }
+
+        .avatar-group {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: 3px solid #1A304B;
+            margin: 0 -8px;
+        }
+
+        .support-section h3 {
+            color: #ffffff;
+            
+            font-size: 18px;
+            font-weight: 400;
+            margin-bottom: 8px;
+        }
+
+        .support-section p {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+
+        .contact-button {
+            text-align: center;
+    
+            padding: 12px 30px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+            .contact-button:hover {
+                background: rgba(255, 255, 255, 0.15);
+            }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="header">
+            <h1>FaQ</h1>
+            <p>Your questions answered here.</p>
+        </div>
+
+        <div class="container">
+            <aside class="sidebar">
+                <button class="nav-button active" onclick="navigateTo('General')">General</button>
+                <button class="nav-button" onclick="navigateTo('Account')">Account & Login</button>
+                <button class="nav-button" onclick="navigateTo('Support')">Support</button>
+                <button class="nav-button" onclick="navigateTo('Libraries')">Libraries Policy</button>
+            </aside>
+
+            <main class="main-content">
+                <div class="faq-list">
+                    <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFaq(this)">
+                            <span>Is there a free trial available?</span>
+                            <i class="bi bi-chevron-down faq-icon"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                Yes, absolutely! We give you access to a 7-day, 3 use a day, 6 files—personalized recommendations, AI message, and sync. Sign up to level up in all areas of your life.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFaq(this)">
+                            <span>Can I change my plan later?</span>
+                            <i class="bi bi-chevron-down faq-icon"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                Yes, you can upgrade or downgrade your plan at any time. Changes will be reflected in your next billing cycle.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFaq(this)">
+                            <span>What is your cancellation policy?</span>
+                            <i class="bi bi-chevron-down faq-icon"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                You can cancel your subscription at any time. You'll continue to have access until the end of your current billing period.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFaq(this)">
+                            <span>Can other info be added to an invoice?</span>
+                            <i class="bi bi-chevron-down faq-icon"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                Yes, you can add additional information to your invoices such as company details, tax ID, or custom notes through your account settings.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFaq(this)">
+                            <span>How does billing work?</span>
+                            <i class="bi bi-chevron-down faq-icon"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                We bill on a monthly or annual basis depending on your chosen plan. Payment is processed automatically using your saved payment method.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFaq(this)">
+                            <span>How do I change my account email?</span>
+                            <i class="bi bi-chevron-down faq-icon"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                You can change your account email in your profile settings. We'll send a verification email to confirm the change.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <div class="support-section">
+            <div class="avatar-group">
+                <div class="avatar"></div>
+                <div class="avatar"></div>
+                <div class="avatar"></div>
+            </div>
+            <h3>Still have questions?</h3>
+            <p>Can't find the answer you're looking for? Please chat to our friendly team.</p>
+            <button class="contact-button">Get in touch</button>
+        </div>
+    </div>
+
+    <script>
+        function toggleFaq(button) {
+            const item = button.parentElement;
+            const wasActive = item.classList.contains('active');
+
+            document.querySelectorAll('.faq-item').forEach(faq => {
+                faq.classList.remove('active');
+            });
+
+            if (!wasActive) {
+                item.classList.add('active');
+            }
+        }
+
+        function navigateTo(section) {
+            document.querySelectorAll('.nav-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            event.target.classList.add('active');
+
+            console.log('Navigating to: ' + section);
+        }
+    </script>
+</body>
+</html>
