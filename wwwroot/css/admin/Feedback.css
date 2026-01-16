@@ -1,2 +1,40 @@
-﻿body {
+﻿
+.page-header {
+    margin-bottom: 24px;
+}
+
+.page-header h3 {
+    font-weight: 600;
+    color: #1a1a1a;
+}
+.search-form{
+    width: fit-content;
+    padding: 5px 10px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    background-color: #fff;
+}
+.search-form > .search-input{
+    border: none;
+    padding: 5px 5px;
+    background: transparent;
+    outline: none;
+    font-size: 20px;
+}
+.search-form > .search-icon{
+    font-size: 20px;
+    color: #AEAEAE;
+    font-weight: bold;
+}
+.search-form > .search-input::placeholder{
+    color: #AEAEAE;
+    font-size: 20px;
+}
+
+.table thead th{
+    background-color: #264A73;
+    color: white
+}
+td > img{
+    width: 40px;
 }
