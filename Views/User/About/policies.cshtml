@@ -1,7 +1,214 @@
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
-    ViewBag.Title = "Policies";
+    ViewBag.Title = "Support";
 }
 
-<h1>Policies</h1>
-<p>Site policies placeholder (privacy, terms, etc.).</p>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Account & Settings</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: #1A304B;
+            min-height: 100vh;
+        }
+
+        .wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+            .header h1 {
+                color: #ffffff;
+                font-size: 42px;
+                font-weight: 300;
+                margin-bottom: 10px;
+            }
+
+            .header p {
+                color: rgba(255, 255, 255, 0.7);
+                font-size: 16px;
+            }
+
+        .container {
+            display: flex;
+            gap: 60px;
+            align-items: flex-start;
+        }
+
+        .sidebar {
+            width: 250px;
+            flex-shrink: 0;
+            padding-top: 20px;
+        }
+
+        .nav-button {
+            display: block;
+            width: 100%;
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            background: transparent;
+            color: #ffffff;
+            border: none;
+            text-align: left;
+            font-size: 20px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+            .nav-button:hover {
+                background: rgba(255, 255, 255, 0.1);
+            }
+
+            .nav-button.active {
+                background: rgba(255, 255, 255, 0.15);
+                font-weight: 500;
+            }
+
+        .main-content {
+            flex: 1;
+            color: rgba(255,255,255,0.85);
+            font-size: 15px;
+            line-height: 1.8;
+        }
+
+            .main-content h2 {
+                color: #ffffff;
+                font-size: 22px;
+                font-weight: 500;
+                margin: 30px 0 12px;
+            }
+
+            .main-content p {
+                margin-bottom: 15px;
+            }
+
+            .main-content ul {
+                margin: 10px 0 20px 20px;
+            }
+
+            .main-content li {
+                margin-bottom: 8px;
+            }
+
+        @@media (max-width: 768px) {
+           
+
+            .container {
+                flex-direction: column;
+                gap: 30px;
+            }
+
+            .sidebar {
+                width: 100%;
+            }
+
+            .nav-button {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrapper">
+
+        <div class="header">
+            <h1>Account & Settings</h1>
+            <p>Manage your library account and access</p>
+        </div>
+
+        <div class="container">
+
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <button class="nav-button" onclick="navigateTo('General')">General</button>
+                <button class="nav-button " onclick="navigateTo('Account')">Account & Login</button>
+                <button class="nav-button " onclick="navigateTo('Support')">Support</button>
+                <button class="nav-button active" onclick="navigateTo('Libraries')">Libraries Policy</button>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="main-content">
+                <h1>Library Policy</h1>
+
+                <p>
+                    This digital library is provided to offer registered users access to books,
+                    documents, and educational materials for personal, academic, and informational use.
+                    Access to the library is limited to authenticated users and is subject to compliance
+                    with this policy and all applicable laws.
+                </p>
+
+                <p>
+                    All materials available through the library are protected by copyright and other
+                    intellectual property laws. Ownership of content remains with the respective authors,
+                    publishers, or rights holders. Users may not copy, reproduce, distribute, transmit,
+                    modify, resell, or publicly display any library materials without prior authorization,
+                    unless explicitly permitted by law or the rights holder.
+                </p>
+
+                <p>
+                    The library may include materials provided under various licensing agreements.
+                    Access to such materials does not grant users any ownership rights.
+                    Use of the content beyond what is permitted by these licenses is strictly prohibited.
+                </p>
+
+                <p>
+                    Users are responsible for ensuring that their use of library materials complies
+                    with applicable copyright, intellectual property, and data protection regulations.
+                    Any attempt to bypass access controls, engage in automated data extraction,
+                    or share access credentials is considered a violation of this policy.
+                </p>
+
+                <p>
+                    The platform reserves the right to monitor usage for security and compliance purposes.
+                    In cases of suspected misuse, abuse, or violation of this policy, access to the library
+                    may be temporarily suspended or permanently revoked without prior notice.
+                </p>
+
+                <p>
+                    Availability of library materials may change at any time due to licensing restrictions,
+                    content updates, or legal requirements. The platform does not guarantee continuous
+                    access to any specific material.
+                </p>
+
+                <p>
+                    By accessing or using the library, users acknowledge that they have read, understood,
+                    and agreed to comply with this Library Policy and any related terms governing access
+                    to the platform.
+                </p>
+
+
+            </main>
+
+        </div>
+    </div>
+
+    <script>
+        function navigateTo(section) {
+            if (section === 'General') {
+                window.location.href = '@Url.Action("Index", "FAQ")';
+            } else if (section === 'Support') {
+                window.location.href = '@Url.Action("Support", "FAQ")';
+            } else if (section === 'Libraries') {
+                window.location.href = '@Url.Action("LibrariesPolicy", "FAQ")';
+            }
+        }
+    </script>
+
+</body>
+</html>
