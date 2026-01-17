@@ -1,122 +1,126 @@
-﻿.page-header {
-    margin-bottom: 24px;
+﻿.dashboard-page {
+  max-width: 1280px;
+}
+
+.page-header {
+  margin-bottom: 24px;
 }
 
 .page-header h3 {
-    font-weight: 600;
-    color: #1a1a1a;
+  font-weight: 600;
+  color: #1a1a1a;
 }
 
-.search-form{
-    width: fit-content;
-    padding: 5px 10px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-    background-color: #fff;
+.search-form {
+  width: fit-content;
+  padding: 5px 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  background-color: #fff;
 }
-.search-form > .search-input{
-    border: none;
-    padding: 5px 5px;
-    background: transparent;
-    outline: none;
-    font-size: 20px;
+.search-form > .search-input {
+  border: none;
+  padding: 5px 5px;
+  background: transparent;
+  outline: none;
+  font-size: 20px;
 }
-.search-form > .search-icon{
-    font-size: 20px;
-    color: #AEAEAE;
-    font-weight: bold;
+.search-form > .search-icon {
+  font-size: 20px;
+  color: #aeaeae;
+  font-weight: bold;
 }
-.search-form > .search-input::placeholder{
-    color: #AEAEAE;
-    font-size: 20px;
+.search-form > .search-input::placeholder {
+  color: #aeaeae;
+  font-size: 20px;
 }
-.new-borrowing-btn{
-    width: fit-content;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 8px;
-    background-color: #264A73;
-    border-radius: 18px;
-    padding: 5px 15px;
-    border: none;
-    margin-left: 10px;
+.new-borrowing-btn {
+  width: fit-content;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  background-color: #264a73;
+  border-radius: 18px;
+  padding: 5px 15px;
+  border: none;
+  margin-left: 10px;
 }
-.new-borrowing-btn > i{
-    color: white;
-    font-size: 25px;
+.new-borrowing-btn > i {
+  color: white;
+  font-size: 25px;
 }
-.new-borrowing-btn > span{
-    font-size: 24px;
-    color: white;
+.new-borrowing-btn > span {
+  font-size: 24px;
+  color: white;
 }
-.dropdown-menu a{
-    font-size: 20px;
+.dropdown-menu a {
+  font-size: 20px;
 }
-.table thead th{
-    background-color: #264A73;
-    color: white;
+.table thead th {
+  background-color: #264a73;
+  color: white;
 }
 
-.action-container{
-    display: flex;
-    justify-content: center;
-    align-content: center;
-    gap: 16px;
+.action-container {
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  gap: 16px;
 }
-.action-container > button{
-    outline: none;
-    border: none;
-    background: none;
+.action-container > button {
+  outline: none;
+  border: none;
+  background: none;
 }
-.action-container >button > i{
-    font-size:23px;
+.action-container > button > i {
+  font-size: 23px;
 }
 /* Custom select wrapper */
 .custom-select-wrapper {
-    position: relative;
+  position: relative;
 }
 
 .custom-select-wrapper select {
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    padding-right: 35px;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding-right: 35px;
 }
 
 .custom-select-wrapper::after {
-    content: '\F282';
-    font-family: 'bootstrap-icons';
-    position: absolute;
-    right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    pointer-events: none;
-    transition: transform 0.3s ease;
-    font-size: 14px;
+  content: "\F282";
+  font-family: "bootstrap-icons";
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  transition: transform 0.3s ease;
+  font-size: 14px;
 }
 
 .custom-select-wrapper.active::after {
-    transform: translateY(-50%) rotate(180deg);
+  transform: translateY(-50%) rotate(180deg);
 }
 
-#bookImageInput::file-selector-button{
-    border: none;
-    border-radius: 8px;
-    padding: 5px 8px;
+#bookImageInput::file-selector-button {
+  border: none;
+  border-radius: 8px;
+  padding: 5px 8px;
 }
-.close{
-    border: none;
-    background-color: transparent;
-    color: #E71D18;
-    border-radius: 8px;
-    font-size: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 3px 8px;
+.close {
+  border: none;
+  background-color: transparent;
+  color: #e71d18;
+  border-radius: 8px;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 8px;
 }
 
-td > img{
-    width: 40px;
+td > img {
+  width: 40px;
 }

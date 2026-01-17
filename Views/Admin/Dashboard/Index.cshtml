@@ -1,5 +1,330 @@
 ﻿@{
-    ViewBag.Title = "Manage Books";
+    ViewBag.Title = "Dashboard";
 }
 
-<h2>Manage Books</h2>
+<link rel="stylesheet" href="~/css/admin/Dashboard.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+<div class="dashboard-page container-fluid">
+
+    <!-- Header -->
+    <div class="dash-header">
+        <div>
+            <h2 class="welcome">Welcome! Admin</h2>
+            <div class="date-line">Oct 25 2025 | Saturday , 12 PM</div>
+        </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Summary Cards -->
+    <div class="summary-row">
+        <div class="sum-card">
+            <div class="sum-icon"><i class="fa-solid fa-book-open"></i></div>
+            <div class="sum-info">
+                <div class="sum-title">Total Books</div>
+                <div class="sum-value">369</div>
+            </div>
+        </div>
+
+        <div class="sum-card">
+            <div class="sum-icon"><i class="fa-solid fa-book"></i></div>
+            <div class="sum-info">
+                <div class="sum-title">Borrowed Books</div>
+                <div class="sum-value">168</div>
+            </div>
+        </div>
+
+        <div class="sum-card">
+            <div class="sum-icon"><i class="fa-solid fa-users"></i></div>
+            <div class="sum-info">
+                <div class="sum-title">Total Users</div>
+                <div class="sum-value">69</div>
+            </div>
+        </div>
+
+        <div class="sum-card">
+            <div class="sum-icon"><i class="fa-solid fa-dollar-sign"></i></div>
+            <div class="sum-info">
+                <div class="sum-title">Total Fines</div>
+                <div class="sum-value">$ 300</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <h3 class="quick-title">Quick Actions</h3>
+
+    <div class="quick-tabs">
+        <button class="qtab active" data-target="#tabOverview">Overview</button>
+        <button class="qtab" data-target="#tabMembers">New Member(s)</button>
+        <button class="qtab" data-target="#tabBooks">New Book(s)</button>
+        <button class="qtab" data-target="#tabBorrow">Borrowing Book(s)</button>
+    </div>
+
+    <div class="quick-panel">
+
+        <!-- Overview -->
+        <div class="qtab-content show" id="tabOverview">
+            <h4 class="panel-title">Overdue Books</h4>
+
+            <div class="table-wrap">
+                <table class="dash-table">
+                    <thead>
+                        <tr>
+                            <th>BOOK TITLE</th>
+                            <th>BORROWER</th>
+                            <th>DUE DATE</th>
+                            <th>DAYS OVERDUE</th>
+                            <th>FINE</th>
+                            <th class="text-center">ACTIONS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Dream Count</td>
+                            <td>Sok Sabbay</td>
+                            <td>10-10-2025</td>
+                            <td><span class="pill danger"><i class="fa-solid fa-triangle-exclamation"></i> 15
+                                    Days</span></td>
+                            <td>$ 5.50</td>
+                            <td class="text-center">
+                                <i class="fa-regular fa-bell action-ico"></i>
+                                <i class="fa-regular fa-circle-question action-ico"></i>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Dream Count</td>
+                            <td>Sok Sabbay</td>
+                            <td>10-10-2025</td>
+                            <td><span class="pill danger"><i class="fa-solid fa-triangle-exclamation"></i> 15
+                                    Days</span></td>
+                            <td>$ 5.50</td>
+                            <td class="text-center">
+                                <i class="fa-regular fa-bell action-ico"></i>
+                                <i class="fa-regular fa-circle-question action-ico"></i>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Dream Count</td>
+                            <td>Sok Sabbay</td>
+                            <td>10-10-2025</td>
+                            <td><span class="pill danger"><i class="fa-solid fa-triangle-exclamation"></i> 15
+                                    Days</span></td>
+                            <td>$ 5.50</td>
+                            <td class="text-center">
+                                <i class="fa-regular fa-bell action-ico"></i>
+                                <i class="fa-regular fa-circle-question action-ico"></i>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Dream Count</td>
+                            <td>Sok Vikchet</td>
+                            <td>10-10-2025</td>
+                            <td><span class="pill warn"><i class="fa-solid fa-triangle-exclamation"></i> 5 Days</span>
+                            </td>
+                            <td>$ 1.50</td>
+                            <td class="text-center">
+                                <i class="fa-regular fa-bell action-ico"></i>
+                                <i class="fa-regular fa-circle-question action-ico"></i>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pager">
+                <a class="pg">Previous</a>
+                <a class="pg active">1</a>
+                <a class="pg">2</a>
+                <a class="pg">3</a>
+                <a class="pg">4</a>
+                <a class="pg">Next</a>
+            </div>
+        </div>
+
+        <!-- New Members -->
+        <div class="qtab-content" id="tabMembers">
+            <h4 class="panel-title">New Register</h4>
+
+            <div class="table-wrap">
+                <table class="dash-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Gender</th>
+                            <th>Phone Number</th>
+                            <th>Email Address</th>
+                            <th>Register Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Sok Sabbay</td>
+                            <td>Male</td>
+                            <td>+855 96 316 0977</td>
+                            <td>namchheavron.info@gmail.com</td>
+                            <td>6:33 PM</td>
+                        </tr>
+                        <tr>
+                            <td>Sok Sabbay</td>
+                            <td>Male</td>
+                            <td>+855 96 316 0977</td>
+                            <td>namchheavron.info@gmail.com</td>
+                            <td>6:33 PM</td>
+                        </tr>
+                        <tr>
+                            <td>Sok Sabbay</td>
+                            <td>Male</td>
+                            <td>+855 96 316 0977</td>
+                            <td>namchheavron.info@gmail.com</td>
+                            <td>6:33 PM</td>
+                        </tr>
+                        <tr>
+                            <td>Sok Vikchet</td>
+                            <td>Male</td>
+                            <td>+855 96 316 0977</td>
+                            <td>namchheavron.info@gmail.com</td>
+                            <td>6:33 PM</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pager">
+                <a class="pg">Previous</a>
+                <a class="pg active">1</a>
+                <a class="pg">2</a>
+                <a class="pg">3</a>
+                <a class="pg">Next</a>
+            </div>
+        </div>
+
+        <!-- New Books -->
+        <div class="qtab-content" id="tabBooks">
+            <h4 class="panel-title">New Books</h4>
+
+            <div class="table-wrap">
+                <table class="dash-table">
+                    <thead>
+                        <tr>
+                            <th style="width:120px;">New Arrival Books</th>
+                            <th>Tittle</th>
+                            <th style="width:120px;">Quantity</th>
+                            <th style="width:160px;">Author Name</th>
+                            <th style="width:140px;">Create at</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="text-center">
+                                <img class="book-img" src="https://via.placeholder.com/28x36" />
+                            </td>
+                            <td>Cambridge English for Engineering Students Book (SAE) with CDS(2)</td>
+                            <td class="text-center">12</td>
+                            <td class="text-center">Jame Walton</td>
+                            <td class="text-center">9 : 33 AM</td>
+                        </tr>
+                        <tr>
+                            <td class="text-center">
+                                <img class="book-img" src="https://via.placeholder.com/28x36" />
+                            </td>
+                            <td>Cambridge English for Engineering Students Book (SAE) with CDS(2)</td>
+                            <td class="text-center">12</td>
+                            <td class="text-center">Jame Walton</td>
+                            <td class="text-center">9 : 33 AM</td>
+                        </tr>
+                        <tr>
+                            <td class="text-center">
+                                <img class="book-img" src="https://via.placeholder.com/28x36" />
+                            </td>
+                            <td>Cambridge English for Engineering Students Book (SAE) with CDS(2)</td>
+                            <td class="text-center">12</td>
+                            <td class="text-center">Jame Walton</td>
+                            <td class="text-center">9 : 33 AM</td>
+                        </tr>
+                        <tr>
+                            <td class="text-center">
+                                <img class="book-img" src="https://via.placeholder.com/28x36" />
+                            </td>
+                            <td>Cambridge English for Engineering Students Book (SAE) with CDS(2)</td>
+                            <td class="text-center">12</td>
+                            <td class="text-center">Jame Walton</td>
+                            <td class="text-center">9 : 33 AM</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pager">
+                <a class="pg">Previous</a>
+                <a class="pg active">1</a>
+                <a class="pg">2</a>
+                <a class="pg">3</a>
+                <a class="pg">Next</a>
+            </div>
+        </div>
+
+        <!-- Borrowing Books -->
+        <div class="qtab-content" id="tabBorrow">
+            <h4 class="panel-title">New Borrowing Books</h4>
+
+            <div class="table-wrap">
+                <table class="dash-table">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Book Tittle</th>
+                            <th>Borrow Date</th>
+                            <th>Due Date</th>
+                            <th class="text-center">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Sok Sabbay</td>
+                            <td>Cambridge English for Engineering Students Book (SAE) with CDS(2)</td>
+                            <td class="text-center">11/15/2025</td>
+                            <td class="text-center">11/20/2025</td>
+                            <td class="text-center"><span class="status pending">Pending</span></td>
+                        </tr>
+                        <tr>
+                            <td>Sok Sabbay</td>
+                            <td>Cambridge English for Engineering Students Book (SAE) with CDS(2)</td>
+                            <td class="text-center">11/15/2025</td>
+                            <td class="text-center">11/20/2025</td>
+                            <td class="text-center"><span class="status pending">Pending</span></td>
+                        </tr>
+                        <tr>
+                            <td>Sok Sabbay</td>
+                            <td>Cambridge English for Engineering Students Book (SAE) with CDS(2)</td>
+                            <td class="text-center">11/15/2025</td>
+                            <td class="text-center">11/20/2025</td>
+                            <td class="text-center"><span class="status pending">Pending</span></td>
+                        </tr>
+                        <tr>
+                            <td>Sok Sabbay</td>
+                            <td>Cambridge English for Engineering Students Book (SAE) with CDS(2)</td>
+                            <td class="text-center">11/15/2025</td>
+                            <td class="text-center">11/20/2025</td>
+                            <td class="text-center"><span class="status borrowing">Borrowing</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pager">
+                <a class="pg">Previous</a>
+                <a class="pg active">1</a>
+                <a class="pg">2</a>
+                <a class="pg">3</a>
+                <a class="pg">Next</a>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/admin/Dashboard.js"></script>
+}

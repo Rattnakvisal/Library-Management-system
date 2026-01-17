@@ -7,6 +7,9 @@
   --line: #e6edf5;
   --shadow: 0 10px 24px rgba(22, 58, 90, 0.08);
 }
+.dashboard-page {
+  max-width: 1280px;
+}
 
 .page-title {
   font-weight: 800;

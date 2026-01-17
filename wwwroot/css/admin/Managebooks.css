@@ -1,179 +1,183 @@
-﻿
+﻿.dashboard-page {
+  max-width: 1280px;
+}
 .page-header {
-    margin-bottom: 24px;
+  margin-bottom: 24px;
 }
 
 .page-header h3 {
-    font-weight: 600;
-    color: #1a1a1a;
+  font-weight: 600;
+  color: #1a1a1a;
 }
 
 .card-container {
-    display: flex;
-    gap: 16px;
-    max-width: 1200px;
-    margin: 0 auto;
-    flex-wrap: wrap;
+  display: flex;
+  gap: 16px;
+  max-width: 1200px;
+  margin: 0 auto;
+  flex-wrap: wrap;
 }
 
 .stat-card {
-    background: #ffffff;
-    border-radius: 12px;
-    border: 1px solid #e5e5e5;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-    padding: 40px 20px;
-    flex: 1;
-    min-width: 180px;
-    display: flex;
-    align-items: center;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e5e5e5;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  padding: 40px 20px;
+  flex: 1;
+  min-width: 180px;
+  display: flex;
+  align-items: center;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .stat-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
 }
 
 .icon-box {
-    width: 56px;
-    height: 56px;
-    border-radius: 10px;
-    background-color: #c9e3f7;
+  width: 56px;
+  height: 56px;
+  border-radius: 10px;
+  background-color: #c9e3f7;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-    margin-right: 14px;
-    flex-shrink: 0;
+  margin-right: 14px;
+  flex-shrink: 0;
 }
 
 .icon-box i {
-    font-size: 26px;
-    color: #1a1a1a;
+  font-size: 26px;
+  color: #1a1a1a;
 }
 .card-content {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 .card-label {
-    font-size: 13px;
-    font-weight: 500;
-    color: #1a1a1a;
-    margin-bottom: 2px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #1a1a1a;
+  margin-bottom: 2px;
 }
 
 .card-value {
-    font-size: 26px;
-    font-weight: 700;
-    color: #1a1a1a;
+  font-size: 26px;
+  font-weight: 700;
+  color: #1a1a1a;
 }
-.search-form{
-    width: fit-content;
-    padding: 5px 10px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-    background-color: #fff;
+.search-form {
+  width: fit-content;
+  padding: 5px 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  background-color: #fff;
 }
-.search-form > .search-input{
-    border: none;
-    padding: 5px 5px;
-    background: transparent;
-    outline: none;
-    font-size: 20px;
+.search-form > .search-input {
+  border: none;
+  padding: 5px 5px;
+  background: transparent;
+  outline: none;
+  font-size: 20px;
 }
-.search-form > .search-icon{
-    font-size: 20px;
-    color: #AEAEAE;
-    font-weight: bold;
+.search-form > .search-icon {
+  font-size: 20px;
+  color: #aeaeae;
+  font-weight: bold;
 }
-.search-form > .search-input::placeholder{
-    color: #AEAEAE;
-    font-size: 20px;
+.search-form > .search-input::placeholder {
+  color: #aeaeae;
+  font-size: 20px;
 }
-.add-books-btn{
-    width: fit-content;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 8px;
-    background-color: #264A73;
-    border-radius: 18px;
-    padding: 0 13px;
-    border: none;
+.add-books-btn {
+  width: fit-content;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  background-color: #264a73;
+  border-radius: 18px;
+  padding: 0 13px;
+  border: none;
 }
-.add-books-btn > i{
-    color: white;
-    font-size: 25px;
+.add-books-btn > i {
+  color: white;
+  font-size: 25px;
 }
-.add-books-btn > span{
-    font-size: 24px;
-    color: white;
+.add-books-btn > span {
+  font-size: 24px;
+  color: white;
 }
-.book-table thead th{
-    background-color: #264A73; 
-    color: white
+.book-table thead th {
+  background-color: #264a73;
+  color: white;
 }
-.action-container{
-    display: flex;
-    justify-content: center;
-    align-content: center;
-    gap: 16px;
+.action-container {
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  gap: 16px;
 }
-.action-container > button{
-    outline: none;
-    border: none;
-    background: none;
+.action-container > button {
+  outline: none;
+  border: none;
+  background: none;
 }
-.action-container >button > i{
-    font-size:23px;
+.action-container > button > i {
+  font-size: 23px;
 }
 /* Custom select wrapper */
 .custom-select-wrapper {
-    position: relative;
+  position: relative;
 }
 
 .custom-select-wrapper select {
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    padding-right: 35px;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding-right: 35px;
 }
 
 .custom-select-wrapper::after {
-    content: '\F282';
-    font-family: 'bootstrap-icons';
-    position: absolute;
-    right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    pointer-events: none;
-    transition: transform 0.3s ease;
-    font-size: 14px;
+  content: "\F282";
+  font-family: "bootstrap-icons";
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  transition: transform 0.3s ease;
+  font-size: 14px;
 }
 
 .custom-select-wrapper.active::after {
-    transform: translateY(-50%) rotate(180deg);
+  transform: translateY(-50%) rotate(180deg);
 }
 
-#bookImageInput::file-selector-button{
-    border: none;
-    border-radius: 8px;
-    padding: 5px 8px;
+#bookImageInput::file-selector-button {
+  border: none;
+  border-radius: 8px;
+  padding: 5px 8px;
 }
-.close{
-    border: none;
-    background-color: transparent;
-    color: #E71D18;
-    border-radius: 8px;
-    font-size: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 3px 8px;
+.close {
+  border: none;
+  background-color: transparent;
+  color: #e71d18;
+  border-radius: 8px;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 8px;
 }
 
-td > img{
-    width: 40px;
+td > img {
+  width: 40px;
 }

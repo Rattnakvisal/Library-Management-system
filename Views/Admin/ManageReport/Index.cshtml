@@ -4,90 +4,92 @@
 
 <link rel="stylesheet" href="~/css/admin/Reports.css" />
 
-<div class="reports-page container-fluid">
-    <div class="row align-items-center mb-4">
-        <div class="col-8">
-            <h2 class="page-title">Reports Type</h2>
-        </div>
-        <div class="col-4 text-end">
-        </div>
-    </div>
-
-    <div class="row mb-3 align-items-center controls-row">
-        <div class="col-md-10">
-            <div class="custom-select" id="reportTypeSelect">
-                <button class="select-btn" id="reportTypeBtn">Borrowing Report <span class="caret">▾</span></button>
-                <ul class="options">
-                    <li data-value="borrowing">Borrowing Report</li>
-                    <li data-value="returns">Return Books Report</li>
-                    <li data-value="most-borrowed">Most Borrowed Books Report</li>
-                    <li data-value="fine-collection">Fine Collection Report</li>
-                </ul>
+<div class="dashboard-page container-fluid">
+    <div class="reports-page">
+        <div class="row align-items-center mb-4">
+            <div class="col-8">
+                <h2 class="page-title">Reports Type</h2>
+            </div>
+            <div class="col-4 text-end">
             </div>
         </div>
 
-        <div class="col-md-2 text-end">
-            <div class="export-select" id="exportTypeSelect">
-                <button class="select-btn" id="exportTypeBtn">Export Type <span class="caret">▾</span></button>
-                <ul class="options right">
-                    <li data-value="excel">Export as Excel</li>
-                    <li data-value="pdf">Export as PDF</li>
-                </ul>
+        <div class="row mb-3 align-items-center controls-row">
+            <div class="col-md-10">
+                <div class="custom-select" id="reportTypeSelect">
+                    <button class="select-btn" id="reportTypeBtn">Borrowing Report <span class="caret">▾</span></button>
+                    <ul class="options">
+                        <li data-value="borrowing">Borrowing Report</li>
+                        <li data-value="returns">Return Books Report</li>
+                        <li data-value="most-borrowed">Most Borrowed Books Report</li>
+                        <li data-value="fine-collection">Fine Collection Report</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-md-2 text-end">
+                <div class="export-select" id="exportTypeSelect">
+                    <button class="select-btn" id="exportTypeBtn">Export Type <span class="caret">▾</span></button>
+                    <ul class="options right">
+                        <li data-value="excel">Export as Excel</li>
+                        <li data-value="pdf">Export as PDF</li>
+                    </ul>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="row mb-4 date-row">
-        <div class="col-md-2">
-            <label class="form-label">From Date</label>
-            <input type="date" class="form-control" id="fromDate" />
+        <div class="row mb-4 date-row">
+            <div class="col-md-2">
+                <label class="form-label">From Date</label>
+                <input type="date" class="form-control" id="fromDate" />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">To Date</label>
+                <input type="date" class="form-control" id="toDate" />
+            </div>
         </div>
-        <div class="col-md-2">
-            <label class="form-label">To Date</label>
-            <input type="date" class="form-control" id="toDate" />
-        </div>
-    </div>
 
-    <div class="report-table-wrapper">
-        <table class="table report-table">
-            <thead>
-                <tr>
-                    <th>Borrow ID</th>
-                    <th>Book Tittle</th>
-                    <th>Borrow Date</th>
-                    <th>Due Date</th>
-                    <th class="text-end">Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                @for (int i = 0; i < 5; i++)
-                {
+        <div class="report-table-wrapper">
+            <table class="table report-table">
+                <thead>
                     <tr>
-                        <td>009</td>
-                        <td>
-                            <div class="book-title">Cambridge English for Engineering Students Book (SAE) with CDS(2)</div>
-                        </td>
-                        <td>11/14/25</td>
-                        <td>11/19/25</td>
-                        <td class="text-end"><span class="status-pill borrowed">Borrowed</span></td>
+                        <th>Borrow ID</th>
+                        <th>Book Tittle</th>
+                        <th>Borrow Date</th>
+                        <th>Due Date</th>
+                        <th class="text-end">Status</th>
                     </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < 5; i++)
+                    {
+                        <tr>
+                            <td>009</td>
+                            <td>
+                                <div class="book-title">Cambridge English for Engineering Students Book (SAE) with CDS(2)
+                                </div>
+                            </td>
+                            <td>11/14/25</td>
+                            <td>11/19/25</td>
+                            <td class="text-end"><span class="status-pill borrowed">Borrowed</span></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
 
-        <div class="pagination-wrapper">
-            <nav aria-label="Page navigation">
-                <ul class="pagination justify-content-end">
-                    <li class="page-item"><a class="page-link" href="#">Previous</a></li>
-                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                    <li class="page-item"><a class="page-link" href="#">4</a></li>
-                    <li class="page-item"><a class="page-link" href="#">Next</a></li>
-                </ul>
-            </nav>
+            <div class="pagination-wrapper">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-end">
+                        <li class="page-item"><a class="page-link" href="#">Previous</a></li>
+                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                        <li class="page-item"><a class="page-link" href="#">4</a></li>
+                        <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                    </ul>
+                </nav>
+            </div>
         </div>
     </div>
 </div>
-
 <script src="~/js/admin/Reports.js"></script>

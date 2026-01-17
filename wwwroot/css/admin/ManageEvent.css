@@ -1,67 +1,71 @@
-﻿.page-header {
-    margin-bottom: 24px;
+﻿.dashboard-page {
+  max-width: 1280px;
+}
+
+.page-header {
+  margin-bottom: 24px;
 }
 
 .page-header h3 {
-    font-weight: 600;
-    color: #1a1a1a;
+  font-weight: 600;
+  color: #1a1a1a;
 }
 
-.add-event-btn{
-    width: fit-content;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 8px;
-    background-color: #264A73;
-    border-radius: 18px;
-    padding: 0 13px;
-    border: none;
+.add-event-btn {
+  width: fit-content;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  background-color: #264a73;
+  border-radius: 18px;
+  padding: 0 13px;
+  border: none;
 }
-.add-event-btn > i{
-    color: white;
-    font-size: 25px;
+.add-event-btn > i {
+  color: white;
+  font-size: 25px;
 }
-.add-event-btn > span{
-    font-size: 24px;
-    color: white;
+.add-event-btn > span {
+  font-size: 24px;
+  color: white;
 }
-.event-table thead th{
-    background-color: #264A73;
-    color: white
+.event-table thead th {
+  background-color: #264a73;
+  color: white;
 }
-.action-container{
-    display: flex;
-    justify-content: center;
-    align-content: center;
-    gap: 16px;
+.action-container {
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  gap: 16px;
 }
-.action-container > button{
-    outline: none;
-    border: none;
-    background: none;
+.action-container > button {
+  outline: none;
+  border: none;
+  background: none;
 }
-.action-container >button > i{
-    font-size:23px;
-}
-
-#eventImageInput::file-selector-button{
-    border: none;
-    border-radius: 8px;
-    padding: 5px 8px;
-}
-.close{
-    border: none;
-    background-color: transparent;
-    color: #E71D18;
-    border-radius: 8px;
-    font-size: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 3px 8px;
+.action-container > button > i {
+  font-size: 23px;
 }
 
-td > img{
-    width: 40px;
+#eventImageInput::file-selector-button {
+  border: none;
+  border-radius: 8px;
+  padding: 5px 8px;
+}
+.close {
+  border: none;
+  background-color: transparent;
+  color: #e71d18;
+  border-radius: 8px;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 8px;
+}
+
+td > img {
+  width: 40px;
 }

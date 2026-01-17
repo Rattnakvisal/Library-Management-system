@@ -1,8 +1,261 @@
-﻿/*namespace Library_Management_system.wwwroot.css*/
-/*{*/
-/*    public class dashboard*/
-/*    {*/
-/*    }*/
-/*}*/
+﻿:root {
+  --navy: #1f4a73;
+  --navy-dark: #163a5a;
+  --bg: #f4f6f8;
+  --text: #1c2b36;
+  --muted: #7b8a97;
+  --line: #dfe6ee;
+  --shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
+}
 
+.dashboard-page {
+  max-width: 1280px;
+}
 
+.dash-header .welcome {
+  font-size: 20px;
+  font-weight: 800;
+  margin: 0;
+}
+.dash-header .date-line {
+  margin-top: 6px;
+  color: var(--navy);
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.divider {
+  height: 1px;
+  background: #222;
+  opacity: 0.6;
+  margin: 10px 0 18px;
+}
+
+/* Summary cards row */
+.summary-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.sum-card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  padding: 14px;
+  gap: 14px;
+}
+
+.sum-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 10px;
+  background: #bfe1fb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.sum-icon i {
+  font-size: 34px;
+  color: #000;
+}
+
+.sum-title {
+  font-weight: 800;
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+.sum-value {
+  font-weight: 800;
+  font-size: 18px;
+  color: var(--navy);
+}
+
+/* Quick actions */
+.quick-title {
+  font-size: 18px;
+  font-weight: 800;
+  margin: 6px 0 6px;
+}
+
+.quick-tabs {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  border-bottom: 2px solid #e1e7ee;
+  margin-bottom: 12px;
+}
+
+.qtab {
+  background: transparent;
+  border: none;
+  padding: 10px 14px;
+  font-weight: 800;
+  font-size: 14px;
+  color: #000;
+  position: relative;
+}
+
+.qtab.active {
+  color: var(--navy);
+}
+.qtab.active::after {
+  content: "";
+  position: absolute;
+  left: 18px;
+  right: 18px;
+  bottom: -2px;
+  height: 3px;
+  background: var(--navy);
+}
+
+/* Panel box */
+.quick-panel {
+  background: #fff;
+  border: 1px solid #d7dee6;
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  padding: 14px;
+}
+
+.panel-title {
+  font-weight: 800;
+  font-size: 18px;
+  margin: 2px 0 14px;
+}
+
+/* Contents show/hide */
+.qtab-content {
+  display: none;
+}
+.qtab-content.show {
+  display: block;
+}
+
+/* Table style */
+.table-wrap {
+  border: 1px solid #cfd6df;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.dash-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.dash-table thead th {
+  background: #efefef;
+  font-size: 11px;
+  font-weight: 900;
+  padding: 12px 12px;
+  border-bottom: 1px solid #c9c9c9;
+}
+
+.dash-table tbody td {
+  padding: 12px 12px;
+  font-size: 11px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+}
+
+.dash-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* pills */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 10px;
+  font-weight: 900;
+  border: 1px solid transparent;
+}
+.pill i {
+  font-size: 12px;
+}
+
+.pill.danger {
+  background: #ff8a8a;
+  color: #b30000;
+  border-color: #ff3b3b;
+}
+.pill.warn {
+  background: #ffc27b;
+  color: #a64a00;
+  border-color: #ff8a00;
+}
+
+/* action icons */
+.action-ico {
+  font-size: 16px;
+  margin: 0 8px;
+  color: #000;
+  opacity: 0.9;
+}
+
+/* status */
+.status {
+  font-weight: 900;
+  font-size: 11px;
+}
+.status.pending {
+  color: #ff9900;
+}
+.status.borrowing {
+  color: #2a3a57;
+}
+
+/* book img */
+.book-img {
+  width: 26px;
+  height: 34px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* Pagination */
+.pager {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0;
+  margin-top: 10px;
+}
+.pg {
+  border: 1px solid #3a3a3a;
+  padding: 6px 12px;
+  font-size: 11px;
+  background: #fff;
+  cursor: pointer;
+  user-select: none;
+}
+.pg.active {
+  background: var(--navy);
+  color: #fff;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  .summary-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .quick-tabs {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+}
+@media (max-width: 576px) {
+  .summary-row {
+    grid-template-columns: 1fr;
+  }
+}
