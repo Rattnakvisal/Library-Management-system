@@ -1,2 +1,235 @@
-﻿body {
+﻿:root {
+  --navy: #1f4a73;
+  --navy-dark: #163a5a;
+  --bg: #f4f6f8;
+  --text: #1c2b36;
+  --muted: #7b8a97;
+  --line: #e6edf5;
+  --shadow: 0 10px 24px rgba(22, 58, 90, 0.08);
+}
+
+.page-title {
+  font-weight: 800;
+  color: var(--text);
+  margin: 0;
+}
+
+.controls-row {
+  margin-top: 8px;
+}
+
+.custom-select,
+.export-select {
+  position: relative;
+  width: 320px; /* like screenshot */
+  max-width: 100%;
+}
+
+/* make export select smaller and right-aligned when inside a right column */
+.export-select {
+  width: 180px;
+}
+
+.select-btn {
+  width: 100%;
+  height: 38px;
+  border: none;
+  background: var(--navy);
+  color: #fff;
+  font-weight: 700;
+  font-size: 13px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 0; /* square corners like screenshot */
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.1);
+}
+
+.select-btn .caret {
+  font-size: 14px;
+  opacity: 0.95;
+}
+
+.custom-select.open .select-btn,
+.export-select.open .select-btn {
+  background: var(--navy);
+}
+
+/* Dropdown list */
+.options {
+  position: absolute;
+  top: 40px;
+  left: 0;
+  width: 100%;
+  background: #fff;
+  border: 1px solid #cfd8e3;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
+  margin: 0;
+  padding: 6px 0;
+  list-style: none;
+  z-index: 50;
+  display: none;
+}
+
+.custom-select.open .options,
+.export-select.open .options {
+  display: block;
+}
+
+/* right dropdown align */
+.options.right {
+  left: auto;
+  right: 0;
+  width: 180px; /* export list smaller like screenshot */
+}
+
+.options li {
+  padding: 10px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--navy);
+  cursor: pointer;
+}
+
+.options li:hover {
+  background: #f1f6ff;
+}
+
+/* =========================
+   DATE INPUTS (From/To)
+========================= */
+.date-row .form-label {
+  font-weight: 700;
+  font-size: 12px;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.date-row .form-control {
+  height: 28px;
+  font-size: 12px;
+  padding: 2px 10px;
+  border: 1px solid var(--navy);
+  border-radius: 3px;
+  width: 120px; /* small like screenshot */
+  background: #fff;
+}
+
+/* =========================
+   TABLE WRAPPER
+========================= */
+.report-table-wrapper {
+  background: #fff;
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+  padding: 0;
+  /* enable scrolling without losing header */
+  max-height: 520px;
+  overflow: auto;
+}
+
+/* Table header blue bar */
+.report-table {
+  margin: 0;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.report-table thead th {
+  background: var(--navy);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 10px 12px;
+  border: none;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+
+.report-table thead th:first-child {
+  border-top-left-radius: 8px;
+}
+.report-table thead th:last-child {
+  border-top-right-radius: 8px;
+}
+
+/* Table body */
+.report-table tbody td {
+  padding: 16px 12px;
+  font-size: 14px;
+  vertical-align: middle;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+}
+
+.book-title {
+  font-size: 14px; /* screenshot small text */
+  line-height: 1.15;
+  color: #22313a;
+  max-width: 280px;
+}
+
+/* Status pill */
+.status-pill {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.status-pill.borrowed {
+  background: #86a8da;
+  color: #0f2f50;
+}
+
+/* =========================
+   PAGINATION (like screenshot)
+========================= */
+.pagination-wrapper {
+  padding: 12px;
+}
+
+.pagination {
+  margin: 0;
+}
+
+.page-link {
+  border: 1px solid #3a3a3a;
+  color: #2b2b2b;
+  font-size: 12px;
+  padding: 6px 12px;
+  border-radius: 0 !important;
+}
+
+.page-item.active .page-link {
+  background: var(--navy);
+  border-color: #3a3a3a;
+  color: #fff;
+}
+
+.page-item .page-link:hover {
+  background: #f4f6f8;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width: 768px) {
+  .custom-select,
+  .export-select {
+    width: 100%;
+  }
+  .options.right {
+    width: 100%;
+  }
+  .date-row .form-control {
+    width: 100%;
+    height: 38px;
+    font-size: 13px;
+  }
+  .book-title {
+    max-width: 100%;
+  }
 }
