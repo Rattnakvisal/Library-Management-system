@@ -28,7 +28,6 @@
   max-width: 100%;
 }
 
-/* make export select smaller and right-aligned when inside a right column */
 .export-select {
   width: 180px;
 }
@@ -84,7 +83,7 @@
 .options.right {
   left: auto;
   right: 0;
-  width: 180px; /* export list smaller like screenshot */
+  width: 180px;
 }
 
 .options li {
@@ -115,7 +114,7 @@
   padding: 2px 10px;
   border: 1px solid var(--navy);
   border-radius: 3px;
-  width: 120px; /* small like screenshot */
+  width: 120px;
   background: #fff;
 }
 
@@ -127,7 +126,6 @@
   border: 1px solid var(--line);
   box-shadow: var(--shadow);
   padding: 0;
-  /* enable scrolling without losing header */
   max-height: 520px;
   overflow: auto;
 }
@@ -167,7 +165,7 @@
 }
 
 .book-title {
-  font-size: 14px; /* screenshot small text */
+  font-size: 14px;
   line-height: 1.15;
   color: #22313a;
   max-width: 280px;
@@ -188,7 +186,7 @@
 }
 
 /* =========================
-   PAGINATION (like screenshot)
+   PAGINATION
 ========================= */
 .pagination-wrapper {
   padding: 12px;

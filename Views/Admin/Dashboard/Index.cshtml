@@ -2,7 +2,7 @@
     ViewBag.Title = "Dashboard";
 }
 
-<link rel="stylesheet" href="~/css/admin/Dashboard.css" />
+<link rel="stylesheet" href="~/css/admin/dashboard.css" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
 <div class="dashboard-page container-fluid">
@@ -133,13 +133,17 @@
                 </table>
             </div>
 
-            <div class="pager">
-                <a class="pg">Previous</a>
-                <a class="pg active">1</a>
-                <a class="pg">2</a>
-                <a class="pg">3</a>
-                <a class="pg">4</a>
-                <a class="pg">Next</a>
+            <div class="pagination-wrapper">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-end">
+                        <li class="page-item"><a class="page-link" href="#">Previous</a></li>
+                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                        <li class="page-item"><a class="page-link" href="#">4</a></li>
+                        <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                    </ul>
+                </nav>
             </div>
         </div>
 
@@ -191,12 +195,17 @@
                 </table>
             </div>
 
-            <div class="pager">
-                <a class="pg">Previous</a>
-                <a class="pg active">1</a>
-                <a class="pg">2</a>
-                <a class="pg">3</a>
-                <a class="pg">Next</a>
+            <div class="pagination-wrapper">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-end">
+                        <li class="page-item"><a class="page-link" href="#">Previous</a></li>
+                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                        <li class="page-item"><a class="page-link" href="#">4</a></li>
+                        <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                    </ul>
+                </nav>
             </div>
         </div>
 
@@ -208,13 +217,14 @@
                 <table class="dash-table">
                     <thead>
                         <tr>
-                            <th style="width:120px;">New Arrival Books</th>
-                            <th>Tittle</th>
-                            <th style="width:120px;">Quantity</th>
+                            <th style="width:120px; text-align:center;">New Arrival</th>
+                            <th style="min-width:240px;">Title</th>
+                            <th style="width:140px; text-align:center;">Quantity</th>
                             <th style="width:160px;">Author Name</th>
-                            <th style="width:140px;">Create at</th>
+                            <th style="width:140px; text-align:center;">Created At</th>
                         </tr>
                     </thead>
+
                     <tbody>
                         <tr>
                             <td class="text-center">
@@ -256,12 +266,17 @@
                 </table>
             </div>
 
-            <div class="pager">
-                <a class="pg">Previous</a>
-                <a class="pg active">1</a>
-                <a class="pg">2</a>
-                <a class="pg">3</a>
-                <a class="pg">Next</a>
+            <div class="pagination-wrapper">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-end">
+                        <li class="page-item"><a class="page-link" href="#">Previous</a></li>
+                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                        <li class="page-item"><a class="page-link" href="#">4</a></li>
+                        <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                    </ul>
+                </nav>
             </div>
         </div>
 
@@ -313,18 +328,119 @@
                 </table>
             </div>
 
-            <div class="pager">
-                <a class="pg">Previous</a>
-                <a class="pg active">1</a>
-                <a class="pg">2</a>
-                <a class="pg">3</a>
-                <a class="pg">Next</a>
+            <div class="pagination-wrapper">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-end">
+                        <li class="page-item"><a class="page-link" href="#">Previous</a></li>
+                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                        <li class="page-item"><a class="page-link" href="#">4</a></li>
+                        <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+    <!-- Charts Row -->
+    <div class="charts-row">
+        <!-- Left -->
+        <div class="chart-col">
+            <div class="quick-panel">
+                <h4 class="panel-title">Book Categories</h4>
+
+                <div class="panel-body categories-body">
+                    <div class="chart-area">
+                        <canvas id="chartCategories" height="220"></canvas>
+                    </div>
+
+                    <div class="legend-area">
+                        <ul class="legend">
+                            <li><span class="dot edu"></span> Education</li>
+                            <li><span class="dot art"></span> Art and Culture</li>
+                            <li><span class="dot rel"></span> Religious</li>
+                            <li><span class="dot other"></span> Other</li>
+                        </ul>
+                    </div>
+                </div>
+
             </div>
         </div>
 
+        <!-- Right -->
+        <div class="chart-col">
+            <div class="quick-panel">
+                <h4 class="panel-title">Book Borrowing Trends</h4>
+
+                <div class="panel-body trends-body">
+                    <div class="chart-area full">
+                        <canvas id="chartTrends" height="220"></canvas>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <!-- Restricted Members panel -->
+    <div style="margin-top:18px;">
+        <div class="quick-panel">
+            <h4 class="panel-title">Restricted Members</h4>
+
+            <div class="table-wrap">
+                <table class="dash-table">
+                    <thead>
+                        <tr>
+                            <th style="width:160px;">MEMBER ID</th>
+                            <th>NAME</th>
+                            <th style="width:120px;" class="text-center">ACTION</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>0007331</td>
+                            <td>Chun Rattnakvisal</td>
+                            <td class="text-center"><button class="pg" style="padding:6px 10px;"><i
+                                        class="fa-solid fa-circle-exclamation"></i></button></td>
+                        </tr>
+                        <tr>
+                            <td>0007332</td>
+                            <td>Sok Sabbay</td>
+                            <td class="text-center"><button class="pg" style="padding:6px 10px;"><i
+                                        class="fa-solid fa-circle-exclamation"></i></button></td>
+                        </tr>
+                        <tr>
+                            <td>0007333</td>
+                            <td>Sok Vikchet</td>
+                            <td class="text-center"><button class="pg" style="padding:6px 10px;"><i
+                                        class="fa-solid fa-circle-exclamation"></i></button></td>
+                        </tr>
+                        <tr>
+                            <td>0007334</td>
+                            <td>Nam Chheav</td>
+                            <td class="text-center"><button class="pg" style="padding:6px 10px;"><i
+                                        class="fa-solid fa-circle-exclamation"></i></button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pagination-wrapper">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-end">
+                        <li class="page-item"><a class="page-link" href="#">Previous</a></li>
+                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                        <li class="page-item"><a class="page-link" href="#">4</a></li>
+                        <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
     </div>
 </div>
 
 @section Scripts {
-    <script src="~/js/admin/Dashboard.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="~/js/admin/dashboard.js"></script>
 }

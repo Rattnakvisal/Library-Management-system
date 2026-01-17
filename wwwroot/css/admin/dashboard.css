@@ -1,4 +1,7 @@
-﻿:root {
+﻿/* =========================================================
+   THEME
+========================================================= */
+:root {
   --navy: #1f4a73;
   --navy-dark: #163a5a;
   --bg: #f4f6f8;
@@ -17,6 +20,7 @@
   font-weight: 800;
   margin: 0;
 }
+
 .dash-header .date-line {
   margin-top: 6px;
   color: var(--navy);
@@ -31,7 +35,9 @@
   margin: 10px 0 18px;
 }
 
-/* Summary cards row */
+/* =========================================================
+   SUMMARY CARDS
+========================================================= */
 .summary-row {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -46,8 +52,8 @@
   box-shadow: var(--shadow);
   display: flex;
   align-items: center;
-  padding: 14px;
   gap: 14px;
+  padding: 14px;
 }
 
 .sum-icon {
@@ -71,17 +77,19 @@
   font-size: 12px;
   margin-bottom: 6px;
 }
+
 .sum-value {
   font-weight: 800;
   font-size: 18px;
   color: var(--navy);
 }
-
-/* Quick actions */
+/* =========================================================
+   QUICK PANELS WITH TABS   
+========================================================= */
 .quick-title {
   font-size: 18px;
   font-weight: 800;
-  margin: 6px 0 6px;
+  margin: 6px 0;
 }
 
 .quick-tabs {
@@ -100,11 +108,13 @@
   font-size: 14px;
   color: #000;
   position: relative;
+  cursor: pointer;
 }
 
 .qtab.active {
   color: var(--navy);
 }
+
 .qtab.active::after {
   content: "";
   position: absolute;
@@ -115,7 +125,6 @@
   background: var(--navy);
 }
 
-/* Panel box */
 .quick-panel {
   background: #fff;
   border: 1px solid #d7dee6;
@@ -130,7 +139,6 @@
   margin: 2px 0 14px;
 }
 
-/* Contents show/hide */
 .qtab-content {
   display: none;
 }
@@ -138,9 +146,10 @@
   display: block;
 }
 
-/* Table style */
+/* =========================================================
+   TABLES (dashboard tables)
+========================================================= */
 .table-wrap {
-  border: 1px solid #cfd6df;
   border-radius: 4px;
   overflow: hidden;
 }
@@ -155,12 +164,12 @@
   background: #efefef;
   font-size: 11px;
   font-weight: 900;
-  padding: 12px 12px;
+  padding: 12px;
   border-bottom: 1px solid #c9c9c9;
 }
 
 .dash-table tbody td {
-  padding: 12px 12px;
+  padding: 12px;
   font-size: 11px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.25);
 }
@@ -169,7 +178,39 @@
   border-bottom: none;
 }
 
-/* pills */
+/* small book image */
+.book-img {
+  width: 26px;
+  height: 34px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* status & action icons */
+.status {
+  font-weight: 900;
+  font-size: 11px;
+}
+
+.status.pending {
+  color: #ff9900;
+}
+
+.status.borrowing {
+  color: #2a3a57;
+}
+
+.action-ico {
+  font-size: 16px;
+  margin: 0 8px;
+  color: #000;
+  opacity: 0.9;
+}
+
+/* =========================================================
+   PILLS
+========================================================= */
 .pill {
   display: inline-flex;
   align-items: center;
@@ -179,7 +220,9 @@
   font-size: 10px;
   font-weight: 900;
   border: 1px solid transparent;
+  white-space: nowrap;
 }
+
 .pill i {
   font-size: 12px;
 }
@@ -189,71 +232,161 @@
   color: #b30000;
   border-color: #ff3b3b;
 }
+
 .pill.warn {
   background: #ffc27b;
   color: #a64a00;
   border-color: #ff8a00;
 }
 
-/* action icons */
-.action-ico {
-  font-size: 16px;
-  margin: 0 8px;
-  color: #000;
-  opacity: 0.9;
+/* =========================
+   PAGINATION
+========================= */
+.pagination-wrapper {
+  padding: 12px;
 }
 
-/* status */
-.status {
-  font-weight: 900;
-  font-size: 11px;
-}
-.status.pending {
-  color: #ff9900;
-}
-.status.borrowing {
-  color: #2a3a57;
+.pagination {
+  margin: 0;
 }
 
-/* book img */
-.book-img {
-  width: 26px;
-  height: 34px;
-  border-radius: 4px;
-  border: 1px solid #ddd;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-}
-
-/* Pagination */
-.pager {
-  display: flex;
-  justify-content: flex-end;
-  gap: 0;
-  margin-top: 10px;
-}
-.pg {
+.page-link {
   border: 1px solid #3a3a3a;
+  color: #2b2b2b;
+  font-size: 12px;
   padding: 6px 12px;
-  font-size: 11px;
-  background: #fff;
-  cursor: pointer;
-  user-select: none;
+  border-radius: 0 !important;
 }
-.pg.active {
+
+.page-item.active .page-link {
   background: var(--navy);
+  border-color: #3a3a3a;
   color: #fff;
 }
 
-/* Responsive */
+.page-item .page-link:hover {
+  background: #f4f6f8;
+}
+
+/* =========================================================
+   CHARTS GRID
+========================================================= */
+.charts-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin: 18px 0;
+}
+
+.chart-col {
+  min-width: 0;
+}
+
+.charts-row .quick-panel {
+  min-height: 320px;
+  display: flex;
+  flex-direction: column;
+}
+
+.charts-row .panel-body {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding-top: 6px;
+  min-width: 0;
+}
+
+.charts-row .chart-area {
+  flex: 0 0 420px;
+  max-width: 420px;
+  min-width: 0;
+}
+
+.charts-row .chart-area.full {
+  flex: 1 1 auto;
+  max-width: 100%;
+}
+
+.charts-row canvas {
+  width: 100% !important;
+  height: 220px !important;
+  display: block;
+}
+
+/* legend */
+.legend-area {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.legend {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 0 8px;
+}
+
+.legend li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 8px 0;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  display: inline-block;
+}
+
+.dot.edu {
+  background: #8b5e53;
+}
+.dot.art {
+  background: #1534ff;
+}
+.dot.rel {
+  background: #1dd13a;
+}
+.dot.other {
+  background: #ff2b2b;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
 @media (max-width: 992px) {
   .summary-row {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
   .quick-tabs {
     flex-wrap: wrap;
     justify-content: flex-start;
   }
+
+  .charts-row {
+    grid-template-columns: 1fr;
+  }
+
+  .charts-row .panel-body {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .charts-row .chart-area {
+    flex: 1 1 auto;
+    max-width: 100%;
+  }
+
+  .legend {
+    margin-left: 0;
+  }
 }
+
 @media (max-width: 576px) {
   .summary-row {
     grid-template-columns: 1fr;
