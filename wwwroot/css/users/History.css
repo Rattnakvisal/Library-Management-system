@@ -1,2 +1,109 @@
-﻿body {
+﻿:root {
+    --nav: #0e2a45;
+    --footer: #0b2236;
+    --page: #eef2f6;
+    --card: #ffffff;
+    --border: rgba(0,0,0,0.10);
+    --text: #132A46;
+    --muted: #6b7a8b;
+    --borrow: #f1b400;
+    --return: #24a148;
+}
+body {
+    background-color: E9EEF4;
+   
+
+{
+    background: var(--page);
+    min-height: calc(100vh - 64px);
+}
+
+.page-wrap {
+    max-width: 980px;
+}
+
+.page-title {
+    color: var(--text);
+    font-weight: 800;
+}
+
+.summary-btn {
+    background: #1B3451 !important;
+    border-color: #1B3451 !important;
+    border-radius: 8px;
+}
+
+    .summary-btn:hover {
+        background: #162a40 !important;
+        border-color: #162a40 !important;
+    }
+
+/* History list card */
+.history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.history-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.thumb {
+    width: 110px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 12px;
+}
+
+    .thumb img {
+        width: 90px;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 10px;
+        border: 1px solid rgba(0,0,0,0.08);
+    }
+
+.book-name {
+    color: var(--text);
+    font-weight: 800;
+    font-size: 1rem;
+}
+
+.text-muted2 {
+    color: var(--muted);
+    font-size: 15px;
+}
+
+.stars {
+    color: #f1b400;
+    font-size: .85rem;
+}
+
+.status-box {
+    border-left: 1px solid rgba(0,0,0,0.08);
+    height: 100%;
+}
+
+.label {
+    color: var(--text);
+    font-weight: 700;
+}
+
+.status {
+    font-weight: 800;
+}
+
+    .status.borrowing {
+        color: var(--borrow);
+    }
+
+    .status.returned {
+        color: var(--return);
+    }
 }
