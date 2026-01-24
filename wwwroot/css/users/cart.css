@@ -1,2 +1,57 @@
 ﻿body {
+    background-color: #f8f9fa;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.cart-card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    transition: transform 0.2s;
+}
+
+.cart-img-width .img {
+    width: 70px;
+    height: 100px;
+}
+
+.btn-delete {
+    background-color: #c00000;
+    color: white;
+    border: none;
+    padding: 8px 25px;
+}
+
+.btn-request {
+    background-color: #0f2a43;
+    color: white;
+    border: none;
+    padding: 8px 25px;
+}
+
+    .btn-delete:hover, .btn-request:hover {
+        color: white;
+        background-color: #c7c9c5;
+    }
+
+.custom-check {
+    width: 24px;
+    height: 24px;
+    border: 2px solid #ced4da;
+    border-radius: 50%;
+    background-color: #e9ecef;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.book-img {
+    width: 100px;
+    height: 140px;
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+.rating-stars {
+    color: #ffc107;
+    font-size: 0.9rem;
 }

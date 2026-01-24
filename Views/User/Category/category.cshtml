@@ -1,0 +1,51 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Category";
+}
+
+<div class="container py-5">
+    <h2 class="text-center fw-bold mb-4 text-navy">Categories</h2>
+    <div class="filter-scroll-container mb-5">
+        <div class="d-flex flex-nowrap px-4">
+            <button class="btn btn-filter active">All</button>
+            <button class="btn btn-filter">Accounting</button>
+            <button class="btn btn-filter">English for Business Communication</button>
+            <button class="btn btn-filter">Management</button>
+            <button class="btn btn-filter">International Law</button>
+            <button class="btn btn-filter">Programming</button>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        @for (int i = 0; i < 8; i++)
+        {
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="card book-card border-0 shadow-sm h-100">
+                    <div class="p-2 position-relative">
+                        <img src="~/images/User/Book/finance.jpg" class="card-img-top rounded-3" alt="Book Cover" style="height: 200px; object-fit: cover;">
+                        <button class="btn wishlist-btn-circle position-absolute top-0 end-0 m-3">
+                            <i class="fa-solid fa-heart"></i>
+                        </button>
+                    </div>
+                    <div class="card-body pt-0 px-3 pb-3">
+                        <span class="category-text-tiny fw-bold text-muted">Professional and Technical</span>
+                        <h6 class="book-title-clamped mb-1 fw-bold">Cambridge English for Engineering Students</h6>
+                        <p class="author-text-tiny text-muted mb-2">Jame Walton</p>
+                        <div class="text-end text-warning small">
+                            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <nav class="mt-5 d-flex justify-content-center">
+        <div class="pagination-wrapper d-flex border rounded overflow-hidden">
+            <a asp-action="Category" asp-route-page="1" class="page-node">1</a>
+            <a asp-action="Category" asp-route-page="2" class="page-node">2</a>
+            <a asp-action="Category" asp-route-page="3" class="page-node active">3</a>
+            <a asp-action="Category" asp-route-page="4" class="page-node px-3">Next</a>
+        </div>
+    </nav>
+</div>

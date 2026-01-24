@@ -114,7 +114,16 @@ namespace Library_Management_system.Controllers
             ViewBag.Title = "Cookie";
             return View("~/Views/User/Cookie/Cookie.cshtml");
         }
-       
+        //public IActionResult Category()
+        //{
+        //    return View("~/Views/User/Category/Category.cshtml");
+        //}
+        //[Area("User")]
+            public IActionResult Category(int page = 1)
+            {
+                ViewBag.CurrentPage = page;
+                return View("~/Views/User/Category/Category.cshtml");
+            }
 
         public IActionResult Privacy()
         {
