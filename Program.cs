@@ -18,7 +18,8 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options =>
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
 builder.Services.AddControllersWithViews();
-
+// Register services
+builder.Services.AddScoped<DbHelper>();  // For DbConnectionHelper
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
