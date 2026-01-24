@@ -1,0 +1,192 @@
+/* =========================================================
+   Library Management Schema (SQL Server)
+   ========================================================= */
+
+SET ANSI_NULLS ON;
+SET QUOTED_IDENTIFIER ON;
+GO
+/* =======================
+   Part 1: Book Management
+   ======================= */
+
+CREATE TABLE dbo.Categories (
+    CategoryID   INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_Categories PRIMARY KEY,
+    CategoryName NVARCHAR(100) NOT NULL CONSTRAINT UQ_Categories_CategoryName UNIQUE
+);
+GO
+
+CREATE TABLE dbo.Authors (
+    AuthorID   INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_Authors PRIMARY KEY,
+    AuthorName NVARCHAR(100) NOT NULL
+);
+GO
+
+CREATE TABLE dbo.Books (
+    BookID        INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_Books PRIMARY KEY,
+    Title         NVARCHAR(200) NOT NULL,
+    ISBN          NVARCHAR(20) NULL,
+    CategoryID    INT NOT NULL,
+    AuthorID      INT NOT NULL,
+    Quantity      INT NOT NULL,
+    Available     INT NOT NULL,
+    PublishedYear INT NULL,
+    CreatedAt     DATETIME2(0) NULL CONSTRAINT DF_Books_CreatedAt DEFAULT (SYSDATETIME()),
+
+    CONSTRAINT FK_Books_Categories FOREIGN KEY (CategoryID) REFERENCES dbo.Categories(CategoryID),
+    CONSTRAINT FK_Books_Authors    FOREIGN KEY (AuthorID)   REFERENCES dbo.Authors(AuthorID),
+
+    CONSTRAINT CK_Books_Quantity_Positive  CHECK (Quantity >= 0),
+    CONSTRAINT CK_Books_Available_NonNeg   CHECK (Available >= 0),
+    CONSTRAINT CK_Books_Available_LTE_Qty  CHECK (Available <= Quantity),
+    CONSTRAINT CK_Books_PublishedYear     CHECK (PublishedYear IS NULL OR (PublishedYear BETWEEN 1000 AND 9999))
+);
+GO
+
+/* =======================
+   Part 2: Reservation & Borrowing
+   ======================= */
+
+CREATE TABLE dbo.Reservations (
+    ReservationID   INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_Reservations PRIMARY KEY,
+    UserID          INT NOT NULL,
+    BookID          INT NOT NULL,
+    ReservationDate DATETIME2(0) NULL CONSTRAINT DF_Reservations_Date DEFAULT (SYSDATETIME()),
+    Status          NVARCHAR(20) NULL,
+
+    CONSTRAINT FK_Reservations_Users FOREIGN KEY (UserID) REFERENCES dbo.Users(UserID),
+    CONSTRAINT FK_Reservations_Books FOREIGN KEY (BookID) REFERENCES dbo.Books(BookID),
+
+    CONSTRAINT CK_Reservations_Status CHECK (
+        Status IS NULL OR Status IN (N'Pending', N'Approved', N'Cancelled')
+    )
+);
+GO
+
+CREATE TABLE dbo.Borrowings (
+    BorrowID       INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_Borrowings PRIMARY KEY,
+    ReservationID  INT NOT NULL,
+    BorrowDate     DATETIME2(0) NULL CONSTRAINT DF_Borrowings_Date DEFAULT (SYSDATETIME()),
+    DueDate        DATETIME2(0) NOT NULL,
+    Status         NVARCHAR(20) NULL,
+
+    CONSTRAINT FK_Borrowings_Reservations FOREIGN KEY (ReservationID) REFERENCES dbo.Reservations(ReservationID),
+
+    CONSTRAINT CK_Borrowings_Status CHECK (
+        Status IS NULL OR Status IN (N'Borrowed', N'Returned', N'Overdue')
+    ),
+    CONSTRAINT CK_Borrowings_Due_After_Borrow CHECK (
+        BorrowDate IS NULL OR DueDate >= BorrowDate
+    )
+);
+GO
+
+CREATE TABLE dbo.Returns (
+    ReturnID    INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_Returns PRIMARY KEY,
+    BorrowID    INT NOT NULL,
+    ReturnDate  DATETIME2(0) NULL CONSTRAINT DF_Returns_Date DEFAULT (SYSDATETIME()),
+    Fine        DECIMAL(10,2) NULL,
+
+    CONSTRAINT FK_Returns_Borrowings FOREIGN KEY (BorrowID) REFERENCES dbo.Borrowings(BorrowID),
+    CONSTRAINT CK_Returns_Fine_NonNeg CHECK (Fine IS NULL OR Fine >= 0)
+);
+GO
+
+CREATE TABLE dbo.Fines (
+    FineID    INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_Fines PRIMARY KEY,
+    ReturnID  INT NOT NULL,
+    Amount    DECIMAL(10,2) NOT NULL,
+    Paid      BIT NULL CONSTRAINT DF_Fines_Paid DEFAULT (0),
+    PaidDate  DATETIME2(0) NULL,
+
+    CONSTRAINT FK_Fines_Returns FOREIGN KEY (ReturnID) REFERENCES dbo.Returns(ReturnID),
+    CONSTRAINT CK_Fines_Amount_NonNeg CHECK (Amount >= 0),
+    CONSTRAINT CK_Fines_PaidDate CHECK (
+        Paid IS NULL
+        OR Paid = 0 AND PaidDate IS NULL
+        OR Paid = 1 AND PaidDate IS NOT NULL
+    )
+);
+GO
+
+/* =======================
+   Part 3: Communication & Review
+   ======================= */
+
+CREATE TABLE dbo.BookReviews (
+    ReviewID    INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_BookReviews PRIMARY KEY,
+    BookID      INT NOT NULL,
+    UserID      INT NOT NULL,
+    Rating      INT NOT NULL,
+    Comment     NVARCHAR(500) NULL,
+    ReviewDate  DATETIME2(0) NULL CONSTRAINT DF_BookReviews_Date DEFAULT (SYSDATETIME()),
+
+    CONSTRAINT FK_BookReviews_Books FOREIGN KEY (BookID) REFERENCES dbo.Books(BookID),
+    CONSTRAINT FK_BookReviews_Users FOREIGN KEY (UserID) REFERENCES dbo.Users(UserID),
+    CONSTRAINT CK_BookReviews_Rating CHECK (Rating BETWEEN 1 AND 5)
+);
+GO
+
+CREATE TABLE dbo.Events (
+    EventID      INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_Events PRIMARY KEY,
+    EventName    NVARCHAR(200) NOT NULL,
+    Description  NVARCHAR(500) NULL,
+    EventDate    DATETIME2(0) NOT NULL,
+    Location     NVARCHAR(255) NULL
+);
+GO
+
+CREATE TABLE dbo.Notifications (
+    NotificationID INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_Notifications PRIMARY KEY,
+    UserID         INT NOT NULL,
+    Message        NVARCHAR(500) NOT NULL,
+    IsRead         BIT NULL CONSTRAINT DF_Notifications_IsRead DEFAULT (0),
+    CreatedAt      DATETIME2(0) NULL CONSTRAINT DF_Notifications_CreatedAt DEFAULT (SYSDATETIME()),
+
+    CONSTRAINT FK_Notifications_Users FOREIGN KEY (UserID) REFERENCES dbo.Users(UserID)
+        ON DELETE CASCADE
+);
+GO
+
+CREATE TABLE dbo.Contacts (
+    ContactID        INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_Contacts PRIMARY KEY,
+    UserID           INT NOT NULL,
+    Phone            NVARCHAR(20) NULL,
+    Address          NVARCHAR(255) NULL,
+    EmergencyContact NVARCHAR(100) NULL,
+    CONSTRAINT FK_Contacts_Users FOREIGN KEY (UserID) REFERENCES dbo.Users(UserID)
+        ON DELETE CASCADE
+);
+GO
+
+
+/* =======================
+   Helpful Indexes
+   ======================= */
+
+CREATE INDEX IX_Users_RoleID            ON dbo.Users(RoleID);
+CREATE INDEX IX_Contacts_UserID         ON dbo.Contacts(UserID);
+CREATE INDEX IX_Staff_RoleID            ON dbo.Staff(RoleID);
+
+CREATE INDEX IX_Books_CategoryID        ON dbo.Books(CategoryID);
+CREATE INDEX IX_Books_AuthorID          ON dbo.Books(AuthorID);
+CREATE INDEX IX_Books_Title             ON dbo.Books(Title);
+
+CREATE INDEX IX_Reservations_UserID     ON dbo.Reservations(UserID);
+CREATE INDEX IX_Reservations_BookID     ON dbo.Reservations(BookID);
+CREATE INDEX IX_Borrowings_ReservationID ON dbo.Borrowings(ReservationID);
+
+CREATE INDEX IX_Returns_BorrowID        ON dbo.Returns(BorrowID);
+CREATE INDEX IX_Fines_ReturnID          ON dbo.Fines(ReturnID);
+
+CREATE INDEX IX_BookReviews_BookID      ON dbo.BookReviews(BookID);
+CREATE INDEX IX_BookReviews_UserID      ON dbo.BookReviews(UserID);
+
+CREATE INDEX IX_Notifications_UserID    ON dbo.Notifications(UserID);
+CREATE INDEX IX_Notifications_IsRead    ON dbo.Notifications(IsRead);
+GO
+
+/* =======================
+   Optional seed data
+   ======================= */
+INSERT INTO dbo.Roles (RoleName) VALUES (N'Admin'), (N'Librarian'), (N'Member');
+GO
