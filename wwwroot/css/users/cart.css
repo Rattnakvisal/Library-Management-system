@@ -34,7 +34,7 @@
         background-color: #c7c9c5;
     }
 
-.custom-check {
+/*.custom-check {
     width: 24px;
     height: 24px;
     border: 2px solid #ced4da;
@@ -42,6 +42,63 @@
     background-color: #e9ecef;
     display: inline-block;
     cursor: pointer;
+}
+
+.custom-check.checked {
+    background-color: #007bff; 
+    border-color: #007bff;
+}*/
+
+.checkbox-container {
+    cursor: pointer;
+    display: inline-block;
+}
+
+.hidden-input {
+    display: none;
+}
+
+.custom-check {
+    width: 28px;
+    height: 28px;
+    display: inline-block;
+    border-radius: 50%;
+    position: relative;
+    transition: all 0.3s ease;
+    background-color: #E4E4E4;
+}
+
+.hidden-input:checked + .custom-check {
+    background-color: #b8860b;
+    border-color: #b8860b;
+}
+
+.custom-check::after {
+    content: "";
+    position: absolute;
+    display: none;
+    left: 11px;
+    top: 5px;
+    width: 7px;
+    height: 14px;
+    border: solid white;
+    border-width: 0 3px 3px 0;
+    transform: rotate(45deg);
+}
+
+.hidden-input:checked + .custom-check::after {
+    display: block;
+    animation: check-pop 0.2s ease-out;
+}
+
+@keyframes check-pop {
+    0% {
+        transform: rotate(45deg) scale(0);
+    }
+
+    100% {
+        transform: rotate(45deg) scale(1);
+    }
 }
 
 .book-img {
