@@ -1,7 +1,93 @@
-@{
+﻿@{
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewBag.Title = "Cart";
 }
 
-<h1>Cart</h1>
-<p>Shopping cart placeholder content.</p>
+@* <h1>Cart</h1>
+<p>Shopping cart placeholder content.</p> *@
+
+<div class="container">
+    <div class="card cart-card p-4 mb-3">
+        <div class="d-flex justify-content-between align-items-center">
+            <h1 class="h2 fw-bold mb-0">Cart</h1>
+            <div>
+                <button class="btn btn-delete me-2">Delete</button>
+                <button class="btn btn-request">Proceed to request</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="mb-2">
+        <div class="d-flex align-items-center mb-3 ms-2">
+            <span class="custom-check me-3"></span>
+            <h5 class="fw-bold text-secondary mb-3">Today</h5>
+        </div>
+
+        <div class="card cart-card p-4 mb-3">
+            <div class="row align-items-center">
+                <div class="col-auto">
+                    <span class="custom-check"></span>
+                </div>
+                <div class="col-auto cart-img-width">
+                    <img src="~/images/User/Book/general2.jpg" alt="Book Cover" class="book-img shadow-sm">
+                </div>
+                <div class="col">
+                    <h4 class="fw-bold mb-1" style="color: #1e293b;">Financial Statement Analysis</h4>
+                    <p class="text-muted small mb-0">Author: Jame Bonds</p>
+                    <p class="text-muted small mb-0">Publish Year: 2023</p>
+                    <p class="text-muted small mb-0">Book Code: A168168</p>
+                    <div class="rating-stars mt-2">
+                        ★★★★<span class="text-light">★</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card cart-card p-4 mb-3">
+            <div class="row align-items-center">
+                <div class="col-auto">
+                    <span class="custom-check"></span>
+                </div>
+                <div class="col-auto">
+                    <img src="~/images/User/Book/general.jpg" alt="Book Cover" class="book-img shadow-sm">
+                </div>
+                <div class="col">
+                    <h4 class="fw-bold mb-1" style="color: #1e293b;">Financial Statement Analysis</h4>
+                    <p class="text-muted small mb-0">Author: Jame Bonds</p>
+                    <p class="text-muted small mb-0">Publish Year: 2023</p>
+                    <p class="text-muted small mb-0">Book Code: A168168</p>
+                    <div class="rating-stars mt-2">
+                        ★★★★<span class="text-light">★</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div>
+        <div class="d-flex align-items-center mb-3 ms-2">
+            <span class="custom-check me-3"></span>
+            <h5 class="fw-bold text-secondary mb-3">Yesterday</h5>
+        </div>
+
+        <div class="card cart-card p-4 mb-3">
+            <div class="row align-items-center">
+                <div class="col-auto">
+                    <span class="custom-check"></span>
+                </div>
+                <div class="col-auto">
+                    <img src="~/images/User/Book/book2.png" alt="Book Cover" class="book-img shadow-sm">
+                </div>
+                <div class="col">
+                    <h4 class="fw-bold mb-1" style="color: #1e293b;">Financial Statement Analysis</h4>
+                    <p class="text-muted small mb-0">Author: Jame Bonds</p>
+                    <p class="text-muted small mb-0">Publish Year: 2023</p>
+                    <p class="text-muted small mb-0">Book Code: A168168</p>
+                    <div class="rating-stars mt-2">
+                        ★★★★<span class="text-light">★</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
