@@ -57,7 +57,7 @@ namespace Library_Management_system.Controllers
         public IActionResult AboutLogin()
         {
             ViewBag.Title = "About - Login";
-            return View("~/Views/User/About/login.cshtml");
+            return RedirectToPage("/Account/Login", new { area = "Identity" });
         }
 
         [HttpGet("event")]
