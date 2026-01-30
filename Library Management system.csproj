@@ -9,12 +9,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Views\NewFolder\**" />
     <Compile Remove="wwwroot\images\NewFolder\**" />
     <Compile Remove="wwwroot\images\User\slide_show\**" />
+    <Content Remove="Views\NewFolder\**" />
     <Content Remove="wwwroot\images\NewFolder\**" />
     <Content Remove="wwwroot\images\User\slide_show\**" />
+    <EmbeddedResource Remove="Views\NewFolder\**" />
     <EmbeddedResource Remove="wwwroot\images\NewFolder\**" />
     <EmbeddedResource Remove="wwwroot\images\User\slide_show\**" />
+    <None Remove="Views\NewFolder\**" />
     <None Remove="wwwroot\images\NewFolder\**" />
     <None Remove="wwwroot\images\User\slide_show\**" />
   </ItemGroup>
@@ -39,10 +43,6 @@
     <_ContentIncludedByDefault Remove="Views\Admin\Borrow\Index.cshtml" />
     <_ContentIncludedByDefault Remove="Views\Admin\Report\Index.cshtml" />
     <_ContentIncludedByDefault Remove="Views\Admin\Users\Index.cshtml" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Views\NewFolder\" />
   </ItemGroup>
 
 </Project>
