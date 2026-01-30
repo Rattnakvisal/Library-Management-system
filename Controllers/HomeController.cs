@@ -81,12 +81,7 @@ namespace Library_Management_system.Controllers
             return View("~/Views/User/History/History.cshtml");
         }
 
-        [HttpGet("notification")]
-        public IActionResult Notification()
-        {
-            ViewBag.Title = "Notifications";
-            return View("~/Views/User/Notification/Notification.cshtml");
-        }
+        
 
         [HttpGet("cart")]
         public IActionResult Cart()

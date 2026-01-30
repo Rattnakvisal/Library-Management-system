@@ -1,0 +1,127 @@
+﻿@page
+@model Library_Management_system.Views.User.Books.IndexModel
+@{
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Book Detail - Middle Only</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+    <div class="page-wrap">
+
+        <!-- ✅ Breadcrumb like your screenshot -->
+        <div class="breadcrumb-wrap">
+            <img src="images/logo.png" class="breadcrumb-icon" alt="icon">
+            <div class="breadcrumb-line">
+                <a href="#" class="breadcrumb-link">Category</a>
+                <span class="breadcrumb-sep">></span>
+                <span class="breadcrumb-current">Professional and Technical</span>
+            </div>
+        </div>
+
+        <!-- ✅ MIDDLE ONLY -->
+        <div class="row g-5 align-items-start">
+            <div class="col-12 col-md-3">
+                <img src="https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=600"
+                     class="main-img cover-sm"
+                     alt="Cover">
+            </div>
+
+            <div class="col-md-8">
+                <div class="d-flex justify-content-between align-items-start gap-3">
+                    <div>
+                        <h1 class="book-title">Cambridge English for Engineering Students Book (SAE) with CDS(2)</h1>
+                        <p class="author-name">Author: Ibbotson</p>
+                    </div>
+
+                    <div class="rate-box">
+                        <div class="rate-stars">★★★★★</div>
+                        <div class="rate-text">Rate this book</div>
+                    </div>
+                </div>
+
+                <p class="desc-text">
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec pulvinar, tortor quis varius pretium est felis
+                    scelerisque nulla, vitae placerat justo nunc a massa. Aenean nec montes vestibulum urna vel imperdiet ipsum.
+                    Orci varius natoque penatibus et magnis dis ridiculus mus.
+                </p>
+
+                <div class="btn-group-custom">
+                    <button class="btn-read">Read</button>
+                    <button class="btn-cart"><i class="bi bi-cart2 me-2"></i> Add to cart</button>
+
+                    <!-- keep your favorite icon button -->
+                    <button class="btn-fav-circle" aria-label="favorite"><i class="bi bi-heart"></i></button>
+
+                    <button class="btn-share-circle" aria-label="share"><i class="bi bi-share"></i></button>
+                </div>
+
+                <div class="info-bar">
+                    <span><span class="info-label">Total page:</span>300</span>
+                    <span><span class="info-label">Publish year:</span>2010</span>
+                    <span><span class="info-label">Book code:</span>A1234</span>
+                </div>
+            </div>
+        </div>
+
+        <h3 class="rec-title">You might also like:</h3>
+        <div class="row row-cols-2 row-cols-md-4 g-4" id="recGrid"></div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        const data = [
+          { title: "Cambridge English for Engineering Students Book (SAE) with CDS(2)", author: "Jane Walton", stars: 5, img: "https://picsum.photos/seed/a1/500/600" },
+          { title: "Cambridge English for Engineering Students Book (SAE) with CDS(2)", author: "Jane Walton", stars: 5, img: "https://picsum.photos/seed/a2/500/600" },
+          { title: "Cambridge English for Engineering Students Book (SAE) with CDS(2)", author: "Jane Walton", stars: 5, img: "https://picsum.photos/seed/a3/500/600" },
+          { title: "Cambridge English for Engineering Students Book (SAE) with CDS(2)", author: "Jane Walton", stars: 5, img: "https://picsum.photos/seed/a4/500/600" }
+        ];
+
+        const grid = document.getElementById('recGrid');
+
+        data.forEach((book, idx) => {
+          grid.innerHTML += `
+            <div class="col">
+              <div class="rec-card">
+                <img class="rec-img" src="${book.img}" alt="book">
+                <div class="rec-body">
+                  <div class="rec-meta">
+                    <div class="rec-cat">Professional and Technical</div>
+                    <button class="rec-heart" type="button" aria-label="favorite" data-id="${idx}">
+                      <i class="bi bi-heart-fill"></i>
+                    </button>
+                  </div>
+
+                  <div class="rec-title2">${book.title}</div>
+                  <div class="rec-author">${book.author}</div>
+                  <div class="rec-stars">★★★★★</div>
+                </div>
+              </div>
+            </div>
+          `;
+        });
+
+        document.querySelectorAll(".rec-heart").forEach(btn => {
+          btn.addEventListener("click", () => {
+            btn.classList.toggle("active");
+            const icon = btn.querySelector("i");
+            const filled = icon.classList.contains("bi-heart-fill");
+            icon.classList.toggle("bi-heart-fill", !filled);
+            icon.classList.toggle("bi-heart", filled);
+          });
+        });
+    </script>
+
+</body>
+</html>

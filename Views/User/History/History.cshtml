@@ -9,9 +9,44 @@
         <!-- Header row -->
         <div class="d-flex align-items-center justify-content-between gap-3 mt-4 mb-3">
             <h3 class="page-title mb-0">History</h3>
-            <button class="btn btn-primary btn-sm px-3 summary-btn">
+            @* <button class="btn btn-primary btn-sm px-3 summary-btn">
                 Borrowing Summary
-            </button>
+            </button> *@
+            <div class="summary-dropdown">
+                <button class="btn btn-primary borrowing-btn" id="toggleSummary">
+                    Borrowing Summary
+                </button>
+
+                <div class="summary-card shadow" id="summaryDetails">
+                    <div class="summary-row">
+                        <span>Sub total</span>
+                        <span class="fw-bold">10</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>On hold</span>
+                        <span class="fw-bold">10</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Return</span>
+                        <span class="fw-bold">8</span>
+                    </div>
+
+                    <hr class="summary-divider">
+
+                    <div class="summary-row mb-4">
+                        <span class="small">Damage & Late returning fee:</span>
+                        <span class="fw-bold">$1.50</span>
+                    </div>
+
+                    <button class="btn btn-light w-100 fw-bold mb-2 py-2" style="color: #1e293b;">
+                        Read Term and Condition
+                    </button>
+
+                    <div class="text-center">
+                        <small class="gold-text">*Term and Condition Applied</small>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- LIST -->
@@ -163,3 +198,20 @@
 
         </div>
     </div>
+
+<script>
+    $(document).ready(function() {
+    // Toggle the dropdown
+    $('#toggleSummary').on('click', function(e) {
+        e.stopPropagation(); // Prevents immediate closing
+        $('#summaryDetails').fadeToggle(200);
+    });
+
+    // Close the dropdown if clicking outside of it
+    $(document).on('click', function(e) {
+        if (!$(e.target).closest('.summary-dropdown').length) {
+            $('#summaryDetails').fadeOut(200);
+        }
+    });
+});
+</script>

@@ -102,11 +102,11 @@
     margin-top: 20px;
 }
 
-.form-group label {
-    display: block;
-    margin-bottom: 6px;
-    font-weight: 500;
-}
+    .form-group label {
+        display: block;
+        margin-bottom: 6px;
+        font-weight: 500;
+    }
 
 /* ================================
    SOCIAL MEDIA
