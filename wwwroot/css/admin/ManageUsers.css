@@ -1,4 +1,13 @@
-﻿.dashboard-page {
+﻿:root {
+    --navy: #1f4a73;
+    --navy-dark: #163a5a;
+    --bg: #f4f6f8;
+    --text: #1c2b36;
+    --muted: #7b8a97;
+    --line: #e6edf5;
+    --shadow: 0 10px 24px rgba(22, 58, 90, 0.08);
+}
+.dashboard-page {
   max-width: 1280px;
 }
 
@@ -239,3 +248,29 @@
 .filter-btn i {
   font-size: 18px;
 }
+.pagination-wrapper {
+    padding: 12px;
+}
+
+.pagination {
+    margin: 0;
+}
+
+.page-link {
+    border: 1px solid #3a3a3a;
+    color: #2b2b2b;
+    font-size: 12px;
+    padding: 6px 12px;
+    border-radius: 0 !important;
+}
+
+.page-item.active .page-link {
+    background: var(--navy);
+    border-color: #3a3a3a;
+    color: #fff;
+}
+
+.page-item .page-link:hover {
+    background: #f4f6f8;
+}
+
