@@ -19,7 +19,7 @@ body {
 ========================= */
 .header {
   height: 80px; /* cleaner than 105px */
-  background: #163a5a;
+  background: #ffffff;
   border-bottom: 1px solid rgba(0, 0, 0, 0.08);
 }
 
@@ -80,14 +80,14 @@ body {
    CONTENT LAYOUT
 ========================= */
 .content {
-  height: calc(100vh - 80px); /* must match header height */
+  height: calc(100vh - 80px);
 }
 
 /* =========================
    SIDEBAR
 ========================= */
 .sidebar {
-  width: 260px; /* fixed width feels better */
+  width: 260px;
   background-color: #294765;
   padding: 16px 10px;
   overflow-y: auto;
@@ -99,7 +99,6 @@ body {
   margin: 0;
 }
 
-/* Each sidebar item */
 .link {
   display: flex;
   align-items: center;
@@ -147,7 +146,7 @@ body {
    MAIN CONTENT
 ========================= */
 .main-content {
-  flex: 1; /* take remaining space */
+  flex: 1;
   padding: 20px;
   overflow-y: auto;
   background-color: #f8f9fa;

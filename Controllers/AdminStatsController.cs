@@ -1,11 +1,12 @@
+using Library_Management_system.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Library_Management_system.Models;
+using System.Linq;
 
 namespace Library_Management_system.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Librarian")]
     [Route("admin/api/stats")]
     public class AdminStatsController : Controller
     {
@@ -16,11 +17,9 @@ namespace Library_Management_system.Controllers
             _userManager = userManager;
         }
 
-        // GET: /admin/api/stats/total-users
         [HttpGet("total-users")]
         public IActionResult TotalUsers()
         {
-            // Identity Users table
             var total = _userManager.Users.Count();
             return Json(new { ok = true, total });
         }

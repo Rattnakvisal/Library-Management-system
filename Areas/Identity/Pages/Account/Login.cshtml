@@ -80,7 +80,7 @@
                     </div>
 
                     <button id="login-submit" type="submit" class="btn-signin">
-                        Sign in
+                        <span class="btn-text">Sign in</span>
                     </button>
                 </form>
 
@@ -125,14 +125,11 @@
         </div>
     </div>
 
-    <script src="~/js/admin/login.js"></script>
-    <script src="~/js/script.js" asp-append-version="true"></script>
-
     @section Scripts {
         <partial name="_ValidationScriptsPartial" />
+        <script src="~/js/admin/login.js"></script>
+        <script src="~/js/script.js" asp-append-version="true"></script>
     }
-
-
 </body>
 
 </html>

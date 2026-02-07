@@ -92,14 +92,24 @@ namespace Library_Management_system.Areas.Identity.Pages.Account
             {
                 _logger.LogInformation("User logged in.");
 
-                // If the user is an Admin, redirect to the Admin Dashboard
+                // Admin -> Dashboard
                 if (await _userManager.IsInRoleAsync(user, "Admin"))
                 {
-                    var adminUrl = Url.Content("~/Admin/Dashboard");
-                    return LocalRedirect(adminUrl);
+                    return RedirectToAction("Index", "Dashboard");
                 }
 
-                return LocalRedirect(returnUrl);
+                // Librarian -> Dashboard (but report hidden/blocked)
+                if (await _userManager.IsInRoleAsync(user, "Librarian"))
+                {
+                    return RedirectToAction("Index", "Dashboard");
+                }
+                // Normal user -> Home
+                if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+                {
+                    return LocalRedirect(returnUrl);
+                }
+
+                return RedirectToAction("Index", "Home");
             }
 
             if (result.IsLockedOut)

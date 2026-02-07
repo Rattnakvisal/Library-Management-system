@@ -70,6 +70,9 @@ using (var scope = app.Services.CreateScope())
     if (!await roleManager.RoleExistsAsync("Admin"))
         await roleManager.CreateAsync(new IdentityRole("Admin"));
 
+    if (!await roleManager.RoleExistsAsync("Librarian"))
+        await roleManager.CreateAsync(new IdentityRole("Librarian"));
+
     if (!await roleManager.RoleExistsAsync("User"))
         await roleManager.CreateAsync(new IdentityRole("User"));
 
@@ -105,6 +108,36 @@ using (var scope = app.Services.CreateScope())
         // Ensure admin password (reset if needed)
         var token = await userManager.GeneratePasswordResetTokenAsync(adminUser);
         await userManager.ResetPasswordAsync(adminUser, token, adminPassword);
+    }
+    // =========================
+    // Librarian account
+    // =========================
+    var librarianEmail = "librarian@library.com";
+    var librarianPassword = "Librarian@12345";
+
+    var librarianUser = await userManager.FindByEmailAsync(librarianEmail);
+
+    if (librarianUser == null)
+    {
+        librarianUser = new ApplicationUser
+        {
+            FullName = "System Librarian",
+            UserName = "SystemLibrarian",
+            Email = librarianEmail,
+            EmailConfirmed = true
+        };
+
+        var createResult = await userManager.CreateAsync(librarianUser, librarianPassword);
+        if (createResult.Succeeded)
+            await userManager.AddToRoleAsync(librarianUser, "Librarian");
+    }
+    else
+    {
+        if (!await userManager.IsInRoleAsync(librarianUser, "Librarian"))
+            await userManager.AddToRoleAsync(librarianUser, "Librarian");
+
+        var token = await userManager.GeneratePasswordResetTokenAsync(librarianUser);
+        await userManager.ResetPasswordAsync(librarianUser, token, librarianPassword);
     }
 }
 
