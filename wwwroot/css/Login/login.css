@@ -56,7 +56,9 @@ body {
 }
 
 .logo img {
-    height: 50px;
+    height: 55px;
+    margin-left: 5px;
+    margin-top: 18px;
 }
 
 .illustration {
@@ -113,6 +115,7 @@ body {
     vertical-align: middle;
     padding: 0px;
     width: 30px;
+    margin-left: 10px;
 }
 
 .btn-login-student {
@@ -122,16 +125,13 @@ body {
     border: none;
     padding: 12px;
     border-radius: 8px;
-    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-weight: 600;
     margin-bottom: 10px;
     font-size: 16px;
-    transition: background 0.3s ease;
 }
-
-    .btn-login-student:hover {
-        background: #1B3452;
-    }
 
 @media (max-width: 480px) {
     .btn-login-student {
@@ -201,7 +201,7 @@ form input {
     position: absolute;
     left: 15px;
     top: 50%;
-    transform: translateY(-72%); /* center vertically */
+    transform: translateY(-73%); /* center vertically */
     font-size: 18px;
     color: #9aa0a6;
 }
@@ -210,7 +210,7 @@ form input {
     position: absolute;
     left: 15px;
     top: 50%;
-    transform: translateY(-133%); /* center vertically */
+    transform: translateY(-135%); /* center vertically */
     font-size: 18px;
     color: #9aa0a6;
 }

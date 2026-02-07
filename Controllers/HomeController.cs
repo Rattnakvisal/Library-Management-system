@@ -53,11 +53,11 @@ namespace Library_Management_system.Controllers
             return View("~/Views/User/About/account.cshtml");
         }
 
-        [HttpGet("about/login")]
-        public IActionResult AboutLogin()
+        [HttpGet("/login")]
+        public IActionResult Login()
         {
             ViewBag.Title = "About - Login";
-            return View("~/Views/User/About/login.cshtml");
+            return RedirectToPage("/Account/Login", new { area = "Identity" });
         }
 
         [HttpGet("event")]
