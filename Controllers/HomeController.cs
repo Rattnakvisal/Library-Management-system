@@ -114,11 +114,35 @@ namespace Library_Management_system.Controllers
         //    return View("~/Views/User/Category/Category.cshtml");
         //}
         //[Area("User")]
-            public IActionResult Category(int page = 1)
-            {
-                ViewBag.CurrentPage = page;
-                return View("~/Views/User/Category/Category.cshtml");
-            }
+        public IActionResult Category(int page = 1)
+        {
+            ViewBag.CurrentPage = page;
+            return View("~/Views/User/Category/Category.cshtml");
+        }
+
+
+        //public IActionResult Category(int page = 1)
+        //{
+        //    int pageSize = 8;
+
+        //    var books = GetDummyBooks(); // temporary fake data
+
+        //    var paginatedBooks = books
+        //        .Skip((page - 1) * pageSize)
+        //        .Take(pageSize)
+        //        .ToList();
+
+        //    ViewBag.CurrentPage = page;
+        //    ViewBag.TotalPages = (int)Math.Ceiling((double)books.Count / pageSize);
+
+        //    if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+        //    {
+        //        return PartialView("_BookGrid", paginatedBooks);
+        //    }
+
+        //    return View(paginatedBooks);
+        //}
+
 
         public IActionResult Privacy()
         {

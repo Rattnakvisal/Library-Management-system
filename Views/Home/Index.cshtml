@@ -91,7 +91,7 @@
                     <div class="card-body p-3">
                         <div class="d-flex justify-content-between align-items-center mb-1">
                             <span class="category-text small fw-bold">Professional and Technical</span>
-                            <button class="btn p-0 border-0 wishlist-btn text-secondary">
+                            <button class="btn p-0 border-0 wishlist-btn text-secondary" data-id="book1">
                                 <i class="fa-solid fa-heart"></i>
                             </button>
                         </div>
@@ -115,7 +115,7 @@
                 <div class="card-body p-3">
                     <div class="d-flex justify-content-between align-items-center mb-1">
                         <span class="category-text small fw-bold">Professional and Technical</span>
-                        <button class="btn p-0 border-0 wishlist-btn text-secondary">
+                            <button class="btn p-0 border-0 wishlist-btn text-secondary" data-id="book2">
                             <i class="fa-solid fa-heart"></i>
                         </button>
                     </div>
@@ -138,7 +138,7 @@
                 <div class="card-body p-3">
                     <div class="d-flex justify-content-between align-items-center mb-1">
                         <span class="category-text small fw-bold">Professional and Technical</span>
-                        <button class="btn p-0 border-0 wishlist-btn text-secondary">
+                            <button class="btn p-0 border-0 wishlist-btn text-secondary" data-id="book3">
                             <i class="fa-solid fa-heart"></i>
                         </button>
                     </div>
@@ -264,7 +264,7 @@
         <h3 class="fw-bold text-navy">New Arrival</h3>
             <button class="btn btn-outline-secondary btn-sm">Explore more</button>
     </div>
-        <div class="row row-cols-2 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3 g-md-4" ">
+        <div class="row row-cols-2 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3 g-md-4" >
 
         <div class="col">
             <div class="card book-card border-0 shadow-sm h-100 position-relative">
@@ -367,7 +367,46 @@
 
 <!-- New arrival section end -->
 </div>
+
 <script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const buttons = document.querySelectorAll('.wishlist-btn');
+
+        buttons.forEach(button => {
+
+            const bookId = button.getAttribute('data-id');
+
+            let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+
+            if (favorites.includes(bookId)) {
+                button.classList.add('active');
+                button.querySelector('i').classList.add('text-danger');
+            }
+
+            button.addEventListener('click', function () {
+
+                let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+
+                if (favorites.includes(bookId)) {
+                    favorites = favorites.filter(id => id !== bookId);
+                    this.classList.remove('active');
+                    this.querySelector('i').classList.remove('text-danger');
+                } else {
+                    favorites.push(bookId);
+                    this.classList.add('active');
+                    this.querySelector('i').classList.add('text-danger');
+                }
+
+                localStorage.setItem('favorites', JSON.stringify(favorites));
+            });
+        });
+
+    });
+</script>
+
+
+@* <script>
         document.querySelectorAll('.wishlist-btn').forEach(button => {
         button.addEventListener('click', function() {
             this.classList.toggle('active');
@@ -395,5 +434,5 @@
         localStorage.setItem('favorites', JSON.stringify(favorites));
     }
 
-</script>
+</script> *@
 
