@@ -7,6 +7,7 @@
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -47,7 +48,7 @@
                     <span>OR</span>
                 </div>
 
-                <!-- ✅ Identity Login Form -->
+                <!-- Identity Login Form -->
                 <form id="account" method="post">
                     <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
 
@@ -57,12 +58,8 @@
                                 <i class="fa-regular fa-envelope"></i>
                             </div>
 
-                            <input asp-for="Input.Email"
-                                   type="email"
-                                   placeholder="Your Email"
-                                   autocomplete="username"
-                                   aria-required="true"
-                                   required />
+                            <input asp-for="Input.Email" type="email" placeholder="Your Email" autocomplete="username"
+                                   aria-required="true" required />
                         </div>
                         <span asp-validation-for="Input.Email" class="text-danger"></span>
 
@@ -71,13 +68,8 @@
                                 <i class="fa-solid fa-lock"></i>
                             </div>
 
-                            <input asp-for="Input.Password"
-                                   type="password"
-                                   class="password"
-                                   placeholder="Your Password"
-                                   autocomplete="current-password"
-                                   aria-required="true"
-                                   required />
+                            <input asp-for="Input.Password" type="password" class="password" placeholder="Your Password"
+                                   autocomplete="current-password" aria-required="true" required />
 
                             <span class="toggle-password" role="button" tabindex="0">
                                 <i class="bi bi-eye-slash" id="togglePassword"></i>
@@ -99,14 +91,12 @@
 
                     <p>
                         Don’t have an account?
-                        <a class="Sign-up-telegram"
-                           asp-page="./Register"
-                           asp-route-returnUrl="@Model.ReturnUrl">
-                            Sign up via Telegram <i class="fab fa-telegram"></i>
+                        <a class="Sign-up-telegram" asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">
+                            Sign up
                         </a>
                     </p>
 
-                   
+
                 </div>
 
                 <!-- External Login (Optional) -->
@@ -115,17 +105,12 @@
                     <div style="margin-top:18px;">
                         <div class="divider"><span>OR</span></div>
 
-                        <form id="external-account"
-                              asp-page="./ExternalLogin"
-                              asp-route-returnUrl="@Model.ReturnUrl"
+                        <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl"
                               method="post">
                             <div style="display:flex; gap:10px; flex-wrap:wrap;">
                                 @foreach (var provider in Model.ExternalLogins!)
                                 {
-                                    <button type="submit"
-                                            class="btn-signin"
-                                            name="provider"
-                                            value="@provider.Name"
+                                    <button type="submit" class="btn-signin" name="provider" value="@provider.Name"
                                             title="Log in using your @provider.DisplayName account"
                                             style="width:auto; padding:10px 16px;">
                                         @provider.DisplayName
@@ -147,6 +132,7 @@
         <partial name="_ValidationScriptsPartial" />
     }
 
-    
+
 </body>
+
 </html>
