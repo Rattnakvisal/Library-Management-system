@@ -12,116 +12,183 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 
+    <!-- Font Awesome (stars) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
 </head>
 
 <body>
-
     <div class="page-wrap">
 
-        <!-- ✅ Breadcrumb like your screenshot -->
+        <!-- Breadcrumb -->
         <div class="breadcrumb-wrap">
-            <img src="images/logo.png" class="breadcrumb-icon" alt="icon">
+            <img src="/images/Login/logoac.png" alt="Logo" class="breadcrumb-icon">
             <div class="breadcrumb-line">
+                <i class="fa-solid fa-angle-right"></i>
                 <a href="#" class="breadcrumb-link">Category</a>
-                <span class="breadcrumb-sep">></span>
-                <span class="breadcrumb-current">Professional and Technical</span>
+                <i class="fa-solid fa-angle-right"></i>
+                <span class="breadcrumb-link">Professional and Technical</span>
             </div>
         </div>
 
-        <!-- ✅ MIDDLE ONLY -->
+        <!-- Main -->
         <div class="row g-5 align-items-start">
-            <div class="col-12 col-md-3">
-                <img src="https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=600"
+            <div class="col-12 col-md-4">
+                <img src="/images/User/Book/book2.png"
                      class="main-img cover-sm"
                      alt="Cover">
             </div>
 
-            <div class="col-md-8">
+            <div class="col-12 col-md-8">
                 <div class="d-flex justify-content-between align-items-start gap-3">
                     <div>
                         <h1 class="book-title">Cambridge English for Engineering Students Book (SAE) with CDS(2)</h1>
                         <p class="author-name">Author: Ibbotson</p>
                     </div>
 
+                    <!-- Top rate (your snippet) -->
                     <div class="rate-box">
-                        <div class="rate-stars">★★★★★</div>
+                        <div class="text-end star-rating text-warning small">
+                            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half-stroke"></i>
+                        </div>
                         <div class="rate-text">Rate this book</div>
                     </div>
                 </div>
 
                 <p class="desc-text">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec pulvinar, tortor quis varius pretium est felis
-                    scelerisque nulla, vitae placerat justo nunc a massa. Aenean nec montes vestibulum urna vel imperdiet ipsum.
-                    Orci varius natoque penatibus et magnis dis ridiculus mus.
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec pulvinar, tortor quis varius pretium est felis scelerisque nulla,
+                    vitae placerat justo nunc a massa. Aenean nec montes vestibulum urna vel imperdiet ipsum. Orci varius natoque penatibus et magnis
+                    dis ridiculus mus.
                 </p>
 
                 <div class="btn-group-custom">
                     <button class="btn-read">Read</button>
                     <button class="btn-cart"><i class="bi bi-cart2 me-2"></i> Add to cart</button>
 
-                    <!-- keep your favorite icon button -->
                     <button class="btn-fav-circle" aria-label="favorite"><i class="bi bi-heart"></i></button>
-
                     <button class="btn-share-circle" aria-label="share"><i class="bi bi-share"></i></button>
                 </div>
 
                 <div class="info-bar">
-                    <span><span class="info-label">Total page:</span>300</span>
-                    <span><span class="info-label">Publish year:</span>2010</span>
-                    <span><span class="info-label">Book code:</span>A1234</span>
+                    <div class="info-item">Total page:&nbsp; 300</div>
+                    <div class="info-item">Publish year:&nbsp; 2010</div>
+                    <div class="info-item">Book code:&nbsp; A1234</div>
                 </div>
             </div>
         </div>
 
-        <h3 class="rec-title">You might also like:</h3>
-        <div class="row row-cols-2 row-cols-md-4 g-4" id="recGrid"></div>
+        <!-- Recommendations -->
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4" id="recGrid"></div>
 
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-    <script>
-        const data = [
-          { title: "Cambridge English for Engineering Students Book (SAE) with CDS(2)", author: "Jane Walton", stars: 5, img: "https://picsum.photos/seed/a1/500/600" },
-          { title: "Cambridge English for Engineering Students Book (SAE) with CDS(2)", author: "Jane Walton", stars: 5, img: "https://picsum.photos/seed/a2/500/600" },
-          { title: "Cambridge English for Engineering Students Book (SAE) with CDS(2)", author: "Jane Walton", stars: 5, img: "https://picsum.photos/seed/a3/500/600" },
-          { title: "Cambridge English for Engineering Students Book (SAE) with CDS(2)", author: "Jane Walton", stars: 5, img: "https://picsum.photos/seed/a4/500/600" }
-        ];
+    <section class="container-fluid mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="fw-bold text-navy">You might also like:</h3>
+        </div>
+        <div class="row row-cols-2 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3 g-md-4" ">
 
-        const grid = document.getElementById('recGrid');
-
-        data.forEach((book, idx) => {
-          grid.innerHTML += `
             <div class="col">
-              <div class="rec-card">
-                <img class="rec-img" src="${book.img}" alt="book">
-                <div class="rec-body">
-                  <div class="rec-meta">
-                    <div class="rec-cat">Professional and Technical</div>
-                    <button class="rec-heart" type="button" aria-label="favorite" data-id="${idx}">
-                      <i class="bi bi-heart-fill"></i>
-                    </button>
-                  </div>
-
-                  <div class="rec-title2">${book.title}</div>
-                  <div class="rec-author">${book.author}</div>
-                  <div class="rec-stars">★★★★★</div>
+                <div class="card book-card border-0 shadow-sm h-100 position-relative">
+                    <span class="badge bg-danger position-absolute top-0 start-0 m-3 px-3 py-2">New</span>
+                    <div class="card-img-wrapper p-2">
+                        <img src="~/images/User/Book/finance.jpg" class="card-img-top rounded" alt="Book" height="200">
+                    </div>
+                    <div class="card-body p-3">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="category-text small fw-bold">Professional and Technical</span>
+                            <button class="btn p-0 border-0 wishlist-btn text-secondary">
+                                <i class="fa-solid fa-heart"></i>
+                            </button>
+                        </div>
+                        <h6 class="book-title mb-1 small fw-bold">
+                            Cambridge English for Engineering Students Book (SAE)
+                            with CDS(2)
+                        </h6>
+                        <p class="author-text mb-3 small italic">Jame Walton</p>
+                        <div class="text-end star-rating text-warning small">
+                            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half-stroke"></i>
+                        </div>
+                    </div>
                 </div>
-              </div>
             </div>
-          `;
-        });
-
-        document.querySelectorAll(".rec-heart").forEach(btn => {
-          btn.addEventListener("click", () => {
-            btn.classList.toggle("active");
-            const icon = btn.querySelector("i");
-            const filled = icon.classList.contains("bi-heart-fill");
-            icon.classList.toggle("bi-heart-fill", !filled);
-            icon.classList.toggle("bi-heart", filled);
-          });
-        });
-    </script>
+            <div class="col">
+                <div class="card book-card border-0 shadow-sm h-100 position-relative">
+                    <span class="badge bg-danger position-absolute top-0 start-0 m-3 px-3 py-2">New</span>
+                    <div class="card-img-wrapper p-2">
+                        <img src="~/images/User/Book/general.jpg" class="card-img-top rounded" alt="Book" height="200">
+                    </div>
+                    <div class="card-body p-3">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="category-text small fw-bold">Professional and Technical</span>
+                            <button class="btn p-0 border-0 wishlist-btn text-secondary">
+                                <i class="fa-solid fa-heart"></i>
+                            </button>
+                        </div>
+                        <h6 class="book-title mb-1 small fw-bold">
+                            Cambridge English for Engineering Students Book (SAE)
+                            with CDS(2)
+                        </h6>
+                        <p class="author-text mb-3 small italic">Jame Walton</p>
+                        <div class="text-end star-rating text-warning small">
+                            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half-stroke"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card book-card border-0 shadow-sm h-100 position-relative">
+                    <span class="badge bg-danger position-absolute top-0 start-0 m-3 px-3 py-2">New</span>
+                    <div class="card-img-wrapper p-2">
+                        <img src="~/images/User/Book/general2.jpg" class="card-img-top rounded" alt="Book" height="200">
+                    </div>
+                    <div class="card-body p-3">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="category-text small fw-bold">Professional and Technical</span>
+                            <button class="btn p-0 border-0 wishlist-btn text-secondary">
+                                <i class="fa-solid fa-heart"></i>
+                            </button>
+                        </div>
+                        <h6 class="book-title mb-1 small fw-bold">
+                            Cambridge English for Engineering Students Book (SAE)
+                            with CDS(2)
+                        </h6>
+                        <p class="author-text mb-3 small italic">Jame Walton</p>
+                        <div class="text-end star-rating text-warning small">
+                            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half-stroke"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card book-card border-0 shadow-sm h-100 position-relative">
+                    <span class="badge bg-danger position-absolute top-0 start-0 m-3 px-3 py-2">New</span>
+                    <div class="card-img-wrapper p-2">
+                        <img src="~/images/User/Book/general3.jpg" class="card-img-top rounded" alt="Book" height="200">
+                    </div>
+                    <div class="card-body p-3">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="category-text small fw-bold">Professional and Technical</span>
+                            <button class="btn p-0 border-0 wishlist-btn text-secondary">
+                                <i class="fa-solid fa-heart"></i>
+                            </button>
+                        </div>
+                        <h6 class="book-title mb-1 small fw-bold">
+                            Cambridge English for Engineering Students Book (SAE)
+                            with CDS(2)
+                        </h6>
+                        <p class="author-text mb-3 small italic">Jame Walton</p>
+                        <div class="text-end star-rating text-warning small">
+                            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half-stroke"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
 </body>
 </html>
+

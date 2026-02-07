@@ -1,37 +1,37 @@
-﻿<style >
+﻿
+<style >
 :root {
-    --navy: #1A304B;
-    --gold: #f5b000;
-    --bg-light: #f4f7f9;
+    --navy: #0e2a47;
+    --navy2: #1A304B;
+    --bg: #E9EEF4;
+    --line: #d7e2ee;
 }
 
-/* ✅ background like your screenshot */
 body {
-    background: #E9EEF4;
+    background: var(--bg);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* ✅ one container width for BOTH breadcrumb + content */
 .page-wrap {
     max-width: 960px !important;
     margin: 20px auto !important;
     padding: 0 16px;
 }
 
-/* ✅ Breadcrumb like your picture */
+/* Breadcrumb */
 .breadcrumb-wrap {
     display: flex;
     align-items: center;
     gap: 8px;
     margin-bottom: 18px;
-    color: var(--navy);
+    color: var(--navy2);
     font-size: 13px;
     font-weight: 600;
 }
 
 .breadcrumb-icon {
-    width: 16px;
-    height: 16px;
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
     object-fit: cover;
     display: block;
@@ -42,12 +42,14 @@ body {
     align-items: center;
     gap: 6px;
     flex-wrap: wrap;
+
 }
 
 .breadcrumb-link {
-    color: var(--navy);
+    color: var(--navy2);
     text-decoration: none;
     font-weight: 600;
+    margin-top: -3px;
 }
 
     .breadcrumb-link:hover {
@@ -60,91 +62,94 @@ body {
 }
 
 .breadcrumb-current {
-    color: var(--navy);
+    color: var(--navy2);
     font-weight: 600;
 }
 
-/* Content */
+/* Cover */
 .main-img {
-    width: 100%;
-    border-radius: 6px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
 }
 
-/* Title + Author */
+.cover-sm {
+    width: 260px;
+    height: 340px;
+    object-fit: cover;
+    display: block;
+}
+
+/* Title */
 .book-title {
-    font-weight: 800;
-    font-size: 22px;
-    line-height: 1.2;
-    margin-bottom: 6px;
+    font-weight: 900;
+    font-size: 28px;
+    line-height: 1.15;
+    margin-bottom: 10px;
     color: #111;
 }
 
 .author-name {
     font-weight: 500;
-    font-size: 13px;
+    font-size: 15px;
     color: #333;
     margin-bottom: 0;
 }
 
 .desc-text {
-    font-size: 14px;
+    font-size: 15px;
     line-height: 1.7;
-    color: #333;
-    margin: 18px 0 26px;
-    text-align: justify;
+    color: #4b5563;
+    margin: 18px 0 22px;
+    max-width: 610px;
 }
 
-/* Rating */
+/* Top rate */
 .rate-box {
     text-align: right;
-    min-width: 150px;
-}
-
-.rate-stars {
-    color: var(--gold);
-    font-size: 18px;
-    letter-spacing: 1px;
-    line-height: 1;
-    margin-bottom: 4px;
+    min-width: 170px;
 }
 
 .rate-text {
-    font-size: 12px;
+    font-size: 14px;
     color: #8a8f98;
     font-weight: 600;
+    margin-top: 6px;
 }
 
-/* Action Buttons (keep your favorite button unchanged) */
+.star-rating i {
+    margin-left: 2px;
+}
+
+/* Buttons */
 .btn-group-custom {
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 22px;
+    gap: 16px;
+    margin-bottom: 16px;
     flex-wrap: wrap;
 }
 
 .btn-read {
-    border: 1.5px solid #9aa9bd;
+    border: 1.5px solid #a9b8cc;
     border-radius: 999px;
-    padding: 10px 56px;
-    font-weight: 700;
+    padding: 12px 70px;
+    font-weight: 800;
     background: #fff;
-    color: #20324a;
+    color: var(--navy);
 }
 
 .btn-cart {
-    background: #0e2a47;
+    background: var(--navy);
     color: #fff;
     border-radius: 999px;
-    padding: 10px 56px;
-    font-weight: 700;
+    padding: 12px 64px;
+    font-weight: 800;
     border: none;
 }
 
 .btn-fav-circle {
-    width: 42px;
-    height: 42px;
+    width: 46px;
+    height: 46px;
     border-radius: 50%;
     background: var(--navy);
     display: flex;
@@ -160,93 +165,105 @@ body {
     }
 
 .btn-share-circle {
-    width: 42px;
-    height: 42px;
+    width: 46px;
+    height: 46px;
     border-radius: 50%;
-    border: 1.5px solid #cbd5e0;
+    border: 1.5px solid var(--line);
+    background: #fff;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #fff;
-    color: #555;
+    cursor: pointer;
 }
+
+    .btn-share-circle i {
+        color: var(--navy);
+        font-size: 18px;
+    }
 
 /* Info bar */
 .info-bar {
     background: #eef3f8;
-    border-radius: 12px;
+    border-radius: 14px;
+    border: 1px solid var(--line);
     padding: 18px 16px;
     display: flex;
-    justify-content: space-around;
-    border: 1px solid #dbe5ef;
+    align-items: center;
+    justify-content: space-between;
     margin-top: 10px;
-    flex-wrap: wrap;
-    gap: 10px;
+    overflow: hidden;
 }
 
-    .info-bar span {
-        font-weight: 600;
-        color: #111;
-        font-size: 12px;
+.info-item {
+    flex: 1;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: #111;
+    padding: 6px 8px;
+    white-space: nowrap;
+}
+
+    .info-item + .info-item {
+        border-left: 1px solid var(--line);
     }
 
-.info-label {
-    font-weight: 700;
-    margin-right: 6px;
-    color: #2a3b55;
-}
-
-/* Recommendation layout */
+/* Recommendations */
 .rec-title {
-    font-weight: 800;
-    margin: 60px 0 15px;
-    color: #0e2a47;
-    font-size: 24px;
+    font-weight: 900;
+    margin: 46px 0 18px;
+    color: var(--navy);
+    font-size: 34px;
+    letter-spacing: -0.3px;
 }
 
 .rec-card {
     border: 1px solid #e6e6e6;
-    border-radius: 10px;
+    border-radius: 14px;
     overflow: hidden;
     background: #fff;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
     height: 100%;
 }
 
 .rec-img {
     width: 100%;
-    height: 220px;
+    height: 190px;
     object-fit: cover;
     display: block;
 }
 
 .rec-body {
-    padding: 10px 10px 12px;
+    padding: 12px 12px 14px;
+    display: flex;
+    flex-direction: column;
+    min-height: 150px;
 }
 
 .rec-meta {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
 }
 
 .rec-cat {
-    font-size: 11px;
-    color: #000;
+    font-size: 12px;
+    color: #111;
 }
 
+/* heart like first pic (simple gray heart, NO circle) */
 .rec-heart {
     border: none;
     background: transparent;
     padding: 0;
-    line-height: 1;
     cursor: pointer;
+    line-height: 1;
 }
 
     .rec-heart i {
         color: #bdbdbd;
-        font-size: 16px;
+        font-size: 20px;
     }
 
     .rec-heart.active i {
@@ -254,25 +271,27 @@ body {
     }
 
 .rec-title2 {
-    font-size: 11px;
+    font-size: 12px;
     color: #111;
-    line-height: 1.25;
-    margin-bottom: 4px;
-    min-height: 32px;
+    line-height: 1.3;
+    margin: 2px 0 6px;
+    min-height: 36px;
     overflow: hidden;
 }
 
 .rec-author {
-    font-size: 10px;
+    font-size: 12px;
     color: #777;
     font-style: italic;
-    margin-bottom: 6px;
+    margin-bottom: 0;
 }
 
-.rec-stars {
-    color: var(--gold);
-    font-size: 12px;
-    letter-spacing: 1px;
+/* ✅ stars bottom-right like your last pic */
+.rec-footer {
+    margin-top: auto;
+    display: flex;
+    justify-content: flex-end; /* RIGHT */
+    padding-top: 8px;
 }
 
 </style >
