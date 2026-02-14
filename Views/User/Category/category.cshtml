@@ -7,29 +7,47 @@
     <h2 class="text-center fw-bold mb-4 text-navy">Categories</h2>
     <div class="filter-scroll-container mb-5">
         <div class="d-flex flex-nowrap px-4">
-            <button class="btn btn-filter active">All</button>
-            <button class="btn btn-filter">Accounting</button>
-            <button class="btn btn-filter">English for Business Communication</button>
-            <button class="btn btn-filter">Management</button>
-            <button class="btn btn-filter">International Law</button>
-            <button class="btn btn-filter">Programming</button>
+            <a asp-action="Category" asp-route-category=""
+               class="btn btn-filter @(string.IsNullOrEmpty(ViewBag.CurrentCategory) ? "active" : "")">All</a>
+
+            <a asp-action="Category" asp-route-category="Accounting"
+               class="btn btn-filter @(ViewBag.CurrentCategory == "Accounting" ? "active" : "")">Accounting</a>
+
+            <a asp-action="Category" asp-route-category="Management"
+               class="btn btn-filter @(ViewBag.CurrentCategory == "Management" ? "active" : "")">Management</a>
         </div>
     </div>
 
+    @* @model IEnumerable<Library_Management_system.Models.Book> *@
+
+    @{
+        int pageSize = 8;
+        int totalItems = 30; 
+
+        int totalPages = (totalItems + pageSize - 1) / pageSize;
+
+        int currentPage = ViewBag.CurrentPage ?? 1;
+        int itemsToShow = Math.Min(pageSize, totalItems - ((currentPage - 1) * pageSize));
+    }
+
     <div class="row g-4">
-        @for (int i = 0; i < 8; i++)
+        @* We only show 'pageSize' number of books (8) *@
+        @for (int e = 0; e < itemsToShow; e++)
         {
             <div class="col-6 col-md-4 col-lg-3">
                 <div class="card book-card border-0 shadow-sm h-100">
                     <div class="p-2 position-relative">
-                        <img src="~/images/User/Book/finance.jpg" class="card-img-top rounded-3" alt="Book Cover" style="height: 200px; object-fit: cover;">                       
+                        <img src="~/images/User/Book/book2.png" class="card-img-top rounded-3" alt="Book Cover" style="height: 200px; object-fit: cover;">
                     </div>
                     <div class="card-body pt-0 px-3 pb-3">
-                        <span class="category-text-tiny fw-bold text-muted">Professional and Technical</span>
-                        <h6 class="book-title-clamped mb-1 fw-bold">Cambridge English for Engineering Students</h6>
-                        <p class="author-text-tiny text-muted mb-2">Jame Walton</p>
+                        <span class="category-text-tiny fw-bold text-muted">Accounting</span>
+                        <h6 class="book-title-clamped mb-1 fw-bold">Book @(e + 1 + ((currentPage - 1) * pageSize))</h6>
+                        <p class="author-text-tiny text-muted mb-2">Author Name</p>
                         <div class="text-end text-warning small">
-                            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                            @for (int i = 0; i < 5; i++)
+                            {
+                                <i class="fa-solid fa-star"></i>
+                            }
                         </div>
                     </div>
                 </div>
@@ -39,10 +57,31 @@
 
     <nav class="mt-5 d-flex justify-content-center">
         <div class="pagination-wrapper d-flex border rounded overflow-hidden">
-            <a asp-action="Category" asp-route-page="1" class="page-node">1</a>
-            <a asp-action="Category" asp-route-page="2" class="page-node">2</a>
-            <a asp-action="Category" asp-route-page="3" class="page-node active">3</a>
-            <a asp-action="Category" asp-route-page="4" class="page-node px-3">Next</a>
+            @if (totalPages > 1)
+            {
+                @* Previous Button *@
+                @if (currentPage > 1)
+                {
+                    <a asp-action="Category" asp-route-page="@(currentPage - 1)" class="page-node px-3">Prev</a>
+                }
+
+                @* Dynamic Page Numbers based on totalItems *@
+                @for (int i = 1; i <= totalPages; i++)
+                {
+                    <a asp-action="Category"
+                       asp-route-page="@i"
+                       asp-route-category="@ViewBag.CurrentCategory"
+                       class="page-node @(i == currentPage ? "active" : "")">
+                        @i
+                    </a>
+                }
+
+                @* Next Button *@
+                @if (currentPage < totalPages)
+                {
+                    <a asp-action="Category" asp-route-page="@(currentPage + 1)" class="page-node px-3">Next</a>
+                }
+            }
         </div>
     </nav>
 </div>

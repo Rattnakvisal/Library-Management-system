@@ -10,5 +10,6 @@ namespace Library_Management_system.Data
             : base(options)
         {
         }
+        public DbSet<Book> Books { get; set; }
     }
 }
