@@ -1,4 +1,9 @@
-﻿<!DOCTYPE html>
+﻿@using Library_Management_system.Models
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -26,14 +31,18 @@
     <link rel="stylesheet" href="~/css/users/cart.css" asp-append-version="true" />
 
     <!-- Roboto font (Google Fonts) + local override to apply Roboto site-wide -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap"
-        />
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" />
     <link rel="stylesheet" href="~/css/fonts.css" asp-append-version="true" />
 
 >>>>>>> b17974366a07d4a0b19e4f84f0ee8bf12a81a655
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+<<<<<<< HEAD
 
 
+=======
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+>>>>>>> 134b3303f1b98ec3c45b61939130c51f37509319
 </head>
 
 <body>
@@ -41,23 +50,47 @@
         <div class="top-header">
             <div class="top-header-content">
                 <div class="logo-section">
-                    <a href="/"> <img src="/images/logo.png" class="navbar-logo" /></a>
-
-                </div>
-                <div class="user-info">
-                    <a href="mailto:aub168@gmail.com" class="email-address">
-                        <i class="bi bi-envelope"></i>
-                        aub168@gmail.com
+                    <a href="/">
+                        <img src="/images/logo.png" class="navbar-logo" />
                     </a>
-                    <span href="/Profile">
-                        <a href="/Profile">
-                            <i class="bi bi-person"></i>
-                            Choun Theachumnith</a>
-                    </span>
+                </div>
+
+                <div class="user-info">
+                    @if (SignInManager.IsSignedIn(User))
+                    {
+                        var u = await UserManager.GetUserAsync(User);
+                        var fullName = u?.FullName ?? u?.UserName ?? "User";
+                        var email = u?.Email ?? "";
+
+                        <a href="mailto:@email" class="email-address">
+                            <i class="bi bi-envelope"></i>
+                            @email
+                        </a>
+
+                        <span>
+                            <a href="/Profile">
+                                <i class="bi bi-person"></i>
+                                @fullName
+                            </a>
+                        </span>
+                    }
+                    else
+                    {
+                        <a class="email-address" asp-area="Identity" asp-page="/Account/Login">
+                            <i class="bi bi-box-arrow-in-right"></i>
+                            Login
+                        </a>
+
+                        <span>
+                            <a asp-area="Identity" asp-page="/Account/Register">
+                                <i class="bi bi-person-plus"></i>
+                                Register
+                            </a>
+                        </span>
+                    }
                 </div>
             </div>
         </div>
-
 
         <nav class="main-navbar">
             <div class="main-navbar-content">
@@ -110,20 +143,22 @@
             </div>
         </nav>
     </header>
+
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
 
-
     <footer>
         <div class="container-footer">
             <div class="footer-content">
                 <div class="footer-left">
                     <img src="/images/logo.png" />
-                    <p>The library preserves knowledge and makes it available to future generations — knowledge never dies
-                        here.</p>
+                    <p>
+                        The library preserves knowledge and makes it available to future generations — knowledge never
+                        dies here.
+                    </p>
                 </div>
                 <div class="footer-right">
                     <div class="footer-links">
@@ -131,12 +166,15 @@
                         <a href="/About/Faq">FAQ</a>
                         <a href="/About/Support">Support</a>
                         <a href="/About">Policies</a>
-                        <a asp-controller="Login" asp-action="Index">Account & Login</a>
+                        <a asp-area="Identity" asp-page="/Account/Login">Account & Login</a>
                     </div>
                 </div>
             </div>
+
             <div class="footer-bottom">
-                <p class="copyright">&copy; 2025 ACLEDA University of Business's Library. All right reserved</p>
+                <p class="copyright">
+                    &copy; 2025 ACLEDA University of Business's Library. All right reserved
+                </p>
                 <div class="footer-bottom-links">
                     <a href="/Terms">Terms of service</a>
                     <a href="/Privacy">Privacy Policy</a>
@@ -146,12 +184,11 @@
         </div>
     </footer>
 
-
-
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/js/users/navbar.js" asp-append-version="true"></script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 

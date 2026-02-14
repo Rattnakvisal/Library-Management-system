@@ -1,18 +1,21 @@
-using System.Diagnostics;
+using Library_Management_system.Data;
 using Library_Management_system.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
 
 namespace Library_Management_system.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly ApplicationDbContext _context;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, ApplicationDbContext context)
         {
             _logger = logger;
+            _context = context;
         }
-
         public IActionResult Index()
         {
             return View();
@@ -81,8 +84,6 @@ namespace Library_Management_system.Controllers
             return View("~/Views/User/History/History.cshtml");
         }
 
-        
-
         [HttpGet("cart")]
         public IActionResult Cart()
         {
@@ -109,16 +110,38 @@ namespace Library_Management_system.Controllers
             ViewBag.Title = "Cookie";
             return View("~/Views/User/Cookie/Cookie.cshtml");
         }
+
         //public IActionResult Category()
         //{
         //    return View("~/Views/User/Category/Category.cshtml");
         //}
         //[Area("User")]
-            public IActionResult Category(int page = 1)
+        //public IActionResult Category(int page = 1)
+        //{
+        //    ViewBag.CurrentPage = page;
+        //    return View("~/Views/User/Category/Category.cshtml");
+        //}
+
+        public IActionResult Category(string category, int page = 1)
+        {
+            ViewBag.CurrentCategory = category;
+            ViewBag.CurrentPage = page;
+
+            var booksQuery = _context.Books.AsQueryable();
+
+            if (!string.IsNullOrEmpty(category))
             {
-                ViewBag.CurrentPage = page;
-                return View("~/Views/User/Category/Category.cshtml");
+                booksQuery = booksQuery.Where(b => b.CategoryName == category);
             }
+
+            var pageSize = 8;
+            var model = booksQuery
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            return View("~/Views/User/Category/Category.cshtml", model);
+        }
 
         public IActionResult Privacy()
         {

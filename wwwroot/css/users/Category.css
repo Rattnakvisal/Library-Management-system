@@ -42,7 +42,7 @@
         border-color: #1a2b48;
     }
 
-.page-node {
+/*.page-node {
     padding: 8px 16px;
     text-decoration: none;
     color: #1a2b48;
@@ -57,5 +57,26 @@
 
     .page-node:hover:not(.active) {
         background-color: #f1f3f5;
+    }*/
+
+/* The base style for your page buttons */
+.page-node {
+    padding: 8px 16px;
+    text-decoration: none;
+    color: #003366; /* Your navy color */
+    border-right: 1px solid #dee2e6;
+    background-color: #fff;
+}
+
+    /* The style that triggers when the condition is met */
+    .page-node.active {
+        background-color: #003366; /* Navy background */
+        color: #ffffff; /* White text */
+        font-weight: bold;
+        pointer-events: none; /* Prevents clicking the page you are already on */
+    }
+
+    .page-node:hover:not(.active) {
+        background-color: #f8f9fa;
     }
 
