@@ -1,5 +1,4 @@
 ﻿
-<style >
 :root {
     --navy: #0e2a47;
     --navy2: #1A304B;
@@ -18,7 +17,6 @@ body {
     padding: 0 16px;
 }
 
-/* Breadcrumb */
 .breadcrumb-wrap {
     display: flex;
     align-items: center;
@@ -66,23 +64,21 @@ body {
     font-weight: 600;
 }
 
-/* Cover */
 .main-img {
     border-radius: 12px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.08);
 }
-
+    
 .cover-sm {
     width: 260px;
-    height: 340px;
+    height: 350px;
     object-fit: cover;
     display: block;
 }
 
-/* Title */
 .book-title {
-    font-weight: 900;
-    font-size: 28px;
+    font-weight: 600;
+    font-size: 20px;
     line-height: 1.15;
     margin-bottom: 10px;
     color: #111;
@@ -103,7 +99,6 @@ body {
     max-width: 610px;
 }
 
-/* Top rate */
 .rate-box {
     text-align: right;
     min-width: 170px;
@@ -120,7 +115,6 @@ body {
     margin-left: 2px;
 }
 
-/* Buttons */
 .btn-group-custom {
     display: flex;
     align-items: center;
@@ -133,7 +127,7 @@ body {
     border: 1.5px solid #a9b8cc;
     border-radius: 999px;
     padding: 12px 70px;
-    font-weight: 800;
+    font-weight: 600;
     background: #fff;
     color: var(--navy);
 }
@@ -143,7 +137,7 @@ body {
     color: #fff;
     border-radius: 999px;
     padding: 12px 64px;
-    font-weight: 800;
+    font-weight: 600;
     border: none;
 }
 
@@ -181,16 +175,15 @@ body {
         font-size: 18px;
     }
 
-/* Info bar */
 .info-bar {
-    background: #eef3f8;
+/*    background: #eef3f8;*/
     border-radius: 14px;
     border: 1px solid var(--line);
-    padding: 18px 16px;
+    padding: 14px 16px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-top: 10px;
+    margin-top: 18px;
     overflow: hidden;
 }
 
@@ -204,11 +197,10 @@ body {
     white-space: nowrap;
 }
 
-    .info-item + .info-item {
-        border-left: 1px solid var(--line);
-    }
+.info-item + .info-item {
+    border-left: 1px solid var(--line);
+}
 
-/* Recommendations */
 .rec-title {
     font-weight: 900;
     margin: 46px 0 18px;
@@ -252,7 +244,6 @@ body {
     color: #111;
 }
 
-/* heart like first pic (simple gray heart, NO circle) */
 .rec-heart {
     border: none;
     background: transparent;
@@ -286,12 +277,10 @@ body {
     margin-bottom: 0;
 }
 
-/* ✅ stars bottom-right like your last pic */
 .rec-footer {
     margin-top: auto;
     display: flex;
-    justify-content: flex-end; /* RIGHT */
+    justify-content: flex-end; 
     padding-top: 8px;
 }
 
-</style >
