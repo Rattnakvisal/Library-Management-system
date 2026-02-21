@@ -1,112 +1,116 @@
-﻿@{
+@{
     ViewBag.Title = "Manage Feedback";
 }
 
 @section Styles {
-    <link rel="stylesheet" href="~/css/admin/Feedback.css" />
+    <link rel="stylesheet" href="~/css/admin/Feedback.css" asp-append-version="true" />
 }
-<div class="dashboard-page container-fluid">
-    <div class="user-feedback-part">
-        <header class="page-header">
-            <h3>User's Feedback</h3>
-        </header>
-        <form action="" class="search-form mb-2" id="user-feedback-search">
+
+<div class="dashboard-page container-fluid feedback-page" id="manageFeedbackPage">
+    <header class="page-header">
+        <h1 class="page-title">Feedback Management</h1>
+        <p class="page-subtitle">Review user feedback and book reviews from readers.</p>
+    </header>
+
+    <section class="feedback-section user-feedback-part">
+        <form action="" class="search-form" id="user-feedback-search">
             <i class="bi bi-search search-icon" id="search-feedback-icon"></i>
-            <input type="text" placeholder="Search feedback..." class="search-input" id="search-feedback-input">
+            <input type="text" placeholder="Search feedback..." class="search-input" id="search-feedback-input" />
         </form>
-        <table class="table user-feedback-table">
-            <thead>
-                <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Username</th>
-                    <th scope="col">Email</th>
-                    <th scope="col">Message</th>
-                    <th scope="col">Created Date</th>
 
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td scope="row">1</td>
-                    <td>Ly</td>
-                    <td>ly@gmail.com</td>
-                    <td>Lorem, ipsum dolor.</td>
-                    <td>2026/01/01</td>
-                </tr>
-            </tbody>
-        </table>
-        <nav aria-label="Book pagination">
-            <ul class="pagination  justify-content-end">
-                <li class="page-item disabled">
-                    <a class="page-link">Previous</a>
-                </li>
+        <div class="table-container">
+            <div class="table-responsive">
+                <table class="table user-feedback-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Username</th>
+                            <th scope="col">Email</th>
+                            <th scope="col">Message</th>
+                            <th scope="col">Created Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>Ly</td>
+                            <td>ly@gmail.com</td>
+                            <td>Lorem, ipsum dolor.</td>
+                            <td>2026/01/01</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
-                <li class="page-item active" aria-current="page"><a class="page-link" href="#">1</a></li>
-                <li class="page-item">
-                    <a class="page-link" href="#">2</a>
-                </li>
-                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                <li class="page-item">
-                    <a class="page-link" href="#">Next</a>
-                </li>
-            </ul>
-        </nav>
-    </div>
-    <div class="book-review-part">
-        <header class="page-header">
-            <h3>Book Review</h3>
-        </header>
-        <form action="" class="search-form mb-2" id="book-review-search">
+            <div class="pagination-wrapper">
+                <nav aria-label="Feedback pagination">
+                    <ul class="pagination justify-content-end">
+                        <li class="page-item disabled"><a class="page-link">Previous</a></li>
+                        <li class="page-item active" aria-current="page"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                        <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </section>
+
+    <section class="feedback-section book-review-part">
+        <div class="section-header">
+            <h2 class="section-title">Book Review</h2>
+        </div>
+
+        <form action="" class="search-form" id="book-review-search">
             <i class="bi bi-search search-icon" id="book-review-icon"></i>
-            <input type="text" placeholder="Search book review..." class="search-input" id="book-review-input">
+            <input type="text" placeholder="Search book review..." class="search-input" id="book-review-input" />
         </form>
-        <table class="table book-review-table">
-            <thead>
-                <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Cover</th>
-                    <th scope="col">Title</th>
-                    <th scope="col">Username</th>
-                    <th scope="col">Email</th>
-                    <th scope="col">Rating</th>
-                    <th scope="col">Created Date</th>
 
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td scope="row">1</td>
-                    <td>
-                        <img src="~/images/User/Book/book2.png" alt="">
-                    </td>
-                    <td>Lorem, ipsum dolor.</td>
-                    <td>Ly</td>
-                    <td>ly@gmail.com</td>
-                    <td>3</td>
-                    <td>2026/01/01</td>
-                </tr>
-            </tbody>
-        </table>
-        <nav aria-label="Book pagination">
-            <ul class="pagination  justify-content-end">
-                <li class="page-item disabled">
-                    <a class="page-link">Previous</a>
-                </li>
+        <div class="table-container">
+            <div class="table-responsive">
+                <table class="table book-review-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Cover</th>
+                            <th scope="col">Title</th>
+                            <th scope="col">Username</th>
+                            <th scope="col">Email</th>
+                            <th scope="col">Rating</th>
+                            <th scope="col">Created Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>
+                                <img class="book-cover" src="~/images/User/Book/book2.png" alt="Book cover" />
+                            </td>
+                            <td>Lorem, ipsum dolor.</td>
+                            <td>Ly</td>
+                            <td>ly@gmail.com</td>
+                            <td><span class="rating-pill">3</span></td>
+                            <td>2026/01/01</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
-                <li class="page-item active" aria-current="page"><a class="page-link" href="#">1</a></li>
-                <li class="page-item">
-                    <a class="page-link" href="#">2</a>
-                </li>
-                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                <li class="page-item">
-                    <a class="page-link" href="#">Next</a>
-                </li>
-            </ul>
-        </nav>
-    </div>
+            <div class="pagination-wrapper">
+                <nav aria-label="Book review pagination">
+                    <ul class="pagination justify-content-end">
+                        <li class="page-item disabled"><a class="page-link">Previous</a></li>
+                        <li class="page-item active" aria-current="page"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                        <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </section>
 </div>
 
-
 @section Scripts {
-    <script src="~/js/admin/Feedback.js"></script>
+    <script src="~/js/admin/Feedback.js" asp-append-version="true"></script>
 }

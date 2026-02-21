@@ -43,30 +43,18 @@ function initializeSearchIcon() {
 }
 
 function styleBorrowingStatuses() {
-    const borrowingStatues = $('.table-status');
+    const borrowingStatuses = $('.table-status');
 
-    borrowingStatues.each(function() {
+    borrowingStatuses.each(function() {
         const status = $(this);
+        const statusText = status.text().trim().toLowerCase();
 
-        if (status.text() === 'Active') {
-            status.css({
-                'backgroundColor': '#DBFCE7',
-                'border': '1px solid #7BF1A6',
-                'display': 'flex',
-                'justifyContent': 'center',
-                'borderRadius': '10px',
-                'padding': '2px 6px'
-            });
-        }
-        else if (status.text() === 'Overdue') {
-            status.css({
-                'backgroundColor': '#FEA8A9',
-                'border': '1px solid #FF0A0A',
-                'display': 'flex',
-                'justifyContent': 'center',
-                'borderRadius': '10px',
-                'padding': '2px 6px'
-            });
+        status.removeClass('status-active status-overdue');
+
+        if (statusText === 'active') {
+            status.addClass('status-active');
+        } else if (statusText === 'overdue') {
+            status.addClass('status-overdue');
         }
     });
 }
@@ -76,36 +64,16 @@ function styleReservationStatuses() {
 
     reservationStatuses.each(function() {
         const status = $(this);
+        const statusText = status.text().trim().toLowerCase();
 
-        if (status.text() === 'Approved') {
-            status.css({
-                'backgroundColor': '#DBFCE7',
-                'border': '1px solid #7BF1A6',
-                'display': 'flex',
-                'justifyContent': 'center',
-                'borderRadius': '10px',
-                'padding': '2px 6px'
-            });
-        }
-        else if (status.text() === 'Rejected') {
-            status.css({
-                'backgroundColor': '#FEA8A9',
-                'border': '1px solid #FF0A0A',
-                'display': 'flex',
-                'justifyContent': 'center',
-                'borderRadius': '10px',
-                'padding': '2px 6px'
-            });
-        }
-        else if (status.text() === 'Pending') {
-            status.css({
-                'backgroundColor': '#FFBE7E',
-                'border': '1px solid #D7650F',
-                'display': 'flex',
-                'justifyContent': 'center',
-                'borderRadius': '10px',
-                'padding': '2px 6px'
-            });
+        status.removeClass('reservation-approved reservation-rejected reservation-pending');
+
+        if (statusText === 'approved') {
+            status.addClass('reservation-approved');
+        } else if (statusText === 'rejected') {
+            status.addClass('reservation-rejected');
+        } else if (statusText === 'pending') {
+            status.addClass('reservation-pending');
         }
     });
 }

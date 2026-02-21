@@ -1,18 +1,17 @@
-﻿@{
+@{
     ViewBag.Title = "Manage Report";
 }
 
-<link rel="stylesheet" href="~/css/admin/Reports.css" />
+@section Styles {
+    <link rel="stylesheet" href="~/css/admin/Reports.css" asp-append-version="true" />
+}
 
 <div class="dashboard-page container-fluid">
     <div class="reports-page">
-        <div class="row align-items-center mb-4">
-            <div class="col-8">
-                <h2 class="page-title">Reports Type</h2>
-            </div>
-            <div class="col-4 text-end">
-            </div>
-        </div>
+        <header class="page-header">
+            <h1 class="page-title">Reports Management</h1>
+            <p class="page-subtitle">Generate and view various reports for library management.</p>
+        </header>
 
         <div class="row mb-3 align-items-center controls-row">
             <div class="col-md-10">
@@ -95,5 +94,5 @@
 @section Scripts {
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="~/js/admin/Reports.js"></script>
+    <script src="~/js/admin/Reports.js" asp-append-version="true"></script>
 }

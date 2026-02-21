@@ -7,51 +7,30 @@
     <link rel="stylesheet" href="~/css/admin/ManageUsers.css" asp-append-version="true" />
 }
 
-<div class="dashboard-page container-fluid"
-     id="manageUsersPage"
-     data-active-tab="@Model.ActiveTab"
-     data-alert-success="@TempData["ManageUserSuccess"]"
-     data-alert-error="@TempData["ManageUserError"]">
-
-    <!-- =========================
-         PAGE HEADER
-    ========================== -->
-    <header class="page-header d-flex flex-wrap align-items-center justify-content-between gap-3">
-        <div>
-            <h1 class="page-title m-0">User Management</h1>
-            <p class="page-subtitle m-0 text-muted">Manage students and staff accounts.</p>
-        </div>
+<div class="dashboard-page container-fluid" id="manageUsersPage" data-active-tab="@Model.ActiveTab"
+     data-alert-success="@TempData["ManageUserSuccess"]" data-alert-error="@TempData["ManageUserError"]">
+    <header class="page-header">
+        <h1 class="page-title">User Management</h1>
+        <p class="page-subtitle">Manage student and staff accounts, roles, and access.</p>
     </header>
 
-    <!-- =========================
-         STATS CARDS
-    ========================== -->
-    <section class="stats-grid card-container" aria-label="User statistics">
-
+    <section class="card-container">
         <article class="stat-card">
-            <div class="icon-box">
-                <i class="bi bi-mortarboard-fill"></i>
-            </div>
+            <div class="icon-box"><i class="bi bi-mortarboard-fill"></i></div>
             <div class="card-content">
                 <span class="card-label">Total Students</span>
                 <span class="card-value">@Model.TotalStudents</span>
             </div>
         </article>
-
         <article class="stat-card">
-            <div class="icon-box">
-                <i class="bi bi-person-badge-fill"></i>
-            </div>
+            <div class="icon-box"><i class="bi bi-person-badge-fill"></i></div>
             <div class="card-content">
                 <span class="card-label">Total Staff</span>
                 <span class="card-value">@Model.TotalStaff</span>
             </div>
         </article>
-
         <article class="stat-card">
-            <div class="icon-box">
-                <i class="bi bi-people-fill"></i>
-            </div>
+            <div class="icon-box"><i class="bi bi-people-fill"></i></div>
             <div class="card-content">
                 <span class="card-label">Total Users</span>
                 <span class="card-value">@Model.TotalUsers</span>
@@ -59,86 +38,67 @@
         </article>
     </section>
 
-    <!-- =========================
-         TOOLBAR (TABS + SEARCH)
-    ========================== -->
-    <section class="toolbar controls-section d-flex flex-wrap align-items-center justify-content-between gap-3">
+    <section class="controls-section">
         <nav class="tabs" aria-label="User types">
-            <button type="button" class="tab" id="studentTab" data-tab="students" aria-controls="student-table-section">
-                Students
-            </button>
-            <button type="button" class="tab" id="staffTab" data-tab="staffs" aria-controls="staff-table-section">
-                Staffs
-            </button>
+            <button type="button" class="tab" id="studentTab" data-tab="students">Students</button>
+            <button type="button" class="tab" id="staffTab" data-tab="staffs">Staffs</button>
         </nav>
-
-        <div class="toolbar-right action-controls d-flex align-items-center gap-2 flex-wrap">
-            <!-- These buttons will be toggled by JS based on active tab -->
-            <button type="button" id="addStudentBtn" class="btn btn-success add-btn" data-bs-toggle="modal"
+        <div class="action-controls">
+            <button type="button" id="addStudentBtn" class="add-btn" data-bs-toggle="modal"
                     data-bs-target="#addStudentModal">
-                <i class="bi bi-plus-circle me-1"></i> Add Student
+                <i class="bi bi-person-plus-fill"></i>
+                Add Student
+            </button>
+            <button type="button" id="addStaffBtn" class="add-btn hidden" data-bs-toggle="modal"
+                    data-bs-target="#addStaffModal">
+                <i class="bi bi-person-workspace"></i>
+                Add Staff
             </button>
 
-            <button type="button" id="addStaffBtn" class="btn btn-success add-btn hidden" data-bs-toggle="modal"
-                    data-bs-target="#addStaffModal">
-                <i class="bi bi-plus-circle me-1"></i> Add Staff
-            </button>
-            <form id="searchForm"
-                  class="search-form"
-                  method="get"
-                  asp-controller="ManageUser"
-                  asp-action="Index"
-                  role="search">
+            <form id="searchForm" class="search-form" method="get" asp-controller="ManageUser" asp-action="Index">
                 <input type="hidden" name="tab" id="searchTabInput" value="@Model.ActiveTab" />
-                <i class="bi bi-search search-icon" aria-hidden="true"></i>
-                <input type="search"
-                       name="search"
-                       value="@Model.Search"
-                       placeholder="Search by name, email, ID..."
-                       class="search-input"
-                       id="searchInput"
-                       aria-label="Search users" />
+                <input type="hidden" name="gender" value="@Model.GenderFilter" />
+                <input type="hidden" name="roleFilter" value="@Model.RoleFilter" />
+                <input type="hidden" name="sort" value="@Model.Sort" />
+                <i class="bi bi-search search-icon" id="searchIcon"></i>
+                <input type="search" name="search" value="@Model.Search" placeholder="Search users..."
+                       class="search-input" id="searchInput" />
             </form>
 
-            <button type="submit"
-                    form="searchForm"
-                    class="btn btn-outline-secondary filter-btn"
-                    aria-label="Apply filter">
-                <i class="bi bi-funnel me-1" aria-hidden="true"></i>
-                Filter
+            <button type="button" class="filter-btn" aria-label="Filter users" data-bs-toggle="modal"
+                    data-bs-target="#filterUserModal">
+                <i class="bi bi-filter" aria-hidden="true"></i>
+                <span>Filter</span>
             </button>
+
+            <a id="clearFilterBtn" class="clear-filter-btn"
+                   href="@Url.Action("Index", "ManageUser", new { tab = Model.ActiveTab, search = Model.Search })">
+                <i class="bi bi-eraser"></i>
+                <span>Clear Filter</span>
+            </a>
         </div>
     </section>
 
-    <!-- =========================
-         STUDENTS TABLE
-    ========================== -->
-    <section id="student-table-section" class="table-container" aria-label="Students table">
+    <section id="student-table-section" class="table-container">
         <div class="table-responsive">
-            <table class="table user-table align-middle">
+            <table class="table user-table">
                 <thead>
                     <tr>
-                        <th style="width:60px;">#</th>
-                        <th style="width:120px;">ID</th>
+                        <th>#</th>
+                        <th>ID</th>
                         <th>Full Name</th>
                         <th>Email</th>
-                        <th style="width:150px;">Phone</th>
-                        <th style="width:120px;">Gender</th>
-                        <th style="width:120px;">Role</th>
-                        <th style="width:120px;">Action</th>
+                        <th>Phone</th>
+                        <th>Gender</th>
+                        <th>Role</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     @if (Model.Students.Count == 0)
                     {
                         <tr>
-                            <td colspan="8" class="text-center py-5">
-                                <div class="empty-state">
-                                    <i class="bi bi-person-x fs-1 d-block mb-2"></i>
-                                    <div class="fw-semibold">No students found</div>
-                                    <div class="text-muted small">Try another keyword or add a new student.</div>
-                                </div>
-                            </td>
+                            <td colspan="8" class="text-center py-4">No students found.</td>
                         </tr>
                     }
                     else
@@ -148,45 +108,35 @@
                             var student = Model.Students[i];
                             <tr>
                                 <td>@(i + 1)</td>
-                                <td class="text-nowrap">@student.UserCode</td>
-                                <td class="fw-semibold">@student.FullName</td>
-                                <td class="text-nowrap">@student.Email</td>
-                                <td class="text-nowrap">@student.PhoneNumber</td>
-                                <td class="text-nowrap">@student.Gender</td>
+                                <td>@student.UserCode</td>
+                                <td>@student.FullName</td>
+                                <td>@student.Email</td>
+                                <td>@student.PhoneNumber</td>
+                                <td>@student.Gender</td>
+                                <td>@student.Role</td>
                                 <td>
-                                    <span class="badge rounded-pill bg-primary-subtle text-primary">
-                                        @student.Role
-                                    </span>
-                                </td>
-                                <td>
-                                    <div class="action-container d-flex gap-2">
-                                        <button type="button"
-                                                class="btn edit-user-btn open-edit-student"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#editStudentModal"
-                                                data-user-id="@student.UserId"
-                                                data-user-code="@student.UserCode"
-                                                data-full-name="@student.FullName"
-                                                data-email="@student.Email"
-                                                data-phone="@student.PhoneNumber"
-                                                data-gender="@student.Gender"
-                                                data-role="User"
-                                                aria-label="Edit @student.FullName">
+                                    <div class="action-container">
+                                        <button type="button" class="edit-user-btn open-edit-student" data-bs-toggle="modal"
+                                                data-bs-target="#editStudentModal" data-user-id="@student.UserId"
+                                                data-user-code="@student.UserCode" data-full-name="@student.FullName"
+                                                data-email="@student.Email" data-phone="@student.PhoneNumber"
+                                                data-gender="@student.Gender" data-role="User">
                                             <i class="bi bi-pencil-square"></i>
                                         </button>
 
-                                        <form method="post"
-                                              asp-controller="ManageUser"
-                                              asp-action="Delete"
-                                              class="delete-user-form"
-                                              data-user-name="@student.FullName">
+                                        <form method="post" asp-controller="ManageUser" asp-action="Delete"
+                                              class="delete-user-form" data-user-name="@student.FullName">
                                             @Html.AntiForgeryToken()
                                             <input type="hidden" name="UserId" value="@student.UserId" />
                                             <input type="hidden" name="ReturnTab" value="students" class="return-tab-input" />
-                                            <input type="hidden" name="Search" value="@Model.Search" class="return-search-input" />
-                                            <button type="submit"
-                                                    class="btn delete-user-btn"
-                                                    aria-label="Delete @student.FullName">
+                                            <input type="hidden" name="Search" value="@Model.Search"
+                                                   class="return-search-input" />
+                                            <input type="hidden" name="FilterGender" value="@Model.GenderFilter"
+                                                   class="return-gender-input" />
+                                            <input type="hidden" name="RoleFilter" value="@Model.RoleFilter"
+                                                   class="return-role-filter-input" />
+                                            <input type="hidden" name="Sort" value="@Model.Sort" class="return-sort-input" />
+                                            <button type="submit" class="delete-user-btn" aria-label="Delete @student.FullName">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </form>
@@ -197,38 +147,41 @@
                     }
                 </tbody>
             </table>
+            <div class="pagination-wrapper">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-end">
+                        <li class="page-item"><a class="page-link" href="#">Previous</a></li>
+                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                        <li class="page-item"><a class="page-link" href="#">4</a></li>
+                        <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                    </ul>
+                </nav>
+            </div>
         </div>
     </section>
 
-    <!-- =========================
-         STAFF TABLE
-    ========================== -->
-    <section id="staff-table-section" class="table-container hidden" aria-label="Staff table">
+    <section id="staff-table-section" class="table-container hidden">
         <div class="table-responsive">
-            <table class="table user-table align-middle">
+            <table class="table user-table">
                 <thead>
                     <tr>
-                        <th style="width:60px;">#</th>
-                        <th style="width:120px;">ID</th>
+                        <th>#</th>
+                        <th>ID</th>
                         <th>Full Name</th>
                         <th>Email</th>
-                        <th style="width:150px;">Phone</th>
-                        <th style="width:120px;">Gender</th>
-                        <th style="width:120px;">Role</th>
-                        <th style="width:120px;">Action</th>
+                        <th>Phone</th>
+                        <th>Gender</th>
+                        <th>Role</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     @if (Model.Staffs.Count == 0)
                     {
                         <tr>
-                            <td colspan="8" class="text-center py-5">
-                                <div class="empty-state">
-                                    <i class="bi bi-person-x fs-1 d-block mb-2"></i>
-                                    <div class="fw-semibold">No staff found</div>
-                                    <div class="text-muted small">Try another keyword or add a new staff account.</div>
-                                </div>
-                            </td>
+                            <td colspan="8" class="text-center py-4">No staff found.</td>
                         </tr>
                     }
                     else
@@ -238,45 +191,35 @@
                             var staff = Model.Staffs[i];
                             <tr>
                                 <td>@(i + 1)</td>
-                                <td class="text-nowrap">@staff.UserCode</td>
-                                <td class="fw-semibold">@staff.FullName</td>
-                                <td class="text-nowrap">@staff.Email</td>
-                                <td class="text-nowrap">@staff.PhoneNumber</td>
-                                <td class="text-nowrap">@staff.Gender</td>
+                                <td>@staff.UserCode</td>
+                                <td>@staff.FullName</td>
+                                <td>@staff.Email</td>
+                                <td>@staff.PhoneNumber</td>
+                                <td>@staff.Gender</td>
+                                <td>@staff.Role</td>
                                 <td>
-                                    <span class="badge rounded-pill bg-success-subtle text-success">
-                                        @staff.Role
-                                    </span>
-                                </td>
-                                <td>
-                                    <div class="action-container d-flex gap-2">
-                                        <button type="button"
-                                                class="btn btn-sm btn-outline-primary edit-user-btn open-edit-staff"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#editStaffModal"
-                                                data-user-id="@staff.UserId"
-                                                data-user-code="@staff.UserCode"
-                                                data-full-name="@staff.FullName"
-                                                data-email="@staff.Email"
-                                                data-phone="@staff.PhoneNumber"
-                                                data-gender="@staff.Gender"
-                                                data-role="@staff.Role"
-                                                aria-label="Edit @staff.FullName">
+                                    <div class="action-container">
+                                        <button type="button" class="edit-user-btn open-edit-staff" data-bs-toggle="modal"
+                                                data-bs-target="#editStaffModal" data-user-id="@staff.UserId"
+                                                data-user-code="@staff.UserCode" data-full-name="@staff.FullName"
+                                                data-email="@staff.Email" data-phone="@staff.PhoneNumber"
+                                                data-gender="@staff.Gender" data-role="@staff.Role">
                                             <i class="bi bi-pencil-square"></i>
                                         </button>
 
-                                        <form method="post"
-                                              asp-controller="ManageUser"
-                                              asp-action="Delete"
-                                              class="delete-user-form"
-                                              data-user-name="@staff.FullName">
+                                        <form method="post" asp-controller="ManageUser" asp-action="Delete"
+                                              class="delete-user-form" data-user-name="@staff.FullName">
                                             @Html.AntiForgeryToken()
                                             <input type="hidden" name="UserId" value="@staff.UserId" />
                                             <input type="hidden" name="ReturnTab" value="staffs" class="return-tab-input" />
-                                            <input type="hidden" name="Search" value="@Model.Search" class="return-search-input" />
-                                            <button type="submit"
-                                                    class="btn btn-sm btn-outline-danger delete-user-btn"
-                                                    aria-label="Delete @staff.FullName">
+                                            <input type="hidden" name="Search" value="@Model.Search"
+                                                   class="return-search-input" />
+                                            <input type="hidden" name="FilterGender" value="@Model.GenderFilter"
+                                                   class="return-gender-input" />
+                                            <input type="hidden" name="RoleFilter" value="@Model.RoleFilter"
+                                                   class="return-role-filter-input" />
+                                            <input type="hidden" name="Sort" value="@Model.Sort" class="return-sort-input" />
+                                            <button type="submit" class="delete-user-btn" aria-label="Delete @staff.FullName">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </form>
@@ -287,266 +230,355 @@
                     }
                 </tbody>
             </table>
+            <div class="pagination-wrapper">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-end">
+                        <li class="page-item"><a class="page-link" href="#">Previous</a></li>
+                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                        <li class="page-item"><a class="page-link" href="#">4</a></li>
+                        <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                    </ul>
+                </nav>
+            </div>
         </div>
     </section>
 
-    <!-- =========================
-         MODALS (SAME LOGIC, CLEANER)
-    ========================== -->
-
-    <!-- Add Student -->
-    <div class="modal fade" id="addStudentModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal fade" id="filterUserModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Add Student</h5>
+                    <h5 class="modal-title">Filter Users</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="formAddStudent" method="post" asp-controller="ManageUser" asp-action="Create">
-                        @Html.AntiForgeryToken()
-                        <input type="hidden" name="Role" value="User" />
-                        <input type="hidden" name="ReturnTab" value="students" class="return-tab-input" />
-                        <input type="hidden" name="Search" value="@Model.Search" class="return-search-input" />
+                    <form id="filterForm" method="get" asp-controller="ManageUser" asp-action="Index" class="row g-3">
+                        <input type="hidden" name="tab" id="filterTabInput" value="@Model.ActiveTab" />
 
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label">ID <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" name="UserCode"
-                                       placeholder="e.g. 0007331" inputmode="numeric"
-                                       minlength="7" maxlength="7" pattern="\d{7}"
-                                       title="ID must be exactly 7 digits" required>
+                        <div class="col-12">
+                            <label class="form-label">Gender</label>
+                            <div class="custom-select-wrapper">
+                                <select class="form-select" name="gender">
+                                    <option value="">All</option>
+                                    <option value="male" selected="@(Model.GenderFilter == "male" ? "selected" : null)">
+                                        Male</option>
+                                        <option value="female"
+                                                selected="@(Model.GenderFilter == "female" ? "selected" : null)">Female</option>
+                                        <option value="unspecified"
+                                                selected="@(Model.GenderFilter == "unspecified" ? "selected" : null)">
+                                            Unspecified</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <label class="form-label">Role</label>
+                                    <div class="custom-select-wrapper">
+                                        <select class="form-select" name="roleFilter">
+                                            <option value="">All</option>
+                                            <option value="student"
+                                                    selected="@(Model.RoleFilter == "student" ? "selected" : null)">Student</option>
+                                            <option value="admin" selected="@(Model.RoleFilter == "admin" ? "selected" : null)">
+                                                Admin</option>
+                                                <option value="librarian"
+                                                        selected="@(Model.RoleFilter == "librarian" ? "selected" : null)">Librarian
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <label class="form-label">Sort</label>
+                                        <div class="custom-select-wrapper">
+                                            <select class="form-select" name="sort">
+                                                <option value="name_asc" selected="@(Model.Sort == "name_asc" ? "selected" : null)">
+                                                    Name (A-Z)</option>
+                                                    <option value="name_desc"
+                                                            selected="@(Model.Sort == "name_desc" ? "selected" : null)">Name (Z-A)</option>
+                                                    <option value="id_asc" selected="@(Model.Sort == "id_asc" ? "selected" : null)">ID
+                                                        (Low to High)</option>
+                                                        <option value="id_desc" selected="@(Model.Sort == "id_desc" ? "selected" : null)">ID
+                                                            (High to Low)</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-12">
+                                                    <label class="form-label">Keyword</label>
+                                                    <input class="form-control" type="text" name="search" value="@Model.Search"
+                                                           placeholder="Name / Email / ID / Phone" />
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <a id="filterResetLink" class="btn btn-outline-secondary"
+                                                   href="@Url.Action("Index", "ManageUser", new { tab = Model.ActiveTab, search = Model.Search })">Clear
+                                                Filter</a>
+                                                <button type="submit" form="filterForm" class="btn btn-success">Apply</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="modal fade" id="addStudentModal" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered modal-lg">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <i class="bi bi-plus-lg"></i>
+                                                <h5 class="modal-title">Add Student</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <form id="formAddStudent" method="post" asp-controller="ManageUser" asp-action="Create">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="Role" value="User" />
+                                                    <input type="hidden" name="ReturnTab" value="students" class="return-tab-input" />
+                                                    <input type="hidden" name="Search" value="@Model.Search" class="return-search-input" />
+                                                    <input type="hidden" name="FilterGender" value="@Model.GenderFilter"
+                                                           class="return-gender-input" />
+                                                    <input type="hidden" name="RoleFilter" value="@Model.RoleFilter"
+                                                           class="return-role-filter-input" />
+                                                    <input type="hidden" name="Sort" value="@Model.Sort" class="return-sort-input" />
+                                                    <div class="row">
+                                                        <div class="col-md-6 mb-3">
+                                                            <label class="form-label">ID <span class="text-danger">*</span></label>
+                                                            <input type="text" class="form-control" name="UserCode" placeholder="e.g. STU001"
+                                                                   required>
+                                                        </div>
+                                                        <div class="col-md-6 mb-3">
+                                                            <label class="form-label">Full Name <span class="text-danger">*</span></label>
+                                                            <input type="text" class="form-control" name="FullName" placeholder="Student Name"
+                                                                   required>
+                                                        </div>
+                                                        <div class="col-md-6 mb-3">
+                                                            <label class="form-label">Email <span class="text-danger">*</span></label>
+                                                            <input type="email" class="form-control" name="Email" required>
+                                                        </div>
+                                                        <div class="col-md-6 mb-3">
+                                                            <label class="form-label">Phone <span class="text-danger">*</span></label>
+                                                            <input type="tel" class="form-control" name="PhoneNumber" required>
+                                                        </div>
+                                                        <div class="col-md-6 mb-3">
+                                                            <label class="form-label">Gender <span class="text-danger">*</span></label>
+                                                            <div class="custom-select-wrapper">
+                                                                <select class="form-select" name="Gender" required>
+                                                                    <option value="">Select Gender</option>
+                                                                    <option value="M">Male</option>
+                                                                    <option value="F">Female</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6 mb-3">
+                                                            <label class="form-label">Password <span class="text-danger">*</span></label>
+                                                            <input type="password" class="form-control" name="Password"
+                                                                   placeholder="Min 6 characters" required>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                <button type="submit" form="formAddStudent" class="btn btn-success">Add Student</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="modal fade" id="addStaffModal" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered modal-lg">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <i class="bi bi-plus-lg"></i>
+                                                <h5 class="modal-title">Add Staff</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <form id="formAddStaff" method="post" asp-controller="ManageUser" asp-action="Create">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="ReturnTab" value="staffs" class="return-tab-input" />
+                                                    <input type="hidden" name="Search" value="@Model.Search" class="return-search-input" />
+                                                    <input type="hidden" name="FilterGender" value="@Model.GenderFilter"
+                                                           class="return-gender-input" />
+                                                    <input type="hidden" name="RoleFilter" value="@Model.RoleFilter"
+                                                           class="return-role-filter-input" />
+                                                    <input type="hidden" name="Sort" value="@Model.Sort" class="return-sort-input" />
+                                                    <div class="row">
+                                                        <div class="col-md-6 mb-3">
+                                                            <label class="form-label">ID <span class="text-danger">*</span></label>
+                                                            <input type="text" class="form-control" name="UserCode" placeholder="e.g. STF001"
+                                                                   required>
+                                                        </div>
+                                                        <div class="col-md-6 mb-3">
+                                                            <label class="form-label">Full Name <span class="text-danger">*</span></label>
+                                                            <input type="text" class="form-control" name="FullName" placeholder="Staff Name"
+                                                                   required>
+                                                        </div>
+                                                        <div class="col-md-6 mb-3">
+                                                            <label class="form-label">Email <span class="text-danger">*</span></label>
+                                                            <input type="email" class="form-control" name="Email" required>
+                                                        </div>
+                                                        <div class="col-md-6 mb-3">
+                                                            <label class="form-label">Phone <span class="text-danger">*</span></label>
+                                                            <input type="tel" class="form-control" name="PhoneNumber" required>
+                                                        </div>
+                                                        <div class="col-md-6 mb-3">
+                                                            <label class="form-label">Gender <span class="text-danger">*</span></label>
+                                                            <div class="custom-select-wrapper">
+                                                                <select class="form-select" name="Gender" required>
+                                                                    <option value="">Select Gender</option>
+                                                                    <option value="M">Male</option>
+                                                                    <option value="F">Female</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6 mb-3">
+                                                            <label class="form-label">Role <span class="text-danger">*</span></label>
+                                                            <div class="custom-select-wrapper">
+                                                                <select class="form-select" name="Role" required>
+                                                                    <option value="">Select Role</option>
+                                                                    <option value="Admin">Admin</option>
+                                                                    <option value="Librarian">Librarian</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6 mb-3">
+                                                            <label class="form-label">Password <span class="text-danger">*</span></label>
+                                                            <input type="password" class="form-control" name="Password"
+                                                                   placeholder="Min 6 characters" required>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                <button type="submit" form="formAddStaff" class="btn btn-success">Add Staff</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="modal fade" id="editStudentModal" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered modal-lg">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Edit Student</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <form id="formEditStudent" method="post" asp-controller="ManageUser" asp-action="Update">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="UserId" />
+                                                    <input type="hidden" name="Role" value="User" />
+                                                    <input type="hidden" name="ReturnTab" value="students" class="return-tab-input" />
+                                                    <input type="hidden" name="Search" value="@Model.Search" class="return-search-input" />
+                                                    <input type="hidden" name="FilterGender" value="@Model.GenderFilter"
+                                                           class="return-gender-input" />
+                                                    <input type="hidden" name="RoleFilter" value="@Model.RoleFilter"
+                                                           class="return-role-filter-input" />
+                                                    <input type="hidden" name="Sort" value="@Model.Sort" class="return-sort-input" />
+                                                    <div class="row">
+                                                        <div class="col-md-6 mb-3">
+                                                            <label class="form-label">ID <span class="text-danger">*</span></label>
+                                                            <input type="text" class="form-control" name="UserCode" readonly required>
+                                                        </div>
+                                                        <div class="col-md-6 mb-3">
+                                                            <label class="form-label">Full Name <span class="text-danger">*</span></label>
+                                                            <input type="text" class="form-control" name="FullName" required>
+                                                        </div>
+                                                        <div class="col-md-6 mb-3">
+                                                            <label class="form-label">Email <span class="text-danger">*</span></label>
+                                                            <input type="email" class="form-control" name="Email" required>
+                                                        </div>
+                                                        <div class="col-md-6 mb-3">
+                                                            <label class="form-label">Phone <span class="text-danger">*</span></label>
+                                                            <input type="tel" class="form-control" name="PhoneNumber" required>
+                                                        </div>
+                                                        <div class="col-md-6 mb-3">
+                                                            <label class="form-label">Gender <span class="text-danger">*</span></label>
+                                                            <div class="custom-select-wrapper">
+                                                                <select class="form-select" name="Gender" required>
+                                                                    <option value="M">Male</option>
+                                                                    <option value="F">Female</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                <button type="submit" form="formEditStudent" class="btn btn-success">Update Student</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="modal fade" id="editStaffModal" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered modal-lg">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Edit Staff</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <form id="formEditStaff" method="post" asp-controller="ManageUser" asp-action="Update">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="UserId" />
+                                                    <input type="hidden" name="ReturnTab" value="staffs" class="return-tab-input" />
+                                                    <input type="hidden" name="Search" value="@Model.Search" class="return-search-input" />
+                                                    <input type="hidden" name="FilterGender" value="@Model.GenderFilter"
+                                                           class="return-gender-input" />
+                                                    <input type="hidden" name="RoleFilter" value="@Model.RoleFilter"
+                                                           class="return-role-filter-input" />
+                                                    <input type="hidden" name="Sort" value="@Model.Sort" class="return-sort-input" />
+                                                    <div class="row">
+                                                        <div class="col-md-6 mb-3">
+                                                            <label class="form-label">ID <span class="text-danger">*</span></label>
+                                                            <input type="text" class="form-control" name="UserCode" readonly required>
+                                                        </div>
+                                                        <div class="col-md-6 mb-3">
+                                                            <label class="form-label">Full Name <span class="text-danger">*</span></label>
+                                                            <input type="text" class="form-control" name="FullName" required>
+                                                        </div>
+                                                        <div class="col-md-6 mb-3">
+                                                            <label class="form-label">Email <span class="text-danger">*</span></label>
+                                                            <input type="email" class="form-control" name="Email" required>
+                                                        </div>
+                                                        <div class="col-md-6 mb-3">
+                                                            <label class="form-label">Phone <span class="text-danger">*</span></label>
+                                                            <input type="tel" class="form-control" name="PhoneNumber" required>
+                                                        </div>
+                                                        <div class="col-md-6 mb-3">
+                                                            <label class="form-label">Gender <span class="text-danger">*</span></label>
+                                                            <div class="custom-select-wrapper">
+                                                                <select class="form-select" name="Gender" required>
+                                                                    <option value="M">Male</option>
+                                                                    <option value="F">Female</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6 mb-3">
+                                                            <label class="form-label">Role <span class="text-danger">*</span></label>
+                                                            <div class="custom-select-wrapper">
+                                                                <select class="form-select" name="Role" required>
+                                                                    <option value="Admin">Admin</option>
+                                                                    <option value="Librarian">Librarian</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                <button type="submit" form="formEditStaff" class="btn btn-success">Update Staff</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
-                            <div class="col-md-6">
-                                <label class="form-label">Full Name <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" name="FullName" placeholder="Student Name" required>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label">Email <span class="text-danger">*</span></label>
-                                <input type="email" class="form-control" name="Email" required>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label">Phone <span class="text-danger">*</span></label>
-                                <input type="tel" class="form-control" name="PhoneNumber" required>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label">Gender <span class="text-danger">*</span></label>
-                                <select class="form-select" name="Gender" required>
-                                    <option value="">Select Gender</option>
-                                    <option value="M">Male</option>
-                                    <option value="F">Female</option>
-                                </select>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label">Password <span class="text-danger">*</span></label>
-                                <input type="password" class="form-control" name="Password" placeholder="Min 6 characters" required>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" form="formAddStudent" class="btn btn-success">Add Student</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Add Staff -->
-    <div class="modal fade" id="addStaffModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Add Staff</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="formAddStaff" method="post" asp-controller="ManageUser" asp-action="Create">
-                        @Html.AntiForgeryToken()
-                        <input type="hidden" name="ReturnTab" value="staffs" class="return-tab-input" />
-                        <input type="hidden" name="Search" value="@Model.Search" class="return-search-input" />
-
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label">ID <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" name="UserCode"
-                                       placeholder="e.g. 0007331" inputmode="numeric"
-                                       minlength="7" maxlength="7" pattern="\d{7}"
-                                       title="ID must be exactly 7 digits" required>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label">Full Name <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" name="FullName" placeholder="Staff Name" required>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label">Email <span class="text-danger">*</span></label>
-                                <input type="email" class="form-control" name="Email" required>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label">Phone <span class="text-danger">*</span></label>
-                                <input type="tel" class="form-control" name="PhoneNumber" required>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label">Gender <span class="text-danger">*</span></label>
-                                <select class="form-select" name="Gender" required>
-                                    <option value="">Select Gender</option>
-                                    <option value="M">Male</option>
-                                    <option value="F">Female</option>
-                                </select>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label">Role <span class="text-danger">*</span></label>
-                                <select class="form-select" name="Role" required>
-                                    <option value="">Select Role</option>
-                                    <option value="Admin">Admin</option>
-                                    <option value="Librarian">Librarian</option>
-                                </select>
-                            </div>
-
-                            <div class="col-md-12">
-                                <label class="form-label">Password <span class="text-danger">*</span></label>
-                                <input type="password" class="form-control" name="Password" placeholder="Min 6 characters" required>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" form="formAddStaff" class="btn btn-success">Add Staff</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Edit Student -->
-    <div class="modal fade" id="editStudentModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Edit Student</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="formEditStudent" method="post" asp-controller="ManageUser" asp-action="Update">
-                        @Html.AntiForgeryToken()
-                        <input type="hidden" name="UserId" />
-                        <input type="hidden" name="Role" value="User" />
-                        <input type="hidden" name="ReturnTab" value="students" class="return-tab-input" />
-                        <input type="hidden" name="Search" value="@Model.Search" class="return-search-input" />
-
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label">ID</label>
-                                <input type="text" class="form-control" name="UserCode" readonly required>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label">Full Name</label>
-                                <input type="text" class="form-control" name="FullName" required>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label">Email</label>
-                                <input type="email" class="form-control" name="Email" required>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label">Phone</label>
-                                <input type="tel" class="form-control" name="PhoneNumber" required>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label">Gender</label>
-                                <select class="form-select" name="Gender" required>
-                                    <option value="M">Male</option>
-                                    <option value="F">Female</option>
-                                </select>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" form="formEditStudent" class="btn btn-success">Update Student</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Edit Staff -->
-    <div class="modal fade" id="editStaffModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Edit Staff</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="formEditStaff" method="post" asp-controller="ManageUser" asp-action="Update">
-                        @Html.AntiForgeryToken()
-                        <input type="hidden" name="UserId" />
-                        <input type="hidden" name="ReturnTab" value="staffs" class="return-tab-input" />
-                        <input type="hidden" name="Search" value="@Model.Search" class="return-search-input" />
-
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label">ID</label>
-                                <input type="text" class="form-control" name="UserCode" readonly required>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label">Full Name</label>
-                                <input type="text" class="form-control" name="FullName" required>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label">Email</label>
-                                <input type="email" class="form-control" name="Email" required>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label">Phone</label>
-                                <input type="tel" class="form-control" name="PhoneNumber" required>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label">Gender</label>
-                                <select class="form-select" name="Gender" required>
-                                    <option value="M">Male</option>
-                                    <option value="F">Female</option>
-                                </select>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label">Role</label>
-                                <select class="form-select" name="Role" required>
-                                    <option value="Admin">Admin</option>
-                                    <option value="Librarian">Librarian</option>
-                                </select>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" form="formEditStaff" class="btn btn-success">Update Staff</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-</div>
-
-@section Scripts {
-    <script src="~/js/admin/ManageUsers.js" asp-append-version="true"></script>
-}
+                            @section Scripts {
+                                <script src="~/js/admin/ManageUsers.js" asp-append-version="true"></script>
+                            }

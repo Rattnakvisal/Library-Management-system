@@ -32,10 +32,13 @@ public class ManageUserController : Controller
     }
 
     [HttpGet("")]
-    public async Task<IActionResult> Index(string? tab, string? search)
+    public async Task<IActionResult> Index(string? tab, string? search, string? gender, string? roleFilter, string? sort)
     {
         var normalizedTab = NormalizeTab(tab);
         var searchText = (search ?? string.Empty).Trim();
+        var normalizedGenderFilter = NormalizeGenderFilter(gender);
+        var normalizedRoleFilter = NormalizeRoleFilter(roleFilter);
+        var normalizedSort = NormalizeSort(sort);
 
         var users = await _dbContext.Users
             .AsNoTracking()
@@ -105,16 +108,29 @@ public class ManageUserController : Controller
                 ContainsIgnoreCase(item.Role, searchText));
         }
 
+        if (!string.IsNullOrWhiteSpace(normalizedGenderFilter))
+        {
+            var displayGender = GetDisplayGenderForFilter(normalizedGenderFilter);
+            items = items.Where(item => string.Equals(item.Gender, displayGender, StringComparison.OrdinalIgnoreCase));
+        }
+
+        if (!string.IsNullOrWhiteSpace(normalizedRoleFilter))
+        {
+            items = items.Where(item => IsRoleMatched(item.Role, normalizedRoleFilter));
+        }
+
         var itemList = items.ToList();
 
-        var students = itemList
-            .Where(x => !x.IsStaff)
-            .OrderBy(x => x.FullName)
+        var students = ApplySort(
+                itemList.Where(x => !x.IsStaff),
+                normalizedSort
+            )
             .ToList();
 
-        var staffs = itemList
-            .Where(x => x.IsStaff)
-            .OrderBy(x => x.FullName)
+        var staffs = ApplySort(
+                itemList.Where(x => x.IsStaff),
+                normalizedSort
+            )
             .ToList();
 
         var totalStudents = users.Count(u =>
@@ -132,6 +148,9 @@ public class ManageUserController : Controller
             TotalUsers = users.Count,
             ActiveTab = normalizedTab,
             Search = searchText,
+            GenderFilter = normalizedGenderFilter,
+            RoleFilter = normalizedRoleFilter,
+            Sort = normalizedSort,
             Students = students,
             Staffs = staffs
         };
@@ -147,19 +166,19 @@ public class ManageUserController : Controller
         if (!IsSupportedRole(role))
         {
             TempData["ManageUserError"] = "Invalid role selected.";
-            return RedirectToAction(nameof(Index), new { tab = NormalizeTab(input.ReturnTab), search = input.Search });
+            return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort));
         }
 
         if (!ModelState.IsValid)
         {
             TempData["ManageUserError"] = BuildModelStateErrorMessage();
-            return RedirectToAction(nameof(Index), new { tab = NormalizeTab(input.ReturnTab), search = input.Search });
+            return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort));
         }
 
         if (await _userManager.FindByEmailAsync(input.Email.Trim()) != null)
         {
             TempData["ManageUserError"] = "A user with this email already exists.";
-            return RedirectToAction(nameof(Index), new { tab = NormalizeTab(input.ReturnTab), search = input.Search });
+            return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort));
         }
 
         var user = new ApplicationUser
@@ -175,7 +194,7 @@ public class ManageUserController : Controller
         if (!createResult.Succeeded)
         {
             TempData["ManageUserError"] = BuildIdentityErrorMessage(createResult);
-            return RedirectToAction(nameof(Index), new { tab = NormalizeTab(input.ReturnTab), search = input.Search });
+            return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort));
         }
 
         var roleResult = await _userManager.AddToRoleAsync(user, role);
@@ -183,13 +202,13 @@ public class ManageUserController : Controller
         {
             await _userManager.DeleteAsync(user);
             TempData["ManageUserError"] = BuildIdentityErrorMessage(roleResult);
-            return RedirectToAction(nameof(Index), new { tab = NormalizeTab(input.ReturnTab), search = input.Search });
+            return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort));
         }
 
         await UpsertUserClaimsAsync(user, input.UserCode, input.Gender);
 
         TempData["ManageUserSuccess"] = "User created successfully.";
-        return RedirectToAction(nameof(Index), new { tab = NormalizeTab(input.ReturnTab), search = input.Search });
+        return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort));
     }
 
     [HttpPost("update")]
@@ -200,20 +219,20 @@ public class ManageUserController : Controller
         if (!IsSupportedRole(role))
         {
             TempData["ManageUserError"] = "Invalid role selected.";
-            return RedirectToAction(nameof(Index), new { tab = NormalizeTab(input.ReturnTab), search = input.Search });
+            return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort));
         }
 
         if (!ModelState.IsValid)
         {
             TempData["ManageUserError"] = BuildModelStateErrorMessage();
-            return RedirectToAction(nameof(Index), new { tab = NormalizeTab(input.ReturnTab), search = input.Search });
+            return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort));
         }
 
         var user = await _userManager.FindByIdAsync(input.UserId);
         if (user == null)
         {
             TempData["ManageUserError"] = "User not found.";
-            return RedirectToAction(nameof(Index), new { tab = NormalizeTab(input.ReturnTab), search = input.Search });
+            return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort));
         }
 
         var normalizedEmail = input.Email.Trim();
@@ -221,7 +240,7 @@ public class ManageUserController : Controller
         if (existingEmailUser != null && existingEmailUser.Id != user.Id)
         {
             TempData["ManageUserError"] = "Another user is already using this email.";
-            return RedirectToAction(nameof(Index), new { tab = NormalizeTab(input.ReturnTab), search = input.Search });
+            return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort));
         }
 
         user.FullName = input.FullName.Trim();
@@ -232,20 +251,20 @@ public class ManageUserController : Controller
         if (!userUpdateResult.Succeeded)
         {
             TempData["ManageUserError"] = BuildIdentityErrorMessage(userUpdateResult);
-            return RedirectToAction(nameof(Index), new { tab = NormalizeTab(input.ReturnTab), search = input.Search });
+            return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort));
         }
 
         var syncRoleResult = await SyncUserRoleAsync(user, role);
         if (!syncRoleResult.Succeeded)
         {
             TempData["ManageUserError"] = BuildIdentityErrorMessage(syncRoleResult);
-            return RedirectToAction(nameof(Index), new { tab = NormalizeTab(input.ReturnTab), search = input.Search });
+            return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort));
         }
 
         await UpsertUserClaimsAsync(user, input.UserCode, input.Gender);
 
         TempData["ManageUserSuccess"] = "User updated successfully.";
-        return RedirectToAction(nameof(Index), new { tab = NormalizeTab(input.ReturnTab), search = input.Search });
+        return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort));
     }
 
     [HttpPost("delete")]
@@ -255,32 +274,44 @@ public class ManageUserController : Controller
         if (!ModelState.IsValid)
         {
             TempData["ManageUserError"] = "Invalid delete request.";
-            return RedirectToAction(nameof(Index), new { tab = NormalizeTab(input.ReturnTab), search = input.Search });
+            return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort));
         }
 
         var currentUserId = _userManager.GetUserId(User);
         if (string.Equals(currentUserId, input.UserId, StringComparison.Ordinal))
         {
             TempData["ManageUserError"] = "You cannot delete your own account.";
-            return RedirectToAction(nameof(Index), new { tab = NormalizeTab(input.ReturnTab), search = input.Search });
+            return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort));
         }
 
         var user = await _userManager.FindByIdAsync(input.UserId);
         if (user == null)
         {
             TempData["ManageUserError"] = "User not found.";
-            return RedirectToAction(nameof(Index), new { tab = NormalizeTab(input.ReturnTab), search = input.Search });
+            return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort));
         }
 
         var result = await _userManager.DeleteAsync(user);
         if (!result.Succeeded)
         {
             TempData["ManageUserError"] = BuildIdentityErrorMessage(result);
-            return RedirectToAction(nameof(Index), new { tab = NormalizeTab(input.ReturnTab), search = input.Search });
+            return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort));
         }
 
         TempData["ManageUserSuccess"] = "User deleted successfully.";
-        return RedirectToAction(nameof(Index), new { tab = NormalizeTab(input.ReturnTab), search = input.Search });
+        return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort));
+    }
+
+    private static object BuildIndexRouteValues(string? tab, string? search, string? gender, string? roleFilter, string? sort)
+    {
+        return new
+        {
+            tab = NormalizeTab(tab),
+            search = (search ?? string.Empty).Trim(),
+            gender = NormalizeGenderFilter(gender),
+            roleFilter = NormalizeRoleFilter(roleFilter),
+            sort = NormalizeSort(sort)
+        };
     }
 
     private static string NormalizeTab(string? tab)
@@ -289,6 +320,103 @@ public class ManageUserController : Controller
                || string.Equals(tab, "staff", StringComparison.OrdinalIgnoreCase)
             ? "staffs"
             : "students";
+    }
+
+    private static string NormalizeGenderFilter(string? gender)
+    {
+        if (string.Equals(gender, "male", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(gender, "m", StringComparison.OrdinalIgnoreCase))
+        {
+            return "male";
+        }
+
+        if (string.Equals(gender, "female", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(gender, "f", StringComparison.OrdinalIgnoreCase))
+        {
+            return "female";
+        }
+
+        if (string.Equals(gender, "unspecified", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(gender, "u", StringComparison.OrdinalIgnoreCase))
+        {
+            return "unspecified";
+        }
+
+        return string.Empty;
+    }
+
+    private static string GetDisplayGenderForFilter(string gender)
+    {
+        return gender switch
+        {
+            "male" => "Male",
+            "female" => "Female",
+            "unspecified" => "Unspecified",
+            _ => string.Empty
+        };
+    }
+
+    private static string NormalizeRoleFilter(string? roleFilter)
+    {
+        if (string.Equals(roleFilter, "student", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(roleFilter, StudentRole, StringComparison.OrdinalIgnoreCase))
+        {
+            return "student";
+        }
+
+        if (string.Equals(roleFilter, AdminRole, StringComparison.OrdinalIgnoreCase))
+        {
+            return "admin";
+        }
+
+        if (string.Equals(roleFilter, LibrarianRole, StringComparison.OrdinalIgnoreCase))
+        {
+            return "librarian";
+        }
+
+        return string.Empty;
+    }
+
+    private static bool IsRoleMatched(string role, string roleFilter)
+    {
+        return roleFilter switch
+        {
+            "student" => string.Equals(role, "Student", StringComparison.OrdinalIgnoreCase),
+            "admin" => string.Equals(role, AdminRole, StringComparison.OrdinalIgnoreCase),
+            "librarian" => string.Equals(role, LibrarianRole, StringComparison.OrdinalIgnoreCase),
+            _ => true
+        };
+    }
+
+    private static string NormalizeSort(string? sort)
+    {
+        if (string.Equals(sort, "name_desc", StringComparison.OrdinalIgnoreCase))
+        {
+            return "name_desc";
+        }
+
+        if (string.Equals(sort, "id_asc", StringComparison.OrdinalIgnoreCase))
+        {
+            return "id_asc";
+        }
+
+        if (string.Equals(sort, "id_desc", StringComparison.OrdinalIgnoreCase))
+        {
+            return "id_desc";
+        }
+
+        return "name_asc";
+    }
+
+    private static IEnumerable<ManageUserItemViewModel> ApplySort(IEnumerable<ManageUserItemViewModel> items, string sort)
+    {
+        return sort switch
+        {
+            "name_desc" => items.OrderByDescending(x => x.FullName).ThenByDescending(x => x.UserCode),
+            "id_asc" => items.OrderBy(x => x.UserCode),
+            "id_desc" => items.OrderByDescending(x => x.UserCode),
+            _ => items.OrderBy(x => x.FullName).ThenBy(x => x.UserCode)
+        };
     }
 
     private static bool ContainsIgnoreCase(string source, string value)

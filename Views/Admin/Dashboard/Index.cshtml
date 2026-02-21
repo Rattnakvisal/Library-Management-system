@@ -2,480 +2,408 @@
     ViewBag.Title = "Dashboard";
 }
 
-<link rel="stylesheet" href="~/css/admin/dashboard.css" asp-append-version="true" />
+@section Styles {
+    <link rel="stylesheet" href="~/css/admin/dashboard.css" asp-append-version="true" />
+}
 
-<div class="dashboard-page container-fluid">
+<div class="dashboard-page container-fluid" id="adminDashboard">
 
-    <!-- Header -->
-    <div class="dash-header">
-        <div>
+    <!-- =========================
+         HEADER
+    ========================== -->
+    <header class="dash-header">
+        <div class="dash-header-left">
             <h2 class="welcome">Welcome! Admin</h2>
-            <div class="date-line">Oct 25 2025 | Saturday , 12 PM</div>
+            <div class="date-line">Oct 25 2025 | Saturday, 12 PM</div>
         </div>
-    </div>
+    </header>
 
     <div class="divider"></div>
 
-    <!-- Summary Cards -->
-    <div class="summary-row">
-        <div class="sum-card">
-            <div class="sum-icon" >
-                <i class="bi bi-book"></i>
-            </div>
+    <!-- =========================
+         SUMMARY CARDS
+    ========================== -->
+    <section class="summary-row" aria-label="Dashboard summary">
+        <article class="sum-card">
+            <div class="sum-icon"><i class="bi bi-book"></i></div>
             <div class="sum-info">
                 <div class="sum-title">Total Books</div>
                 <div class="sum-value">369</div>
             </div>
-        </div>
+        </article>
 
-        <div class="sum-card">
+        <article class="sum-card">
             <div class="sum-icon"><i class="bi bi-journal-bookmark"></i></div>
             <div class="sum-info">
                 <div class="sum-title">Borrowed Books</div>
                 <div class="sum-value">168</div>
             </div>
-        </div>
+        </article>
 
-        <div class="sum-card">
+        <article class="sum-card">
             <div class="sum-icon"><i class="bi bi-people"></i></div>
             <div class="sum-info">
                 <div class="sum-title">Total Users</div>
                 <div class="sum-value" id="totalUsers">0</div>
             </div>
-        </div>
+        </article>
 
-        <div class="sum-card">
+        <article class="sum-card">
             <div class="sum-icon"><i class="bi bi-currency-dollar"></i></div>
             <div class="sum-info">
                 <div class="sum-title">Total Fines</div>
                 <div class="sum-value">$ 300</div>
             </div>
+        </article>
+    </section>
+
+    <!-- =========================
+         QUICK ACTIONS / TABS
+    ========================== -->
+    <section class="quick-section">
+        <h3 class="quick-title">Quick Actions</h3>
+
+        <nav class="quick-tabs" aria-label="Quick action tabs">
+            <button type="button" class="qtab active" data-tab="overview">Overview</button>
+            <button type="button" class="qtab" data-tab="members">New Member(s)</button>
+            <button type="button" class="qtab" data-tab="books">New Book(s)</button>
+            <button type="button" class="qtab" data-tab="borrow">Borrowing Book(s)</button>
+        </nav>
+
+        <div class="quick-panel">
+            <!-- Overview -->
+            <section class="qtab-content show" data-panel="overview">
+                <h4 class="panel-title">Overdue Books</h4>
+
+                <div class="table-wrap">
+                    <table class="dash-table">
+                        <thead>
+                            <tr>
+                                <th>BOOK TITLE</th>
+                                <th>BORROWER</th>
+                                <th>DUE DATE</th>
+                                <th>DAYS OVERDUE</th>
+                                <th>FINE</th>
+                                <th class="text-center">ACTIONS</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Dream Count</td>
+                                <td>Sok Sabbay</td>
+                                <td>10-10-2025</td>
+                                <td>
+                                    <span class="pill danger">
+                                        <i class="bi bi-exclamation-triangle"></i> 15 Days
+                                    </span>
+                                </td>
+                                <td>$ 5.50</td>
+                                <td class="text-center">
+                                    <button type="button" class="ico-btn" aria-label="Notify">
+                                        <i class="bi bi-bell"></i>
+                                    </button>
+                                    <button type="button" class="ico-btn" aria-label="Details">
+                                        <i class="bi bi-question-circle"></i>
+                                    </button>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>Dream Count</td>
+                                <td>Sok Vikchet</td>
+                                <td>10-10-2025</td>
+                                <td>
+                                    <span class="pill warn">
+                                        <i class="bi bi-exclamation-triangle"></i> 5 Days
+                                    </span>
+                                </td>
+                                <td>$ 1.50</td>
+                                <td class="text-center">
+                                    <button type="button" class="ico-btn" aria-label="Notify">
+                                        <i class="bi bi-bell"></i>
+                                    </button>
+                                    <button type="button" class="ico-btn" aria-label="Details">
+                                        <i class="bi bi-question-circle"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="pagination-wrapper">
+                    <nav aria-label="Overdue pagination">
+                        <ul class="pagination justify-content-end">
+                            <li class="page-item disabled"><a class="page-link">Previous</a></li>
+                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                            <li class="page-item"><a class="page-link" href="#">2</a></li>
+                            <li class="page-item"><a class="page-link" href="#">3</a></li>
+                            <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                        </ul>
+                    </nav>
+                </div>
+            </section>
+
+            <!-- New Members -->
+            <section class="qtab-content" data-panel="members">
+                <h4 class="panel-title">New Register</h4>
+
+                <div class="table-wrap">
+                    <table class="dash-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Gender</th>
+                                <th>Phone Number</th>
+                                <th>Email Address</th>
+                                <th>Register Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Sok Sabbay</td>
+                                <td>Male</td>
+                                <td>+855 96 316 0977</td>
+                                <td>namchheavron.info@gmail.com</td>
+                                <td>6:33 PM</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="pagination-wrapper">
+                    <nav aria-label="Members pagination">
+                        <ul class="pagination justify-content-end">
+                            <li class="page-item disabled"><a class="page-link">Previous</a></li>
+                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                            <li class="page-item"><a class="page-link" href="#">2</a></li>
+                            <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                        </ul>
+                    </nav>
+                </div>
+            </section>
+
+            <!-- New Books -->
+            <section class="qtab-content" data-panel="books">
+                <h4 class="panel-title">New Books</h4>
+
+                <div class="table-wrap">
+                    <table class="dash-table">
+                        <thead>
+                            <tr>
+                                <th style="width:120px; text-align:center;">New Arrival</th>
+                                <th style="min-width:240px;">Title</th>
+                                <th style="width:140px; text-align:center;">Quantity</th>
+                                <th style="width:180px;">Author Name</th>
+                                <th style="width:140px; text-align:center;">Created At</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="text-center">
+                                    <img class="book-img" src="https://via.placeholder.com/28x36" alt="book" />
+                                </td>
+                                <td>Cambridge English for Engineering Students Book (SAE) with CDS(2)</td>
+                                <td class="text-center">12</td>
+                                <td>Jame Walton</td>
+                                <td class="text-center">9:33 AM</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="pagination-wrapper">
+                    <nav aria-label="Books pagination">
+                        <ul class="pagination justify-content-end">
+                            <li class="page-item disabled"><a class="page-link">Previous</a></li>
+                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                            <li class="page-item"><a class="page-link" href="#">2</a></li>
+                            <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                        </ul>
+                    </nav>
+                </div>
+            </section>
+
+            <!-- Borrowing -->
+            <section class="qtab-content" data-panel="borrow">
+                <h4 class="panel-title">New Borrowing Books</h4>
+
+                <div class="table-wrap">
+                    <table class="dash-table">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Book Title</th>
+                                <th class="text-center">Borrow Date</th>
+                                <th class="text-center">Due Date</th>
+                                <th class="text-center">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Sok Sabbay</td>
+                                <td>Cambridge English for Engineering Students Book (SAE) with CDS(2)</td>
+                                <td class="text-center">11/15/2025</td>
+                                <td class="text-center">11/20/2025</td>
+                                <td class="text-center"><span class="status pending">Pending</span></td>
+                            </tr>
+                            <tr>
+                                <td>Sok Sabbay</td>
+                                <td>Cambridge English for Engineering Students Book (SAE) with CDS(2)</td>
+                                <td class="text-center">11/15/2025</td>
+                                <td class="text-center">11/20/2025</td>
+                                <td class="text-center"><span class="status borrowing">Borrowing</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="pagination-wrapper">
+                    <nav aria-label="Borrow pagination">
+                        <ul class="pagination justify-content-end">
+                            <li class="page-item disabled"><a class="page-link">Previous</a></li>
+                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                            <li class="page-item"><a class="page-link" href="#">2</a></li>
+                            <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                        </ul>
+                    </nav>
+                </div>
+            </section>
         </div>
-    </div>
+    </section>
 
-    <!-- Quick Actions -->
-    <h3 class="quick-title">Quick Actions</h3>
+    <!-- =========================
+         CHARTS ROW
+    ========================== -->
+    <section class="charts-row">
+        <div class="chart-col">
+            <div class="quick-panel">
+                <h4 class="panel-title">Book Categories</h4>
 
-    <div class="quick-tabs">
-        <button class="qtab active" data-target="#tabOverview">Overview</button>
-        <button class="qtab" data-target="#tabMembers">New Member(s)</button>
-        <button class="qtab" data-target="#tabBooks">New Book(s)</button>
-        <button class="qtab" data-target="#tabBorrow">Borrowing Book(s)</button>
-    </div>
+                <div class="panel-body categories-body">
+                    <div class="chart-area">
+                        <canvas id="chartCategories" height="220"></canvas>
+                    </div>
 
-    <div class="quick-panel">
+                    <div class="legend-area">
+                        <ul class="legend">
+                            <li><span class="dot edu"></span> Education</li>
+                            <li><span class="dot art"></span> Art and Culture</li>
+                            <li><span class="dot rel"></span> Religious</li>
+                            <li><span class="dot other"></span> Other</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-        <!-- Overview -->
-        <div class="qtab-content show" id="tabOverview">
-            <h4 class="panel-title">Overdue Books</h4>
+        <div class="chart-col">
+            <div class="quick-panel">
+                <h4 class="panel-title">Book Borrowing Trends</h4>
+
+                <div class="panel-body trends-body">
+                    <div class="chart-area full">
+                        <canvas id="chartTrends" height="220"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================
+         RESTRICTED MEMBERS
+    ========================== -->
+    <section class="restricted-section" style="margin-top:18px;">
+        <div class="quick-panel">
+            <h4 class="panel-title">Restricted Members</h4>
 
             <div class="table-wrap">
                 <table class="dash-table">
                     <thead>
                         <tr>
-                            <th>BOOK TITLE</th>
-                            <th>BORROWER</th>
-                            <th>DUE DATE</th>
-                            <th>DAYS OVERDUE</th>
-                            <th>FINE</th>
-                            <th class="text-center">ACTIONS</th>
+                            <th style="width:160px;">MEMBER ID</th>
+                            <th>NAME</th>
+                            <th style="width:120px;" class="text-center">ACTION</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td>Dream Count</td>
+                            <td>0007331</td>
+                            <td>Chun Rattnakvisal</td>
+                            <td class="text-center">
+                                <button type="button" class="pg" aria-label="View restriction">
+                                    <i class="bi bi-exclamation-circle"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>0007332</td>
                             <td>Sok Sabbay</td>
-                            <td>10-10-2025</td>
-                            <td><span class="pill danger"><i class="bi bi-exclamation-triangle"></i> 15
-                                Days</span></td>
-                                <td>$ 5.50</td>
-                                <td class="text-center">
-                                    <i class="bi bi-bell action-ico"></i>
-                                    <i class="bi bi-question-circle action-ico"></i>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Dream Count</td>
-                                <td>Sok Sabbay</td>
-                                <td>10-10-2025</td>
-                                <td><span class="pill danger"><i class="bi bi-exclamation-triangle"></i> 15
-                                    Days</span></td>
-                                    <td>$ 5.50</td>
-                                    <td class="text-center">
-                                        <i class="bi bi-bell action-ico"></i>
-                                        <i class="bi bi-question-circle action-ico"></i>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Dream Count</td>
-                                    <td>Sok Sabbay</td>
-                                    <td>10-10-2025</td>
-                                    <td><span class="pill danger"><i class="bi bi-exclamation-triangle"></i> 15
-                                        Days</span></td>
-                                        <td>$ 5.50</td>
-                                        <td class="text-center">
-                                            <i class="bi bi-bell action-ico"></i>
-                                            <i class="bi bi-question-circle action-ico"></i>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>Dream Count</td>
-                                        <td>Sok Vikchet</td>
-                                        <td>10-10-2025</td>
-                                        <td><span class="pill warn"><i class="bi bi-exclamation-triangle"></i> 5 Days</span>
-                                        </td>
-                                        <td>$ 1.50</td>
-                                        <td class="text-center">
-                                            <i class="bi bi-bell action-ico"></i>
-                                            <i class="bi bi-question-circle action-ico"></i>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <div class="pagination-wrapper">
-                            <nav aria-label="Page navigation">
-                                <ul class="pagination justify-content-end">
-                                    <li class="page-item"><a class="page-link" href="#">Previous</a></li>
-                                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">4</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">Next</a></li>
-                                </ul>
-                            </nav>
-                        </div>
-                    </div>
-
-                    <!-- New Members -->
-                    <div class="qtab-content" id="tabMembers">
-                        <h4 class="panel-title">New Register</h4>
-
-                        <div class="table-wrap">
-                            <table class="dash-table">
-                                <thead>
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>Gender</th>
-                                        <th>Phone Number</th>
-                                        <th>Email Address</th>
-                                        <th>Register Time</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>Sok Sabbay</td>
-                                        <td>Male</td>
-                                        <td>+855 96 316 0977</td>
-                                        <td>namchheavron.info@gmail.com</td>
-                                        <td>6:33 PM</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Sok Sabbay</td>
-                                        <td>Male</td>
-                                        <td>+855 96 316 0977</td>
-                                        <td>namchheavron.info@gmail.com</td>
-                                        <td>6:33 PM</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Sok Sabbay</td>
-                                        <td>Male</td>
-                                        <td>+855 96 316 0977</td>
-                                        <td>namchheavron.info@gmail.com</td>
-                                        <td>6:33 PM</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Sok Vikchet</td>
-                                        <td>Male</td>
-                                        <td>+855 96 316 0977</td>
-                                        <td>namchheavron.info@gmail.com</td>
-                                        <td>6:33 PM</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <div class="pagination-wrapper">
-                            <nav aria-label="Page navigation">
-                                <ul class="pagination justify-content-end">
-                                    <li class="page-item"><a class="page-link" href="#">Previous</a></li>
-                                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">4</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">Next</a></li>
-                                </ul>
-                            </nav>
-                        </div>
-                    </div>
-
-                    <!-- New Books -->
-                    <div class="qtab-content" id="tabBooks">
-                        <h4 class="panel-title">New Books</h4>
-
-                        <div class="table-wrap">
-                            <table class="dash-table">
-                                <thead>
-                                    <tr>
-                                        <th style="width:120px; text-align:center;">New Arrival</th>
-                                        <th style="min-width:240px;">Title</th>
-                                        <th style="width:140px; text-align:center;">Quantity</th>
-                                        <th style="width:160px;">Author Name</th>
-                                        <th style="width:140px; text-align:center;">Created At</th>
-                                    </tr>
-                                </thead>
-
-                                <tbody>
-                                    <tr>
-                                        <td class="text-center">
-                                            <img class="book-img" src="https://via.placeholder.com/28x36" />
-                                        </td>
-                                        <td>Cambridge English for Engineering Students Book (SAE) with CDS(2)</td>
-                                        <td class="text-center">12</td>
-                                        <td class="text-center">Jame Walton</td>
-                                        <td class="text-center">9 : 33 AM</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="text-center">
-                                            <img class="book-img" src="https://via.placeholder.com/28x36" />
-                                        </td>
-                                        <td>Cambridge English for Engineering Students Book (SAE) with CDS(2)</td>
-                                        <td class="text-center">12</td>
-                                        <td class="text-center">Jame Walton</td>
-                                        <td class="text-center">9 : 33 AM</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="text-center">
-                                            <img class="book-img" src="https://via.placeholder.com/28x36" />
-                                        </td>
-                                        <td>Cambridge English for Engineering Students Book (SAE) with CDS(2)</td>
-                                        <td class="text-center">12</td>
-                                        <td class="text-center">Jame Walton</td>
-                                        <td class="text-center">9 : 33 AM</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="text-center">
-                                            <img class="book-img" src="https://via.placeholder.com/28x36" />
-                                        </td>
-                                        <td>Cambridge English for Engineering Students Book (SAE) with CDS(2)</td>
-                                        <td class="text-center">12</td>
-                                        <td class="text-center">Jame Walton</td>
-                                        <td class="text-center">9 : 33 AM</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <div class="pagination-wrapper">
-                            <nav aria-label="Page navigation">
-                                <ul class="pagination justify-content-end">
-                                    <li class="page-item"><a class="page-link" href="#">Previous</a></li>
-                                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">4</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">Next</a></li>
-                                </ul>
-                            </nav>
-                        </div>
-                    </div>
-
-                    <!-- Borrowing Books -->
-                    <div class="qtab-content" id="tabBorrow">
-                        <h4 class="panel-title">New Borrowing Books</h4>
-
-                        <div class="table-wrap">
-                            <table class="dash-table">
-                                <thead>
-                                    <tr>
-                                        <th>User</th>
-                                        <th>Book Tittle</th>
-                                        <th>Borrow Date</th>
-                                        <th>Due Date</th>
-                                        <th class="text-center">Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>Sok Sabbay</td>
-                                        <td>Cambridge English for Engineering Students Book (SAE) with CDS(2)</td>
-                                        <td class="text-center">11/15/2025</td>
-                                        <td class="text-center">11/20/2025</td>
-                                        <td class="text-center"><span class="status pending">Pending</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Sok Sabbay</td>
-                                        <td>Cambridge English for Engineering Students Book (SAE) with CDS(2)</td>
-                                        <td class="text-center">11/15/2025</td>
-                                        <td class="text-center">11/20/2025</td>
-                                        <td class="text-center"><span class="status pending">Pending</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Sok Sabbay</td>
-                                        <td>Cambridge English for Engineering Students Book (SAE) with CDS(2)</td>
-                                        <td class="text-center">11/15/2025</td>
-                                        <td class="text-center">11/20/2025</td>
-                                        <td class="text-center"><span class="status pending">Pending</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Sok Sabbay</td>
-                                        <td>Cambridge English for Engineering Students Book (SAE) with CDS(2)</td>
-                                        <td class="text-center">11/15/2025</td>
-                                        <td class="text-center">11/20/2025</td>
-                                        <td class="text-center"><span class="status borrowing">Borrowing</span></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <div class="pagination-wrapper">
-                            <nav aria-label="Page navigation">
-                                <ul class="pagination justify-content-end">
-                                    <li class="page-item"><a class="page-link" href="#">Previous</a></li>
-                                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">4</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">Next</a></li>
-                                </ul>
-                            </nav>
-                        </div>
-                    </div>
-                </div>
-                <!-- Charts Row -->
-                <div class="charts-row">
-                    <!-- Left -->
-                    <div class="chart-col">
-                        <div class="quick-panel">
-                            <h4 class="panel-title">Book Categories</h4>
-
-                            <div class="panel-body categories-body">
-                                <div class="chart-area">
-                                    <canvas id="chartCategories" height="220"></canvas>
-                                </div>
-
-                                <div class="legend-area">
-                                    <ul class="legend">
-                                        <li><span class="dot edu"></span> Education</li>
-                                        <li><span class="dot art"></span> Art and Culture</li>
-                                        <li><span class="dot rel"></span> Religious</li>
-                                        <li><span class="dot other"></span> Other</li>
-                                    </ul>
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-
-                    <!-- Right -->
-                    <div class="chart-col">
-                        <div class="quick-panel">
-                            <h4 class="panel-title">Book Borrowing Trends</h4>
-
-                            <div class="panel-body trends-body">
-                                <div class="chart-area full">
-                                    <canvas id="chartTrends" height="220"></canvas>
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-                <!-- Restricted Members panel -->
-                <div style="margin-top:18px;">
-                    <div class="quick-panel">
-                        <h4 class="panel-title">Restricted Members</h4>
-
-                        <div class="table-wrap">
-                            <table class="dash-table">
-                                <thead>
-                                    <tr>
-                                        <th style="width:160px;">MEMBER ID</th>
-                                        <th>NAME</th>
-                                        <th style="width:120px;" class="text-center">ACTION</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>0007331</td>
-                                        <td>Chun Rattnakvisal</td>
-                                        <td class="text-center"><button class="pg" style="padding:6px 10px;"><i
-                                            class="bi bi-exclamation-circle"></i></button></td>
-                                        </tr>
-                                        <tr>
-                                            <td>0007332</td>
-                                            <td>Sok Sabbay</td>
-                                            <td class="text-center"><button class="pg" style="padding:6px 10px;"><i
-                                                class="bi bi-exclamation-circle"></i></button></td>
-                                            </tr>
-                                            <tr>
-                                                <td>0007333</td>
-                                                <td>Sok Vikchet</td>
-                                                <td class="text-center"><button class="pg" style="padding:6px 10px;"><i
-                                                    class="bi bi-exclamation-circle"></i></button></td>
-                                                </tr>
-                                                <tr>
-                                                    <td>0007334</td>
-                                                    <td>Nam Chheav</td>
-                                                    <td class="text-center"><button class="pg" style="padding:6px 10px;"><i
-                                                        class="bi bi-exclamation-circle"></i></button></td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-
-                                        <div class="pagination-wrapper">
-                                            <nav aria-label="Page navigation">
-                                                <ul class="pagination justify-content-end">
-                                                    <li class="page-item"><a class="page-link" href="#">Previous</a></li>
-                                                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                                                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                                    <li class="page-item"><a class="page-link" href="#">4</a></li>
-                                                    <li class="page-item"><a class="page-link" href="#">Next</a></li>
-                                                </ul>
-                                            </nav>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                            <td class="text-center">
+                                <button type="button" class="pg" aria-label="View restriction">
+                                    <i class="bi bi-exclamation-circle"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
-        </div>    
-    </div>
+
+            <div class="pagination-wrapper">
+                <nav aria-label="Restricted pagination">
+                    <ul class="pagination justify-content-end">
+                        <li class="page-item disabled"><a class="page-link">Previous</a></li>
+                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </section>
+
 </div>
+
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <script src="~/js/admin/dashboard.js"></script>
+    <script src="~/js/admin/dashboard.js" asp-append-version="true"></script>
 
     <script>
         async function loadTotalUsers() {
-            try {
-                const res = await fetch('/admin/api/stats/total-users', {
-                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                });
+        try {
+        const res = await fetch('/admin/api/stats/total-users', {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
 
-                if (!res.ok) return;
+        if (!res.ok) return;
 
-                const data = await res.json();
-                if (!data || !data.ok) return;
+        const data = await res.json();
+        if (!data || !data.ok) return;
 
-                const el = document.getElementById('totalUsers');
-                if (el) el.textContent = data.total;
-            } catch (e) {
-                console.error(e);
-            }
+        const el = document.getElementById('totalUsers');
+        if (el) el.textContent = data.total;
+        } catch (e) {
+        console.error(e);
+        }
         }
 
-        // load once on page load
         document.addEventListener('DOMContentLoaded', () => {
-            loadTotalUsers();
+        loadTotalUsers();
+        setInterval(loadTotalUsers, 5000);
+        });
 
-            // refresh every 5 seconds (real-time style)
-            setInterval(loadTotalUsers, 5000);
+        // Tabs UI (simple)
+        document.addEventListener('click', (e) => {
+        const btn = e.target.closest('.qtab');
+        if (!btn) return;
+
+        document.querySelectorAll('.qtab').forEach(x => x.classList.remove('active'));
+        btn.classList.add('active');
+
+        const tab = btn.dataset.tab;
+        document.querySelectorAll('.qtab-content').forEach(p => {
+        p.classList.toggle('show', p.dataset.panel === tab);
+        });
         });
     </script>
 }

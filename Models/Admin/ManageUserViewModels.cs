@@ -9,6 +9,9 @@ public class ManageUserPageViewModel
     public int TotalUsers { get; set; }
     public string ActiveTab { get; set; } = "students";
     public string Search { get; set; } = string.Empty;
+    public string GenderFilter { get; set; } = string.Empty;
+    public string RoleFilter { get; set; } = string.Empty;
+    public string Sort { get; set; } = "name_asc";
     public IReadOnlyList<ManageUserItemViewModel> Students { get; set; } = Array.Empty<ManageUserItemViewModel>();
     public IReadOnlyList<ManageUserItemViewModel> Staffs { get; set; } = Array.Empty<ManageUserItemViewModel>();
 }
@@ -58,6 +61,9 @@ public class ManageUserFormInput
 
     public string? ReturnTab { get; set; } = "students";
     public string? Search { get; set; }
+    public string? FilterGender { get; set; }
+    public string? RoleFilter { get; set; }
+    public string? Sort { get; set; }
 }
 
 public class ManageUserUpdateInput
@@ -92,6 +98,9 @@ public class ManageUserUpdateInput
 
     public string? ReturnTab { get; set; } = "students";
     public string? Search { get; set; }
+    public string? FilterGender { get; set; }
+    public string? RoleFilter { get; set; }
+    public string? Sort { get; set; }
 }
 
 public class ManageUserDeleteInput
@@ -101,4 +110,7 @@ public class ManageUserDeleteInput
 
     public string? ReturnTab { get; set; } = "students";
     public string? Search { get; set; }
+    public string? FilterGender { get; set; }
+    public string? RoleFilter { get; set; }
+    public string? Sort { get; set; }
 }

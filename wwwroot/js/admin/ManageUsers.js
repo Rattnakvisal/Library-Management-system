@@ -8,6 +8,24 @@ $(document).ready(function () {
     const errorMessage = page.data('alert-error');
 
     const normalizeTab = (tab) => (String(tab || '').toLowerCase() === 'staffs' || String(tab || '').toLowerCase() === 'staff') ? 'staffs' : 'students';
+    const buildClearFilterUrl = (tab) => {
+        const params = new URLSearchParams();
+        const activeTab = normalizeTab(tab || $('#searchTabInput').val());
+        const searchText = ($('#searchInput').val() || '').trim();
+
+        params.set('tab', activeTab);
+        if (searchText) {
+            params.set('search', searchText);
+        }
+
+        return `?${params.toString()}`;
+    };
+
+    const updateClearFilterLinks = (tab) => {
+        const href = buildClearFilterUrl(tab);
+        $('#filterResetLink').attr('href', href);
+        $('#clearFilterBtn').attr('href', href);
+    };
 
     const setTab = (tab) => {
         const activeTab = normalizeTab(tab);
@@ -27,7 +45,9 @@ $(document).ready(function () {
         }
 
         $('#searchTabInput').val(activeTab);
+        $('#filterTabInput').val(activeTab);
         $('.return-tab-input').val(activeTab);
+        updateClearFilterLinks(activeTab);
     };
 
     setTab(page.data('active-tab'));
@@ -42,10 +62,14 @@ $(document).ready(function () {
 
     $('#searchInput').on('focus', function () {
         $('#searchIcon').hide();
+        updateClearFilterLinks();
+    }).on('input', function () {
+        updateClearFilterLinks();
     }).on('blur', function () {
         if (!$(this).val()) {
             $('#searchIcon').show();
         }
+        updateClearFilterLinks();
     });
 
     $('#editStudentModal').on('show.bs.modal', function (event) {
