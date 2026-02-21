@@ -5,6 +5,8 @@
 
 <!-- CONTACT PAGE WRAPPER (960px) -->
 <div class="contact-wrapper">
+    <input type="hidden" id="contact-success-message" value="@TempData["ContactSuccess"]" />
+    <input type="hidden" id="contact-error-message" value="@TempData["ContactError"]" />
 
     <!-- MAP -->
     <div class="contact-map">
@@ -45,6 +47,7 @@
         <h4>Feedback Form</h4>
 
         <form asp-controller="Contact" asp-action="SendFeedback" method="post">
+            @Html.AntiForgeryToken()
 
             <div class="form-row">
                 <div class="form-col">
@@ -84,3 +87,28 @@
     </div>
 
 </div>
+
+@section Scripts {
+    <script>
+        (function () {
+            const success = (document.getElementById('contact-success-message')?.value || '').trim();
+            const error = (document.getElementById('contact-error-message')?.value || '').trim();
+
+            if (success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: success,
+                    confirmButtonColor: '#264A73'
+                });
+            } else if (error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Action Failed',
+                    text: error,
+                    confirmButtonColor: '#264A73'
+                });
+            }
+        })();
+    </script>
+}

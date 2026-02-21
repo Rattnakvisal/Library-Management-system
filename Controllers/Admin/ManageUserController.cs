@@ -93,6 +93,8 @@ public class ManageUserController : Controller
                 PhoneNumber = user.PhoneNumber ?? string.Empty,
                 Gender = NormalizeGender(rawGender),
                 Role = role == StudentRole ? "Student" : role,
+                CreatedBy = string.IsNullOrWhiteSpace(user.CreatedBy) ? "-" : user.CreatedBy,
+                CreatedDate = user.CreatedDate,
                 IsStaff = isStaff
             };
         });
@@ -187,7 +189,9 @@ public class ManageUserController : Controller
             Email = input.Email.Trim(),
             EmailConfirmed = true,
             PhoneNumber = input.PhoneNumber.Trim(),
-            UserName = await GenerateUniqueUsernameAsync(input.FullName, input.Email)
+            UserName = await GenerateUniqueUsernameAsync(input.FullName, input.Email),
+            CreatedBy = GetCurrentActor(),
+            CreatedDate = DateTime.UtcNow
         };
 
         var createResult = await _userManager.CreateAsync(user, input.Password.Trim());
@@ -633,6 +637,12 @@ public class ManageUserController : Controller
     {
         var message = string.Join(" ", result.Errors.Select(x => x.Description).Take(3));
         return string.IsNullOrWhiteSpace(message) ? "Operation failed." : message;
+    }
+
+    private string GetCurrentActor()
+    {
+        var actor = User?.Identity?.Name?.Trim();
+        return string.IsNullOrWhiteSpace(actor) ? "System Admin" : actor;
     }
 
     private string BuildModelStateErrorMessage()

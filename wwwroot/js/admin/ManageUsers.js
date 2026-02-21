@@ -51,6 +51,7 @@ $(document).ready(function () {
     };
 
     setTab(page.data('active-tab'));
+    openDeepLinkAction();
 
     $('#staffTab').on('click', function () {
         setTab('staffs');
@@ -144,5 +145,25 @@ $(document).ready(function () {
             text: errorMessage,
             confirmButtonColor: '#264A73'
         });
+    }
+
+    function openDeepLinkAction() {
+        const params = new URLSearchParams(window.location.search);
+        const action = String(params.get('quickAction') || params.get('action') || '').toLowerCase();
+        if (action !== 'add-user') {
+            return;
+        }
+
+        const tab = normalizeTab(params.get('tab'));
+        setTab(tab);
+
+        const modalId = tab === 'staffs' ? 'addStaffModal' : 'addStudentModal';
+        const modalElement = document.getElementById(modalId);
+        if (!modalElement || typeof bootstrap === 'undefined') {
+            return;
+        }
+
+        const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+        modal.show();
     }
 });

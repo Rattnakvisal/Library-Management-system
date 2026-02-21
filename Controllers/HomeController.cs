@@ -122,25 +122,42 @@ namespace Library_Management_system.Controllers
         //    return View("~/Views/User/Category/Category.cshtml");
         //}
 
-        public IActionResult Category(string category, int page = 1)
+        public async Task<IActionResult> Category(string? category, int page = 1)
         {
-            ViewBag.CurrentCategory = category;
-            ViewBag.CurrentPage = page;
+            var normalizedCategory = string.IsNullOrWhiteSpace(category) ? null : category.Trim();
+            var pageSize = 8;
 
-            var booksQuery = _context.Books.AsQueryable();
+            var categories = await _context.Books
+                .AsNoTracking()
+                .Where(b => !string.IsNullOrWhiteSpace(b.CategoryName))
+                .Select(b => b.CategoryName)
+                .Distinct()
+                .OrderBy(name => name)
+                .ToListAsync();
 
-            if (!string.IsNullOrEmpty(category))
+            var booksQuery = _context.Books.AsNoTracking().AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(normalizedCategory))
             {
-                booksQuery = booksQuery.Where(b => b.CategoryName == category);
+                booksQuery = booksQuery.Where(b => b.CategoryName == normalizedCategory);
             }
 
-            var pageSize = 8;
-            var model = booksQuery
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToList();
+            var totalItems = await booksQuery.CountAsync();
+            var totalPages = Math.Max(1, (int)Math.Ceiling(totalItems / (double)pageSize));
+            var currentPage = Math.Clamp(page, 1, totalPages);
 
-            return View("~/Views/User/Category/Category.cshtml", model);
+            var model = await booksQuery
+                .OrderByDescending(b => b.Id)
+                .Skip((currentPage - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            ViewBag.CurrentCategory = normalizedCategory;
+            ViewBag.CurrentPage = currentPage;
+            ViewBag.TotalPages = totalPages;
+            ViewBag.Categories = categories;
+
+            return View("~/Views/User/Category/category.cshtml", model);
         }
 
         public IActionResult Privacy()

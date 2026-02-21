@@ -1,5 +1,13 @@
-﻿@{
+@using System.Linq
+@model IEnumerable<Library_Management_system.Models.Book>
+@{
     ViewBag.Title = "Manage Books";
+
+    int totalBooks = ViewBag.TotalBooks ?? 0;
+    int borrowedBooks = ViewBag.BorrowedBooks ?? 0;
+    int availableCopies = ViewBag.AvailableCopies ?? 0;
+    int unavailableBooks = ViewBag.UnavailableBooks ?? 0;
+    var bookCategories = ViewBag.BookCategories as IEnumerable<string> ?? Enumerable.Empty<string>();
 }
 
 @section Styles {
@@ -7,24 +15,17 @@
 }
 
 <div class="dashboard-page container-fluid" id="manageBooksPage">
-
-    <!-- =========================
-         HEADER
-    ========================== -->
     <header class="page-header">
         <h1 class="page-title">Book Management</h1>
         <p class="page-subtitle">Manage your library books, quantity, and availability.</p>
     </header>
 
-    <!-- =========================
-         SUMMARY CARDS (4)
-    ========================== -->
     <section class="card-container" aria-label="Book statistics">
         <article class="stat-card">
             <div class="icon-box"><i class="bi bi-book"></i></div>
             <div class="card-content">
                 <span class="card-label">Total Books</span>
-                <span class="card-value">369</span>
+                <span class="card-value">@totalBooks</span>
             </div>
         </article>
 
@@ -32,7 +33,7 @@
             <div class="icon-box"><i class="bi bi-journal-bookmark"></i></div>
             <div class="card-content">
                 <span class="card-label">Borrowed Books</span>
-                <span class="card-value">168</span>
+                <span class="card-value">@borrowedBooks</span>
             </div>
         </article>
 
@@ -40,7 +41,7 @@
             <div class="icon-box"><i class="bi bi-stack"></i></div>
             <div class="card-content">
                 <span class="card-label">Available Copies</span>
-                <span class="card-value">201</span>
+                <span class="card-value">@availableCopies</span>
             </div>
         </article>
 
@@ -48,14 +49,11 @@
             <div class="icon-box"><i class="bi bi-exclamation-circle"></i></div>
             <div class="card-content">
                 <span class="card-label">Unavailable</span>
-                <span class="card-value">12</span>
+                <span class="card-value">@unavailableBooks</span>
             </div>
         </article>
     </section>
 
-    <!-- =========================
-         TOOLBAR (Search + Add + Filter)
-    ========================== -->
     <section class="controls-section">
         <form class="search-form" method="get">
             <i class="bi bi-search search-icon"></i>
@@ -72,17 +70,13 @@
                 <i class="bi bi-funnel"></i>
                 Filter
             </button>
-            <a id="clearFilterBtn" class="clear-filter-btn" href="#">
+            <a id="clearFilterBtn" class="clear-filter-btn" href="@Url.Action("Index", "ManageBooks")">
                 <i class="bi bi-eraser"></i>
                 <span>Clear Filter</span>
             </a>
         </div>
-
     </section>
 
-    <!-- =========================
-         TABLE PANEL
-    ========================== -->
     <section class="table-container">
         <table class="table book-table align-middle">
             <thead>
@@ -93,94 +87,72 @@
                     <th style="width:140px;">ISBN</th>
                     <th style="width:110px;">Qty</th>
                     <th style="width:150px;">Status</th>
+                    <th style="width:160px;">Created By</th>
+                    <th style="width:180px;">Created Date</th>
                     <th style="width:160px; text-align:center;">Actions</th>
                 </tr>
             </thead>
 
             <tbody>
-                <!-- Example row -->
-                <tr>
-                    <td>
-                        <img class="book-cover" src="/images/books/default.jpg" alt="Book cover" />
-                    </td>
-                    <td>
-                        <div style="font-weight:800;">Atomic Habits</div>
-                        <div style="color:#64748b; font-size:12px;">Category: Self-help</div>
-                    </td>
-                    <td>James Clear</td>
-                    <td>9780735211292</td>
-                    <td>12</td>
-                    <td>
-                        <span class="table-status status-available">Available</span>
-                    </td>
-                    <td>
-                        <div class="action-container">
-                            <button class="edit-book-btn" type="button" data-bs-toggle="modal"
-                                    data-bs-target="#editBookModal">
-                                <i class="bi bi-pencil-square"></i>
-                            </button>
+                @if (Model != null && Model.Any())
+                {
+                    @foreach (var book in Model)
+                    {
+                        var imagePath = string.IsNullOrWhiteSpace(book.ImageUrl)
+                            ? Url.Content("~/images/User/Book/book2.png")
+                            : Url.Content(book.ImageUrl);
 
-                            <form method="post" action="#">
-                                <button class="delete-book-btn" type="submit">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </form>
-                        </div>
-                    </td>
-                </tr>
+                        <tr data-book-id="@book.Id" data-category-name="@book.CategoryName" data-description="">
+                            <td>
+                                <img class="book-cover" src="@imagePath" alt="Book cover" />
+                            </td>
+                            <td>
+                                <div style="font-weight:800;">@book.Title</div>
+                                <div style="color:#64748b; font-size:12px;">Category: @book.CategoryName</div>
+                            </td>
+                            <td>@book.Author</td>
+                            <td>-</td>
+                            <td>1</td>
+                            <td>
+                                <span class="table-status">Available</span>
+                            </td>
+                            <td>@(string.IsNullOrWhiteSpace(book.CreatedBy) ? "-" : book.CreatedBy)</td>
+                            <td>@(book.CreatedDate?.ToLocalTime().ToString("yyyy-MM-dd HH:mm") ?? "-")</td>
+                            <td>
+                                <div class="action-container">
+                                    <button class="edit-book-btn" type="button" data-bs-toggle="modal"
+                                            data-bs-target="#editBookModal">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </button>
 
-                <!-- Example row 2 -->
-                <tr>
-                    <td>
-                        <img class="book-cover" src="/images/books/default.jpg" alt="Book cover" />
-                    </td>
-                    <td>
-                        <div style="font-weight:800;">Clean Code</div>
-                        <div style="color:#64748b; font-size:12px;">Category: Programming</div>
-                    </td>
-                    <td>Robert C. Martin</td>
-                    <td>9780132350884</td>
-                    <td>0</td>
-                    <td>
-                        <span class="table-status status-unavailable">Unavailable</span>
-                    </td>
-                    <td>
-                        <div class="action-container">
-                            <button class="edit-book-btn" type="button" data-bs-toggle="modal"
-                                    data-bs-target="#editBookModal">
-                                <i class="bi bi-pencil-square"></i>
-                            </button>
-
-                            <form method="post" action="#">
-                                <button class="delete-book-btn" type="submit">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </form>
-                        </div>
-                    </td>
-                </tr>
+                                    <button class="delete-book-btn" type="button" data-book-id="@book.Id">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="9" class="text-center text-muted py-4">No books found.</td>
+                    </tr>
+                }
             </tbody>
         </table>
 
-        <!-- =========================
-             PAGINATION
-        ========================== -->
         <div class="pagination-wrapper">
             <nav aria-label="Book pagination">
                 <ul class="pagination justify-content-end">
                     <li class="page-item disabled"><a class="page-link" href="#">Prev</a></li>
                     <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                    <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                    <li class="page-item disabled"><a class="page-link" href="#">Next</a></li>
                 </ul>
             </nav>
         </div>
     </section>
 
-    <!-- =========================
-         FILTER MODAL (added because you referenced it)
-    ========================== -->
     <div class="modal fade" id="filterBookModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -206,21 +178,6 @@
                         </div>
 
                         <div class="col-12">
-                            <label class="form-label">Sort</label>
-                            <div class="custom-select-wrapper">
-                                <select class="form-select" name="sort">
-                                    <option value="">Default</option>
-                                    <option value="title_asc">Title (A-Z)</option>
-                                    <option value="title_desc">Title (Z-A)</option>
-                                    <option value="qty_desc">Quantity (High → Low)</option>
-                                    <option value="qty_asc">Quantity (Low → High)</option>
-                                    <option value="year_desc">Year (Newest)</option>
-                                    <option value="year_asc">Year (Oldest)</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="col-12">
                             <label class="form-label">Keyword</label>
                             <input class="form-control" type="text" name="q" placeholder="Title / Author / ISBN"
                                    value="@Context.Request.Query["q"]" />
@@ -229,16 +186,13 @@
                 </div>
 
                 <div class="modal-footer">
-                    <a class="btn btn-outline-secondary" href="@Url.Action("ManageBooks", "Admin")">Reset</a>
+                    <a class="btn btn-outline-secondary" href="@Url.Action("Index", "ManageBooks")">Reset</a>
                     <button type="submit" form="filterForm" class="btn btn-success">Apply</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- =========================
-         ADD BOOK MODAL
-    ========================== -->
     <div class="modal fade" id="addBookModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
@@ -265,38 +219,51 @@
 
                             <div class="col-md-6">
                                 <label class="form-label">Book Title <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="bookTitleInput" placeholder="eg. Me"
-                                       required />
+                                <input type="text" class="form-control" id="bookTitleInput" placeholder="eg. Me" required />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Category <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <select class="form-select" id="categorySelect" required>
+                                        <option value="">Select category</option>
+                                        @foreach (var category in bookCategories)
+                                        {
+                                            <option value="@category">@category</option>
+                                        }
+                                        <option value="__new__">+ Add New Category</option>
+                                    </select>
+                                    <button type="button" class="btn btn-outline-primary" id="showAddCategoryBtn">Add</button>
+                                </div>
+                                <div class="input-group mt-2 d-none" id="newCategoryGroup">
+                                    <input type="text" class="form-control" id="newCategoryInput" placeholder="New category name" />
+                                    <button type="button" class="btn btn-primary" id="addCategoryOptionBtn">Save</button>
+                                </div>
                             </div>
 
                             <div class="col-md-6">
                                 <label class="form-label">Quantity <span class="text-danger">*</span></label>
-                                <input type="number" class="form-control" id="quantityInput" placeholder="eg. 10"
-                                       min="0" required />
+                                <input type="number" class="form-control" id="quantityInput" placeholder="eg. 10" min="0" required />
                             </div>
 
                             <div class="col-md-6">
                                 <label class="form-label">ISBN</label>
-                                <input type="text" class="form-control" id="isbnInput"
-                                       placeholder="eg. 978-3-16-148410-0" />
+                                <input type="text" class="form-control" id="isbnInput" placeholder="eg. 978-3-16-148410-0" />
                             </div>
 
                             <div class="col-md-6">
                                 <label class="form-label">Author <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="authorInput" placeholder="eg. John Doe"
-                                       required />
+                                <input type="text" class="form-control" id="authorInput" placeholder="eg. John Doe" required />
                             </div>
 
                             <div class="col-md-6">
                                 <label class="form-label">Pages <span class="text-danger">*</span></label>
-                                <input type="number" class="form-control" id="pagesInput" placeholder="eg. 250" min="1"
-                                       required />
+                                <input type="number" class="form-control" id="pagesInput" placeholder="eg. 250" min="1" required />
                             </div>
 
                             <div class="col-md-6">
                                 <label class="form-label">Year <span class="text-danger">*</span></label>
-                                <input type="number" class="form-control" id="yearInput" placeholder="eg. 2024"
-                                       min="1000" max="9999" required />
+                                <input type="number" class="form-control" id="yearInput" placeholder="eg. 2024" min="1000" max="9999" required />
                             </div>
 
                             <div class="col-md-6">
@@ -309,6 +276,20 @@
                                         <option value="borrowed">Borrowed</option>
                                         <option value="reserved">Reserved</option>
                                         <option value="maintenance">Maintenance</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Rating</label>
+                                <div class="custom-select-wrapper">
+                                    <select class="form-select" id="ratingSelect">
+                                        <option value="5">5</option>
+                                        <option value="4">4</option>
+                                        <option value="3">3</option>
+                                        <option value="2">2</option>
+                                        <option value="1">1</option>
+                                        <option value="0">0</option>
                                     </select>
                                 </div>
                             </div>
@@ -334,9 +315,6 @@
         </div>
     </div>
 
-    <!-- =========================
-         EDIT BOOK MODAL
-    ========================== -->
     <div class="modal fade" id="editBookModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
@@ -347,6 +325,7 @@
 
                 <div class="modal-body">
                     <form id="editBookForm">
+                        <input type="hidden" id="editBookIdInput" />
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label">Book Code <span class="text-danger">*</span></label>
@@ -364,6 +343,19 @@
                             <div class="col-md-6">
                                 <label class="form-label">Book Title <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="edit-bookTitleInput" required />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Category <span class="text-danger">*</span></label>
+                                <div class="custom-select-wrapper">
+                                    <select class="form-select" id="edit-categorySelect" required>
+                                        <option value="">Select category</option>
+                                        @foreach (var category in bookCategories)
+                                        {
+                                            <option value="@category">@category</option>
+                                        }
+                                    </select>
+                                </div>
                             </div>
 
                             <div class="col-md-6">
@@ -388,8 +380,7 @@
 
                             <div class="col-md-6">
                                 <label class="form-label">Year <span class="text-danger">*</span></label>
-                                <input type="number" class="form-control" id="edit-yearInput" min="1000" max="9999"
-                                       required />
+                                <input type="number" class="form-control" id="edit-yearInput" min="1000" max="9999" required />
                             </div>
 
                             <div class="col-md-6">
@@ -431,3 +422,4 @@
 @section Scripts {
     <script src="~/js/admin/ManageBooks.js" asp-append-version="true"></script>
 }
+

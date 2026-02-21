@@ -8,5 +8,10 @@ namespace Library_Management_system.Models
         [Required]
         [StringLength(100)]
         public string FullName { get; set; } = string.Empty;
+
+        [StringLength(100)]
+        public string? CreatedBy { get; set; }
+
+        public DateTime? CreatedDate { get; set; }
     }
 }

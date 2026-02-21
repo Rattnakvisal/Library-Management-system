@@ -63,6 +63,7 @@ await using (var scope = app.Services.CreateAsyncScope())
     var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
 
     await dbContext.Database.MigrateAsync();
+    await EnsureCategoriesTableAsync(dbContext);
 
     await EnsureRoleExistsAsync(roleManager, "Admin");
     await EnsureRoleExistsAsync(roleManager, "Librarian");
@@ -84,4 +85,32 @@ static async Task EnsureRoleExistsAsync(RoleManager<IdentityRole> roleManager, s
         var errors = string.Join("; ", createRoleResult.Errors.Select(e => e.Description));
         throw new InvalidOperationException($"Failed to create role '{roleName}': {errors}");
     }
+}
+
+static async Task EnsureCategoriesTableAsync(ApplicationDbContext dbContext)
+{
+    const string sql = """
+        IF OBJECT_ID(N'[Categories]', N'U') IS NULL
+        BEGIN
+            CREATE TABLE [Categories] (
+                [Id] INT IDENTITY(1,1) NOT NULL,
+                [Name] NVARCHAR(100) NOT NULL,
+                CONSTRAINT [PK_Categories] PRIMARY KEY ([Id])
+            );
+            CREATE UNIQUE INDEX [IX_Categories_Name] ON [Categories]([Name]);
+        END;
+
+        INSERT INTO [Categories]([Name])
+        SELECT DISTINCT b.[CategoryName]
+        FROM [Books] b
+        WHERE b.[CategoryName] IS NOT NULL
+          AND LTRIM(RTRIM(b.[CategoryName])) <> ''
+          AND NOT EXISTS (
+                SELECT 1
+                FROM [Categories] c
+                WHERE c.[Name] = b.[CategoryName]
+          );
+        """;
+
+    await dbContext.Database.ExecuteSqlRawAsync(sql);
 }

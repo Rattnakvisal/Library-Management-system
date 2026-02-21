@@ -1,7 +1,10 @@
 ﻿@using Microsoft.AspNetCore.Identity
 @using Library_Management_system.Models
+@using Library_Management_system.Data
+@using Microsoft.EntityFrameworkCore
 @inject UserManager<ApplicationUser> UserManager
 @inject SignInManager<ApplicationUser> SignInManager
+@inject ApplicationDbContext DbContext
 
 @functions {
     string IsActive(string controller, string? action = null)
@@ -15,6 +18,36 @@
         if (action is null) return "active";
         return string.Equals(currentAction, action, StringComparison.OrdinalIgnoreCase) ? "active" : "";
     }
+
+    // Optional: open group if any controller inside that group is active
+    string IsGroupOpen(params string[] controllers)
+    {
+        var currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+        return controllers.Any(c => string.Equals(currentController, c, StringComparison.OrdinalIgnoreCase))
+            ? "show"
+            : "show"; // keep groups open by default
+    }
+
+    string TruncateText(string? text, int maxLength)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            return string.Empty;
+        }
+
+        var value = text.Trim();
+        return value.Length <= maxLength ? value : $"{value[..maxLength]}...";
+    }
+
+    string FormatRelativeTime(DateTime utcDateTime)
+    {
+        var timeSpan = DateTime.UtcNow - utcDateTime;
+        if (timeSpan.TotalMinutes < 1) return "Just now";
+        if (timeSpan.TotalHours < 1) return $"{(int)timeSpan.TotalMinutes}m ago";
+        if (timeSpan.TotalDays < 1) return $"{(int)timeSpan.TotalHours}h ago";
+        if (timeSpan.TotalDays < 7) return $"{(int)timeSpan.TotalDays}d ago";
+        return utcDateTime.ToLocalTime().ToString("yyyy-MM-dd");
+    }
 }
 
 @{
@@ -24,6 +57,10 @@
     string displayName = "Admin";
     string roleText = isAdmin ? "Admin" : (isLibrarian ? "Librarian" : "Staff");
     string initials = "A";
+    int newUsersCount = 0;
+    int newBooksCount = 0;
+    int unreadContactCount = 0;
+    var recentContacts = new List<ContactMessage>();
 
     if (SignInManager.IsSignedIn(User))
     {
@@ -37,7 +74,32 @@
             1 => $"{parts[0][0]}".ToUpper(),
             _ => "A"
         };
+
+        var since = DateTime.UtcNow.AddDays(-7);
+        newUsersCount = await DbContext.Users
+            .AsNoTracking()
+            .CountAsync(x => (x.CreatedDate ?? DateTime.MinValue) >= since);
+
+        newBooksCount = await DbContext.Books
+            .AsNoTracking()
+            .CountAsync(x => (x.CreatedDate ?? DateTime.MinValue) >= since);
+
+        unreadContactCount = await DbContext.ContactMessages
+            .AsNoTracking()
+            .CountAsync(x => !x.IsRead);
+
+        recentContacts = await DbContext.ContactMessages
+            .AsNoTracking()
+            .OrderByDescending(x => x.CreatedDate)
+            .Take(5)
+            .ToListAsync();
     }
+
+    var notificationCount = newUsersCount + newBooksCount + unreadContactCount;
+
+    // ✅ CHANGE THIS if your controller name is different
+    // Example: "Category" instead of "ManageCategory"
+    const string CATEGORY_CONTROLLER = "ManageCategory";
 }
 
 <!DOCTYPE html>
@@ -78,6 +140,133 @@
         <div class="topbar-right">
             @if (SignInManager.IsSignedIn(User))
             {
+                <div class="topbar-actions"
+                     id="topbarActions"
+                     data-base-notification-count="@(newUsersCount + newBooksCount)">
+                    <div class="dropdown action-dropdown">
+                        <button class="action-icon-btn dropdown-toggle"
+                                type="button"
+                                data-bs-toggle="dropdown"
+                                data-bs-auto-close="outside"
+                                aria-expanded="false"
+                                title="Notifications">
+                            <i class="bi bi-bell"></i>
+                            <span class="action-badge @(notificationCount > 0 ? "" : "d-none")"
+                                  id="notificationBadge">@notificationCount</span>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-end action-menu notification-menu shadow-sm">
+                            <div class="action-menu-header">
+                                <span>Notifications</span>
+                                <small>Last 7 days</small>
+                            </div>
+
+                            @if (notificationCount == 0)
+                            {
+                                <div class="action-menu-empty">No new notifications.</div>
+                            }
+                            else
+                            {
+                                <a class="dropdown-item action-item" asp-controller="ManageUser" asp-action="Index" asp-route-sort="id_desc">
+                                    <span class="action-item-left">
+                                        <span class="action-item-icon"><i class="bi bi-person-plus"></i></span>
+                                        <span class="action-item-stack">
+                                            <span class="action-item-title">New Users</span>
+                                            <span class="action-item-sub">Recently registered members</span>
+                                        </span>
+                                    </span>
+                                    <span class="action-item-meta">@newUsersCount new</span>
+                                </a>
+                                <a class="dropdown-item action-item" asp-controller="ManageBooks" asp-action="Index">
+                                    <span class="action-item-left">
+                                        <span class="action-item-icon"><i class="bi bi-book-half"></i></span>
+                                        <span class="action-item-stack">
+                                            <span class="action-item-title">New Books</span>
+                                            <span class="action-item-sub">Latest books added</span>
+                                        </span>
+                                    </span>
+                                    <span class="action-item-meta">@newBooksCount new</span>
+                                </a>
+                                <a class="dropdown-item action-item" asp-controller="ManageFeedback" asp-action="Index">
+                                    <span class="action-item-left">
+                                        <span class="action-item-icon"><i class="bi bi-envelope-open"></i></span>
+                                        <span class="action-item-stack">
+                                            <span class="action-item-title">Contact Messages</span>
+                                            <span class="action-item-sub">Unread inbox messages</span>
+                                        </span>
+                                    </span>
+                                    <span class="action-item-meta">@unreadContactCount unread</span>
+                                </a>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="dropdown action-dropdown">
+                        <button class="action-icon-btn dropdown-toggle"
+                                type="button"
+                                data-bs-toggle="dropdown"
+                                data-bs-auto-close="outside"
+                                aria-expanded="false"
+                                title="Contact messages">
+                            <i class="bi bi-envelope"></i>
+                            <span class="action-badge @(unreadContactCount > 0 ? "" : "d-none")"
+                                  id="contactBadge">@unreadContactCount</span>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-end action-menu contact-menu shadow-sm" id="contactMenu">
+                            <div class="action-menu-header">
+                                <span>Contact Messages</span>
+                                <div class="contact-header-right">
+                                    <small id="contactMenuUnreadText">@unreadContactCount unread</small>
+                                    <button type="button"
+                                            class="mark-all-contact-read-btn @(unreadContactCount > 0 ? "" : "d-none")"
+                                            id="markAllContactsReadBtn">
+                                        Mark all
+                                    </button>
+                                </div>
+                            </div>
+
+                            @if (recentContacts.Count == 0)
+                            {
+                                <div class="action-menu-empty">No contact messages yet.</div>
+                            }
+                            else
+                            {
+                                @foreach (var message in recentContacts)
+                                {
+                                    <div class="contact-item @(message.IsRead ? "is-read" : "is-unread")"
+                                         data-contact-id="@message.Id">
+                                        <div class="contact-item-top">
+                                            <span class="contact-email">
+                                                <span class="contact-unread-dot"></span>
+                                                @message.Email
+                                            </span>
+                                            <span class="contact-time">@FormatRelativeTime(message.CreatedDate)</span>
+                                        </div>
+                                        <div class="contact-message">@TruncateText(message.Message, 80)</div>
+                                        <div class="contact-item-actions">
+                                            @if (!message.IsRead)
+                                            {
+                                                <button type="button"
+                                                        class="mark-contact-read-btn"
+                                                        data-contact-id="@message.Id">
+                                                    Mark as read
+                                                </button>
+                                            }
+                                            else
+                                            {
+                                                <span class="contact-read-label">Read</span>
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                            }
+
+                            <div class="action-menu-footer">
+                                <a asp-controller="ManageFeedback" asp-action="Index">Open Feedback Page</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="dropdown">
                     <button class="user-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <span class="avatar">@initials</span>
@@ -122,11 +311,15 @@
 
     <!-- LAYOUT -->
     <div class="layout">
+
         <!-- DESKTOP SIDEBAR -->
         <aside class="sidebar d-none d-lg-flex" id="sidebar">
             <div class="sidebar-inner">
 
+                <!-- MAIN -->
                 <div class="sidebar-section">
+                    <div class="sidebar-title">MAIN</div>
+
                     @if (isAdmin || isLibrarian)
                     {
                         <a class="nav-link @IsActive("Dashboard")" asp-controller="Dashboard" asp-action="Index">
@@ -134,47 +327,83 @@
                             <span>Dashboard</span>
                         </a>
                     }
-
-                    <a class="nav-link @IsActive("ManageBooks")" asp-controller="ManageBooks" asp-action="Index">
-                        <i class="bi bi-book"></i>
-                        <span>Manage Books</span>
-                    </a>
-
-                    <a class="nav-link @IsActive("ManageBorrowingBook")" asp-controller="ManageBorrowingBook" asp-action="Index">
-                        <i class="bi bi-journals"></i>
-                        <span>Borrowing Book</span>
-                    </a>
                 </div>
 
                 <div class="sidebar-divider"></div>
 
+                <!-- LIBRARY GROUP -->
                 <div class="sidebar-section">
+                    <button class="nav-group-toggle" type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#navLibrary"
+                            aria-expanded="true">
+                        <span class="nav-group-label">
+                            <i class="bi bi-collection me-2"></i> Library
+                        </span>
+                        <i class="bi bi-chevron-down nav-group-icon"></i>
+                    </button>
 
-                    @if (isAdmin)
-                    {
-                        <a class="nav-link @IsActive("ManageUser")" asp-controller="ManageUser" asp-action="Index">
-                            <i class="bi bi-people"></i>
-                            <span>Manage User</span>
+                    <div class="collapse show nav-group" id="navLibrary">
+                        <a class="nav-link @IsActive("ManageBooks")" asp-controller="ManageBooks" asp-action="Index">
+                            <i class="bi bi-book"></i>
+                            <span>Manage Books</span>
                         </a>
-                    }
 
-                    <a class="nav-link @IsActive("ManageEvent")" asp-controller="ManageEvent" asp-action="Index">
-                        <i class="bi bi-calendar-event"></i>
-                        <span>Event</span>
-                    </a>
-
-                    <a class="nav-link @IsActive("ManageFeedback")" asp-controller="ManageFeedback" asp-action="Index">
-                        <i class="bi bi-envelope-exclamation"></i>
-                        <span>Feedbacks</span>
-                    </a>
-
-                    @if (isAdmin)
-                    {
-                        <a class="nav-link @IsActive("ManageReport")" asp-controller="ManageReport" asp-action="Index">
-                            <i class="bi bi-receipt"></i>
-                            <span>Report</span>
+                        <!-- ✅ NEW: Categories -->
+                        <a class="nav-link @IsActive(CATEGORY_CONTROLLER)" asp-controller="@CATEGORY_CONTROLLER" asp-action="Index">
+                            <i class="bi bi-tags"></i>
+                            <span>Categories</span>
                         </a>
-                    }
+
+                        <a class="nav-link @IsActive("ManageBorrowingBook")" asp-controller="ManageBorrowingBook" asp-action="Index">
+                            <i class="bi bi-journals"></i>
+                            <span>Borrowing Book</span>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="sidebar-divider"></div>
+
+                <!-- MANAGEMENT GROUP -->
+                <div class="sidebar-section">
+                    <button class="nav-group-toggle" type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#navManage"
+                            aria-expanded="true">
+                        <span class="nav-group-label">
+                            <i class="bi bi-gear me-2"></i> Management
+                        </span>
+                        <i class="bi bi-chevron-down nav-group-icon"></i>
+                    </button>
+
+                    <div class="collapse show nav-group" id="navManage">
+
+                        @if (isAdmin)
+                        {
+                            <a class="nav-link @IsActive("ManageUser")" asp-controller="ManageUser" asp-action="Index">
+                                <i class="bi bi-people"></i>
+                                <span>Manage User</span>
+                            </a>
+                        }
+
+                        <a class="nav-link @IsActive("ManageEvent")" asp-controller="ManageEvent" asp-action="Index">
+                            <i class="bi bi-calendar-event"></i>
+                            <span>Event</span>
+                        </a>
+
+                        <a class="nav-link @IsActive("ManageFeedback")" asp-controller="ManageFeedback" asp-action="Index">
+                            <i class="bi bi-envelope-exclamation"></i>
+                            <span>Feedbacks</span>
+                        </a>
+
+                        @if (isAdmin)
+                        {
+                            <a class="nav-link @IsActive("ManageReport")" asp-controller="ManageReport" asp-action="Index">
+                                <i class="bi bi-receipt"></i>
+                                <span>Report</span>
+                            </a>
+                        }
+                    </div>
                 </div>
 
             </div>
@@ -192,6 +421,7 @@
             <h5 class="offcanvas-title">Menu</h5>
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
         </div>
+
         <div class="offcanvas-body p-0">
             <div class="mobile-nav">
 
@@ -202,13 +432,24 @@
                     </a>
                 }
 
+                <div class="mobile-nav-divider"></div>
+                <div class="mobile-nav-title">LIBRARY</div>
+
                 <a class="nav-link @IsActive("ManageBooks")" asp-controller="ManageBooks" asp-action="Index">
                     <i class="bi bi-book"></i><span>Manage Books</span>
+                </a>
+
+                <!-- ✅ NEW: Categories -->
+                <a class="nav-link @IsActive(CATEGORY_CONTROLLER)" asp-controller="@CATEGORY_CONTROLLER" asp-action="Index">
+                    <i class="bi bi-tags"></i><span>Categories</span>
                 </a>
 
                 <a class="nav-link @IsActive("ManageBorrowingBook")" asp-controller="ManageBorrowingBook" asp-action="Index">
                     <i class="bi bi-journals"></i><span>Borrowing Book</span>
                 </a>
+
+                <div class="mobile-nav-divider"></div>
+                <div class="mobile-nav-title">MANAGEMENT</div>
 
                 @if (isAdmin)
                 {
@@ -246,8 +487,179 @@
             const btn = document.getElementById('sidebarToggle');
             if (!sidebar || !btn) return;
 
+            const storageKey = 'adminSidebarCollapsed';
+            const savedState = localStorage.getItem(storageKey);
+            if (savedState === '1') {
+                document.body.classList.add('sidebar-collapsed');
+            }
+
+            btn.setAttribute(
+                'aria-pressed',
+                document.body.classList.contains('sidebar-collapsed') ? 'true' : 'false'
+            );
+
             btn.addEventListener('click', () => {
-                document.body.classList.toggle('sidebar-collapsed');
+                const collapsed = document.body.classList.toggle('sidebar-collapsed');
+                localStorage.setItem(storageKey, collapsed ? '1' : '0');
+                btn.setAttribute('aria-pressed', collapsed ? 'true' : 'false');
+            });
+        })();
+
+        // Remember nav-group collapse state
+        (function () {
+            const toggles = document.querySelectorAll('.nav-group-toggle');
+            if (!toggles.length) return;
+
+            toggles.forEach(btn => {
+                const target = btn.getAttribute('data-bs-target');
+                if (!target) return;
+
+                const key = 'navGroup:' + target;
+                const el = document.querySelector(target);
+                if (!el) return;
+
+                // restore
+                const saved = localStorage.getItem(key);
+                if (saved === 'hide') {
+                    el.classList.remove('show');
+                    btn.setAttribute('aria-expanded', 'false');
+                }
+
+                // save
+                el.addEventListener('shown.bs.collapse', () => localStorage.setItem(key, 'show'));
+                el.addEventListener('hidden.bs.collapse', () => localStorage.setItem(key, 'hide'));
+            });
+        })();
+
+        // Topbar action dropdown behavior
+        (function () {
+            const actionDropdowns = Array.from(document.querySelectorAll('.action-dropdown'));
+            if (!actionDropdowns.length) return;
+
+            const closeOthers = (currentDropdown) => {
+                actionDropdowns.forEach((dropdown) => {
+                    if (dropdown === currentDropdown) return;
+                    const toggle = dropdown.querySelector('[data-bs-toggle="dropdown"]');
+                    if (!toggle || !window.bootstrap) return;
+                    const instance = bootstrap.Dropdown.getOrCreateInstance(toggle);
+                    instance.hide();
+                });
+            };
+
+            const syncMobilePanelState = () => {
+                if (window.innerWidth > 991) {
+                    document.body.classList.remove('topbar-panel-open');
+                    return;
+                }
+
+                const hasOpen = actionDropdowns.some((dropdown) => dropdown.classList.contains('show'));
+                document.body.classList.toggle('topbar-panel-open', hasOpen);
+            };
+
+            actionDropdowns.forEach((dropdown) => {
+                dropdown.addEventListener('show.bs.dropdown', () => closeOthers(dropdown));
+                dropdown.addEventListener('shown.bs.dropdown', syncMobilePanelState);
+                dropdown.addEventListener('hidden.bs.dropdown', syncMobilePanelState);
+            });
+
+            window.addEventListener('resize', syncMobilePanelState);
+        })();
+
+        // Contact message actions + badge synchronization
+        (function () {
+            const contactMenu = document.getElementById('contactMenu');
+            if (!contactMenu) return;
+
+            const topbarActions = document.getElementById('topbarActions');
+            const baseNotificationCount = Number(topbarActions?.dataset.baseNotificationCount || 0);
+            const notificationBadge = document.getElementById('notificationBadge');
+            const contactBadge = document.getElementById('contactBadge');
+            const contactUnreadText = document.getElementById('contactMenuUnreadText');
+            const markAllButton = document.getElementById('markAllContactsReadBtn');
+
+            const markContactItemAsRead = (item) => {
+                if (!item) return;
+
+                item.classList.remove('is-unread');
+                item.classList.add('is-read');
+
+                const markButton = item.querySelector('.mark-contact-read-btn');
+                if (markButton) {
+                    markButton.remove();
+                }
+
+                const actions = item.querySelector('.contact-item-actions');
+                if (actions && !actions.querySelector('.contact-read-label')) {
+                    const label = document.createElement('span');
+                    label.className = 'contact-read-label';
+                    label.textContent = 'Read';
+                    actions.appendChild(label);
+                }
+            };
+
+            const updateBadge = (count) => {
+                const unreadCount = Math.max(0, Number(count || 0));
+
+                if (contactBadge) {
+                    contactBadge.textContent = String(unreadCount);
+                    contactBadge.classList.toggle('d-none', unreadCount <= 0);
+                }
+
+                if (contactUnreadText) {
+                    contactUnreadText.textContent = `${unreadCount} unread`;
+                }
+
+                if (markAllButton) {
+                    markAllButton.classList.toggle('d-none', unreadCount <= 0);
+                }
+
+                if (notificationBadge) {
+                    const totalNotification = baseNotificationCount + unreadCount;
+                    notificationBadge.textContent = String(totalNotification);
+                    notificationBadge.classList.toggle('d-none', totalNotification <= 0);
+                }
+            };
+
+            contactMenu.addEventListener('click', async (event) => {
+                const markButton = event.target.closest('.mark-contact-read-btn');
+                if (markButton) {
+                    const id = markButton.getAttribute('data-contact-id');
+                    if (!id) return;
+
+                    markButton.disabled = true;
+                    try {
+                        const response = await fetch(`/admin/inbox/contacts/${id}/mark-read`, { method: 'POST' });
+                        const payload = await response.json().catch(() => ({}));
+                        if (!response.ok || !payload.success) {
+                            return;
+                        }
+
+                        const item = contactMenu.querySelector(`.contact-item[data-contact-id="${id}"]`);
+                        markContactItemAsRead(item);
+
+                        updateBadge(Number(payload.unreadCount || 0));
+                    } finally {
+                        markButton.disabled = false;
+                    }
+                    return;
+                }
+
+                const markAllTarget = event.target.closest('#markAllContactsReadBtn');
+                if (markAllTarget) {
+                    markAllTarget.disabled = true;
+                    try {
+                        const response = await fetch('/admin/inbox/contacts/mark-all-read', { method: 'POST' });
+                        const payload = await response.json().catch(() => ({}));
+                        if (!response.ok || !payload.success) {
+                            return;
+                        }
+
+                        contactMenu.querySelectorAll('.contact-item').forEach((item) => markContactItemAsRead(item));
+                        updateBadge(Number(payload.unreadCount || 0));
+                    } finally {
+                        markAllTarget.disabled = false;
+                    }
+                }
             });
         })();
     </script>

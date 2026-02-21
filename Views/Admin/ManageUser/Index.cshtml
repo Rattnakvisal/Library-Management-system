@@ -91,6 +91,8 @@
                         <th>Phone</th>
                         <th>Gender</th>
                         <th>Role</th>
+                        <th>Created By</th>
+                        <th>Created Date</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -98,7 +100,7 @@
                     @if (Model.Students.Count == 0)
                     {
                         <tr>
-                            <td colspan="8" class="text-center py-4">No students found.</td>
+                            <td colspan="10" class="text-center py-4">No students found.</td>
                         </tr>
                     }
                     else
@@ -114,6 +116,8 @@
                                 <td>@student.PhoneNumber</td>
                                 <td>@student.Gender</td>
                                 <td>@student.Role</td>
+                                <td>@student.CreatedBy</td>
+                                <td>@(student.CreatedDate?.ToLocalTime().ToString("yyyy-MM-dd HH:mm") ?? "-")</td>
                                 <td>
                                     <div class="action-container">
                                         <button type="button" class="edit-user-btn open-edit-student" data-bs-toggle="modal"
@@ -174,6 +178,8 @@
                         <th>Phone</th>
                         <th>Gender</th>
                         <th>Role</th>
+                        <th>Created By</th>
+                        <th>Created Date</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -181,7 +187,7 @@
                     @if (Model.Staffs.Count == 0)
                     {
                         <tr>
-                            <td colspan="8" class="text-center py-4">No staff found.</td>
+                            <td colspan="10" class="text-center py-4">No staff found.</td>
                         </tr>
                     }
                     else
@@ -197,6 +203,8 @@
                                 <td>@staff.PhoneNumber</td>
                                 <td>@staff.Gender</td>
                                 <td>@staff.Role</td>
+                                <td>@staff.CreatedBy</td>
+                                <td>@(staff.CreatedDate?.ToLocalTime().ToString("yyyy-MM-dd HH:mm") ?? "-")</td>
                                 <td>
                                     <div class="action-container">
                                         <button type="button" class="edit-user-btn open-edit-staff" data-bs-toggle="modal"
@@ -343,7 +351,7 @@
                                                     <div class="row">
                                                         <div class="col-md-6 mb-3">
                                                             <label class="form-label">ID <span class="text-danger">*</span></label>
-                                                            <input type="text" class="form-control" name="UserCode" placeholder="e.g. STU001"
+                                                            <input type="text" class="form-control" name="UserCode" placeholder="e.g. 0001234"
                                                                    required>
                                                         </div>
                                                         <div class="col-md-6 mb-3">

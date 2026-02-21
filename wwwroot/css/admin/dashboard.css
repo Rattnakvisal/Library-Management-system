@@ -204,6 +204,9 @@ body {
   transition:
     background 0.15s ease,
     color 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .qtab:hover {
@@ -218,6 +221,20 @@ body {
 
 .qtab.active::after {
   display: none;
+}
+
+.qtab-badge {
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+  background: rgba(31, 74, 115, 0.14);
+  color: var(--navy);
 }
 
 .quick-panel {
@@ -235,6 +252,45 @@ body {
   font-weight: 900;
   font-size: 16px;
   margin: 6px 0 14px;
+}
+
+.panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.panel-head .panel-title {
+  margin: 0;
+}
+
+.quick-add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 800;
+  color: #fff;
+  background: var(--navy);
+  border: 1px solid var(--navy);
+  border-radius: 12px;
+  padding: 8px 12px;
+  box-shadow: 0 10px 18px rgba(31, 74, 115, 0.16);
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    background 0.15s ease;
+}
+
+.quick-add-btn:hover {
+  color: #fff;
+  background: var(--navy-dark);
+  border-color: var(--navy-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 14px 22px rgba(31, 74, 115, 0.22);
 }
 
 .qtab-content {
@@ -468,6 +524,11 @@ body {
   font-size: 13px;
   font-weight: 800;
   color: #0f172a;
+}
+
+.legend .legend-empty {
+  color: #64748b;
+  font-weight: 700;
 }
 
 .dot {

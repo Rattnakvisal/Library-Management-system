@@ -1,0 +1,44 @@
+#manageCategoryPage .card-container {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+#manageCategoryPage .category-name {
+  font-weight: 800;
+  color: #0f172a;
+}
+
+#manageCategoryPage .book-count-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #eaf4ff;
+  border: 1px solid #b9d6f7;
+  color: #1f4a73;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+#manageCategoryPage .action-container {
+  justify-content: center;
+}
+
+#manageCategoryPage .edit-book-btn,
+#manageCategoryPage .delete-book-btn {
+  width: 36px;
+  height: 36px;
+}
+
+#manageCategoryPage .edit-book-btn:hover,
+#manageCategoryPage .delete-book-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 16px rgba(15, 33, 56, 0.14);
+}
+
+@media (max-width: 1200px) {
+  #manageCategoryPage .card-container {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,5 +1,12 @@
-﻿@{
+@using System.Text.Json
+@model Library_Management_system.Models.Admin.DashboardViewModel
+@{
     ViewBag.Title = "Dashboard";
+    var now = DateTime.Now;
+    var categoryLabelsJson = JsonSerializer.Serialize(
+        Model.CategoryDistribution.Select(x => x.CategoryName).ToArray());
+    var categoryCountsJson = JsonSerializer.Serialize(
+        Model.CategoryDistribution.Select(x => x.BookCount).ToArray());
 }
 
 @section Styles {
@@ -8,27 +15,21 @@
 
 <div class="dashboard-page container-fluid" id="adminDashboard">
 
-    <!-- =========================
-         HEADER
-    ========================== -->
     <header class="dash-header">
         <div class="dash-header-left">
             <h2 class="welcome">Welcome! Admin</h2>
-            <div class="date-line">Oct 25 2025 | Saturday, 12 PM</div>
+            <div class="date-line">@now.ToString("MMM dd yyyy") | @now.ToString("dddd, hh tt")</div>
         </div>
     </header>
 
     <div class="divider"></div>
 
-    <!-- =========================
-         SUMMARY CARDS
-    ========================== -->
     <section class="summary-row" aria-label="Dashboard summary">
         <article class="sum-card">
             <div class="sum-icon"><i class="bi bi-book"></i></div>
             <div class="sum-info">
-                <div class="sum-title">Total Books</div>
-                <div class="sum-value">369</div>
+                <span class="sum-title">Total Books</span>
+                <span class="sum-value">@Model.TotalBooks</span>
             </div>
         </article>
 
@@ -36,7 +37,7 @@
             <div class="sum-icon"><i class="bi bi-journal-bookmark"></i></div>
             <div class="sum-info">
                 <div class="sum-title">Borrowed Books</div>
-                <div class="sum-value">168</div>
+                <div class="sum-value">@Model.BorrowedBooks</div>
             </div>
         </article>
 
@@ -44,7 +45,7 @@
             <div class="sum-icon"><i class="bi bi-people"></i></div>
             <div class="sum-info">
                 <div class="sum-title">Total Users</div>
-                <div class="sum-value" id="totalUsers">0</div>
+                <div class="sum-value">@Model.TotalUsers</div>
             </div>
         </article>
 
@@ -52,27 +53,23 @@
             <div class="sum-icon"><i class="bi bi-currency-dollar"></i></div>
             <div class="sum-info">
                 <div class="sum-title">Total Fines</div>
-                <div class="sum-value">$ 300</div>
+                <div class="sum-value">$ @Model.TotalFines.ToString("N2")</div>
             </div>
         </article>
     </section>
 
-    <!-- =========================
-         QUICK ACTIONS / TABS
-    ========================== -->
     <section class="quick-section">
         <h3 class="quick-title">Quick Actions</h3>
 
         <nav class="quick-tabs" aria-label="Quick action tabs">
-            <button type="button" class="qtab active" data-tab="overview">Overview</button>
-            <button type="button" class="qtab" data-tab="members">New Member(s)</button>
-            <button type="button" class="qtab" data-tab="books">New Book(s)</button>
-            <button type="button" class="qtab" data-tab="borrow">Borrowing Book(s)</button>
+            <button type="button" class="qtab active" data-target="#panel-overview">Overview</button>
+            <button type="button" class="qtab" data-target="#panel-members">New Member(s) <span class="qtab-badge">@Model.NewMembers.Count</span></button>
+            <button type="button" class="qtab" data-target="#panel-books">New Book(s) <span class="qtab-badge">@Model.NewBooks.Count</span></button>
+            <button type="button" class="qtab" data-target="#panel-borrow">Borrowing Book(s)</button>
         </nav>
 
         <div class="quick-panel">
-            <!-- Overview -->
-            <section class="qtab-content show" data-panel="overview">
+            <section class="qtab-content show" id="panel-overview">
                 <h4 class="panel-title">Overdue Books</h4>
 
                 <div class="table-wrap">
@@ -107,46 +104,19 @@
                                     </button>
                                 </td>
                             </tr>
-
-                            <tr>
-                                <td>Dream Count</td>
-                                <td>Sok Vikchet</td>
-                                <td>10-10-2025</td>
-                                <td>
-                                    <span class="pill warn">
-                                        <i class="bi bi-exclamation-triangle"></i> 5 Days
-                                    </span>
-                                </td>
-                                <td>$ 1.50</td>
-                                <td class="text-center">
-                                    <button type="button" class="ico-btn" aria-label="Notify">
-                                        <i class="bi bi-bell"></i>
-                                    </button>
-                                    <button type="button" class="ico-btn" aria-label="Details">
-                                        <i class="bi bi-question-circle"></i>
-                                    </button>
-                                </td>
-                            </tr>
                         </tbody>
                     </table>
                 </div>
-
-                <div class="pagination-wrapper">
-                    <nav aria-label="Overdue pagination">
-                        <ul class="pagination justify-content-end">
-                            <li class="page-item disabled"><a class="page-link">Previous</a></li>
-                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                            <li class="page-item"><a class="page-link" href="#">2</a></li>
-                            <li class="page-item"><a class="page-link" href="#">3</a></li>
-                            <li class="page-item"><a class="page-link" href="#">Next</a></li>
-                        </ul>
-                    </nav>
-                </div>
             </section>
 
-            <!-- New Members -->
-            <section class="qtab-content" data-panel="members">
-                <h4 class="panel-title">New Register</h4>
+            <section class="qtab-content" id="panel-members">
+                <div class="panel-head">
+                    <h4 class="panel-title">New Register</h4>
+                    <a class="quick-add-btn" href="@Url.Action("Index", "ManageUser", new { tab = "students", quickAction = "add-user" })">
+                        <i class="bi bi-person-plus"></i>
+                        Add New User
+                    </a>
+                </div>
 
                 <div class="table-wrap">
                     <table class="dash-table">
@@ -160,32 +130,38 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>Sok Sabbay</td>
-                                <td>Male</td>
-                                <td>+855 96 316 0977</td>
-                                <td>namchheavron.info@gmail.com</td>
-                                <td>6:33 PM</td>
-                            </tr>
+                            @if (Model.NewMembers != null && Model.NewMembers.Any())
+                            {
+                                @foreach (var member in Model.NewMembers)
+                                {
+                                    <tr>
+                                        <td>@member.FullName</td>
+                                        <td>@member.Gender</td>
+                                        <td>@(string.IsNullOrWhiteSpace(member.PhoneNumber) ? "-" : member.PhoneNumber)</td>
+                                        <td>@member.Email</td>
+                                        <td>@(member.CreatedDate?.ToLocalTime().ToString("yyyy-MM-dd HH:mm") ?? "-")</td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted py-4">No new members found.</td>
+                                </tr>
+                            }
                         </tbody>
                     </table>
                 </div>
-
-                <div class="pagination-wrapper">
-                    <nav aria-label="Members pagination">
-                        <ul class="pagination justify-content-end">
-                            <li class="page-item disabled"><a class="page-link">Previous</a></li>
-                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                            <li class="page-item"><a class="page-link" href="#">2</a></li>
-                            <li class="page-item"><a class="page-link" href="#">Next</a></li>
-                        </ul>
-                    </nav>
-                </div>
             </section>
 
-            <!-- New Books -->
-            <section class="qtab-content" data-panel="books">
-                <h4 class="panel-title">New Books</h4>
+            <section class="qtab-content" id="panel-books">
+                <div class="panel-head">
+                    <h4 class="panel-title">New Books</h4>
+                    <a class="quick-add-btn" href="@Url.Action("Index", "ManageBooks", new { quickAction = "add-book" })">
+                        <i class="bi bi-plus-lg"></i>
+                        Add New Book
+                    </a>
+                </div>
 
                 <div class="table-wrap">
                     <table class="dash-table">
@@ -193,41 +169,44 @@
                             <tr>
                                 <th style="width:120px; text-align:center;">New Arrival</th>
                                 <th style="min-width:240px;">Title</th>
-                                <th style="width:140px; text-align:center;">Quantity</th>
+                                <th style="width:160px;">Category</th>
                                 <th style="width:180px;">Author Name</th>
-                                <th style="width:140px; text-align:center;">Created At</th>
+                                <th style="width:170px; text-align:center;">Created At</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td class="text-center">
-                                    <img class="book-img" src="https://via.placeholder.com/28x36" alt="book" />
-                                </td>
-                                <td>Cambridge English for Engineering Students Book (SAE) with CDS(2)</td>
-                                <td class="text-center">12</td>
-                                <td>Jame Walton</td>
-                                <td class="text-center">9:33 AM</td>
-                            </tr>
+                            @if (Model.NewBooks != null && Model.NewBooks.Any())
+                            {
+                                @foreach (var book in Model.NewBooks)
+                                {
+                                    var imagePath = string.IsNullOrWhiteSpace(book.ImageUrl)
+                                        ? Url.Content("~/images/User/Book/book2.png")
+                                        : Url.Content(book.ImageUrl);
+
+                                    <tr>
+                                        <td class="text-center">
+                                            <img class="book-img" src="@imagePath" alt="@book.Title" />
+                                        </td>
+                                        <td>@book.Title</td>
+                                        <td>@book.CategoryName</td>
+                                        <td>@book.Author</td>
+                                        <td class="text-center">@(book.CreatedDate?.ToLocalTime().ToString("yyyy-MM-dd HH:mm") ?? "-")</td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted py-4">No new books found.</td>
+                                </tr>
+                            }
                         </tbody>
                     </table>
                 </div>
-
-                <div class="pagination-wrapper">
-                    <nav aria-label="Books pagination">
-                        <ul class="pagination justify-content-end">
-                            <li class="page-item disabled"><a class="page-link">Previous</a></li>
-                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                            <li class="page-item"><a class="page-link" href="#">2</a></li>
-                            <li class="page-item"><a class="page-link" href="#">Next</a></li>
-                        </ul>
-                    </nav>
-                </div>
             </section>
 
-            <!-- Borrowing -->
-            <section class="qtab-content" data-panel="borrow">
+            <section class="qtab-content" id="panel-borrow">
                 <h4 class="panel-title">New Borrowing Books</h4>
-
                 <div class="table-wrap">
                     <table class="dash-table">
                         <thead>
@@ -242,39 +221,18 @@
                         <tbody>
                             <tr>
                                 <td>Sok Sabbay</td>
-                                <td>Cambridge English for Engineering Students Book (SAE) with CDS(2)</td>
+                                <td>Cambridge English for Engineering Students Book</td>
                                 <td class="text-center">11/15/2025</td>
                                 <td class="text-center">11/20/2025</td>
                                 <td class="text-center"><span class="status pending">Pending</span></td>
                             </tr>
-                            <tr>
-                                <td>Sok Sabbay</td>
-                                <td>Cambridge English for Engineering Students Book (SAE) with CDS(2)</td>
-                                <td class="text-center">11/15/2025</td>
-                                <td class="text-center">11/20/2025</td>
-                                <td class="text-center"><span class="status borrowing">Borrowing</span></td>
-                            </tr>
                         </tbody>
                     </table>
-                </div>
-
-                <div class="pagination-wrapper">
-                    <nav aria-label="Borrow pagination">
-                        <ul class="pagination justify-content-end">
-                            <li class="page-item disabled"><a class="page-link">Previous</a></li>
-                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                            <li class="page-item"><a class="page-link" href="#">2</a></li>
-                            <li class="page-item"><a class="page-link" href="#">Next</a></li>
-                        </ul>
-                    </nav>
                 </div>
             </section>
         </div>
     </section>
 
-    <!-- =========================
-         CHARTS ROW
-    ========================== -->
     <section class="charts-row">
         <div class="chart-col">
             <div class="quick-panel">
@@ -286,12 +244,7 @@
                     </div>
 
                     <div class="legend-area">
-                        <ul class="legend">
-                            <li><span class="dot edu"></span> Education</li>
-                            <li><span class="dot art"></span> Art and Culture</li>
-                            <li><span class="dot rel"></span> Religious</li>
-                            <li><span class="dot other"></span> Other</li>
-                        </ul>
+                        <ul class="legend" id="categoryLegend"></ul>
                     </div>
                 </div>
             </div>
@@ -310,9 +263,6 @@
         </div>
     </section>
 
-    <!-- =========================
-         RESTRICTED MEMBERS
-    ========================== -->
     <section class="restricted-section" style="margin-top:18px;">
         <div class="quick-panel">
             <h4 class="panel-title">Restricted Members</h4>
@@ -336,28 +286,8 @@
                                 </button>
                             </td>
                         </tr>
-                        <tr>
-                            <td>0007332</td>
-                            <td>Sok Sabbay</td>
-                            <td class="text-center">
-                                <button type="button" class="pg" aria-label="View restriction">
-                                    <i class="bi bi-exclamation-circle"></i>
-                                </button>
-                            </td>
-                        </tr>
                     </tbody>
                 </table>
-            </div>
-
-            <div class="pagination-wrapper">
-                <nav aria-label="Restricted pagination">
-                    <ul class="pagination justify-content-end">
-                        <li class="page-item disabled"><a class="page-link">Previous</a></li>
-                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                        <li class="page-item"><a class="page-link" href="#">2</a></li>
-                        <li class="page-item"><a class="page-link" href="#">Next</a></li>
-                    </ul>
-                </nav>
             </div>
         </div>
     </section>
@@ -365,45 +295,12 @@
 </div>
 
 @section Scripts {
+    <script>
+        window.dashboardCategoryChart = {
+            labels: @Html.Raw(categoryLabelsJson),
+            counts: @Html.Raw(categoryCountsJson)
+        };
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="~/js/admin/dashboard.js" asp-append-version="true"></script>
-
-    <script>
-        async function loadTotalUsers() {
-        try {
-        const res = await fetch('/admin/api/stats/total-users', {
-        headers: { 'X-Requested-With': 'XMLHttpRequest' }
-        });
-
-        if (!res.ok) return;
-
-        const data = await res.json();
-        if (!data || !data.ok) return;
-
-        const el = document.getElementById('totalUsers');
-        if (el) el.textContent = data.total;
-        } catch (e) {
-        console.error(e);
-        }
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-        loadTotalUsers();
-        setInterval(loadTotalUsers, 5000);
-        });
-
-        // Tabs UI (simple)
-        document.addEventListener('click', (e) => {
-        const btn = e.target.closest('.qtab');
-        if (!btn) return;
-
-        document.querySelectorAll('.qtab').forEach(x => x.classList.remove('active'));
-        btn.classList.add('active');
-
-        const tab = btn.dataset.tab;
-        document.querySelectorAll('.qtab-content').forEach(p => {
-        p.classList.toggle('show', p.dataset.panel === tab);
-        });
-        });
-    </script>
 }

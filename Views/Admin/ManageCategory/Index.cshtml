@@ -1,0 +1,117 @@
+@using System.Linq
+@model IEnumerable<Library_Management_system.Models.Admin.ManageCategoryViewModel>
+@{
+    ViewBag.Title = "Manage Categories";
+    int totalCategories = ViewBag.TotalCategories ?? 0;
+    int totalBooksInCategories = ViewBag.TotalBooksInCategories ?? 0;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/admin/ManageBooks.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/admin/ManageCategory.css" asp-append-version="true" />
+}
+
+<div class="dashboard-page container-fluid" id="manageCategoryPage">
+    <header class="page-header">
+        <h1 class="page-title">Category Management</h1>
+        <p class="page-subtitle">Organize categories used by books and keep your catalog clean.</p>
+    </header>
+
+    <section class="card-container" aria-label="Category statistics">
+        <article class="stat-card">
+            <div class="icon-box"><i class="bi bi-tags"></i></div>
+            <div class="card-content">
+                <span class="card-label">Total Categories</span>
+                <span class="card-value">@totalCategories</span>
+            </div>
+        </article>
+        <article class="stat-card">
+            <div class="icon-box"><i class="bi bi-book-half"></i></div>
+            <div class="card-content">
+                <span class="card-label">Books In Categories</span>
+                <span class="card-value">@totalBooksInCategories</span>
+            </div>
+        </article>
+    </section>
+
+    <section class="controls-section">
+        <form method="get" class="search-form">
+            <i class="bi bi-search search-icon"></i>
+            <input type="text"
+                   name="q"
+                   class="search-input"
+                   placeholder="Search category..."
+                   value="@Context.Request.Query["q"]" />
+        </form>
+        <div class="action-controls">
+            <button type="button" class="add-btn" id="addCategoryBtn">
+                <i class="bi bi-plus-lg"></i>
+                <span>Add Category</span>
+            </button>
+            <a class="clear-filter-btn" href="@Url.Action("Index", "ManageCategory")">
+                <i class="bi bi-eraser"></i>
+                <span>Clear Filter</span>
+            </a>
+        </div>
+    </section>
+
+    <section class="table-container">
+        <div class="table-responsive">
+            <table class="table book-table align-middle category-table">
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th style="width:130px;">Books</th>
+                    <th style="width:170px;">Created By</th>
+                    <th style="width:180px;">Created Date</th>
+                    <th style="width:140px; text-align:center;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    @foreach (var category in Model)
+                    {
+                        <tr data-category-name="@category.Name">
+                            <td>
+                                <span class="category-name">@category.Name</span>
+                            </td>
+                            <td>
+                                <span class="book-count-pill">@category.BookCount</span>
+                            </td>
+                            <td>@(string.IsNullOrWhiteSpace(category.CreatedBy) ? "-" : category.CreatedBy)</td>
+                            <td>@(category.CreatedDate?.ToLocalTime().ToString("yyyy-MM-dd HH:mm") ?? "-")</td>
+                            <td>
+                                <div class="action-container">
+                                    <button type="button"
+                                            class="edit-book-btn rename-category-btn"
+                                            data-category-name="@category.Name"
+                                            title="Rename @category.Name">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </button>
+                                    <button type="button"
+                                            class="delete-book-btn delete-category-btn"
+                                            data-category-name="@category.Name"
+                                            title="Delete @category.Name">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="5" class="text-center text-muted py-4">No categories found.</td>
+                    </tr>
+                }
+            </tbody>
+            </table>
+        </div>
+    </section>
+</div>
+
+@section Scripts {
+    <script src="~/js/admin/ManageCategory.js" asp-append-version="true"></script>
+}
