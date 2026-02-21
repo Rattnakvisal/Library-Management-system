@@ -1,70 +1,124 @@
-﻿$(document).ready(function() {
-    // Tab Toggle Logic
-    $('#staffTab').on('click', function() {
-        $('.table-container, .add-btn').addClass('hidden');
-        $('#staff-table-section, #addStaffBtn').removeClass('hidden');
-        $('.tab').removeClass('active'); $(this).addClass('active');
-    });
-    $('#studentTab').on('click', function() {
-        $('.table-container, .add-btn').addClass('hidden');
-        $('#student-table-section, #addStudentBtn').removeClass('hidden');
-        $('.tab').removeClass('active'); $(this).addClass('active');
-    });
-
-    // Search Icon focus toggle
-    $('#searchInput').on('focus', () => $('#searchIcon').hide()).on('blur', function() {
-        if (!$(this).val()) $('#searchIcon').show();
-    });
-});
-
-// SWEETALERT FUNCTIONS
-function handleSave(formId, modalId, isEdit = false) {
-    const form = document.getElementById(formId);
-    const formData = new FormData(form);
-    let hasEmpty = false;
-
-    // Check if required fields (any input/select) are empty
-    for (let [key, value] of formData.entries()) {
-        if (!value.trim()) { hasEmpty = true; break; }
-    }
-
-    if (hasEmpty) {
-        Swal.fire({
-            icon: 'warning',
-            title: 'Incomplete Input',
-            text: 'Please fill in all required fields!',
-            confirmButtonColor: '#264A73'
-        });
+$(document).ready(function () {
+    const page = $('#manageUsersPage');
+    if (!page.length) {
         return;
     }
 
-    // Show Success Alert
-    Swal.fire({
-        icon: 'success',
-        title: isEdit ? 'Updated!' : 'Saved!',
-        text: isEdit ? 'User details updated successfully.' : 'New user added successfully.',
-        showConfirmButton: false,
-        timer: 1500
+    const successMessage = page.data('alert-success');
+    const errorMessage = page.data('alert-error');
+
+    const normalizeTab = (tab) => (String(tab || '').toLowerCase() === 'staffs' || String(tab || '').toLowerCase() === 'staff') ? 'staffs' : 'students';
+
+    const setTab = (tab) => {
+        const activeTab = normalizeTab(tab);
+
+        $('.tab').removeClass('active');
+        $('.table-container').addClass('hidden');
+        $('.add-btn').addClass('hidden');
+
+        if (activeTab === 'staffs') {
+            $('#staffTab').addClass('active');
+            $('#staff-table-section').removeClass('hidden');
+            $('#addStaffBtn').removeClass('hidden');
+        } else {
+            $('#studentTab').addClass('active');
+            $('#student-table-section').removeClass('hidden');
+            $('#addStudentBtn').removeClass('hidden');
+        }
+
+        $('#searchTabInput').val(activeTab);
+        $('.return-tab-input').val(activeTab);
+    };
+
+    setTab(page.data('active-tab'));
+
+    $('#staffTab').on('click', function () {
+        setTab('staffs');
     });
 
-    // Close Modal
-    const modal = bootstrap.Modal.getInstance(document.getElementById(modalId));
-    modal.hide();
-    if (!isEdit) form.reset();
-}
+    $('#studentTab').on('click', function () {
+        setTab('students');
+    });
 
-function handleDelete(name) {
-    Swal.fire({
-        title: 'Are you sure?',
-        text: `You are about to delete ${name}.`,
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#dc3545',
-        cancelButtonColor: '#6c757d',
-        confirmButtonText: 'Yes, delete it!'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            Swal.fire('Deleted!', 'The user record has been removed.', 'success');
+    $('#searchInput').on('focus', function () {
+        $('#searchIcon').hide();
+    }).on('blur', function () {
+        if (!$(this).val()) {
+            $('#searchIcon').show();
         }
     });
-}
+
+    $('#editStudentModal').on('show.bs.modal', function (event) {
+        const button = $(event.relatedTarget);
+        const form = $('#formEditStudent');
+
+        form.find('input[name="UserId"]').val(button.attr('data-user-id') || '');
+        form.find('input[name="UserCode"]').val(button.attr('data-user-code') || '');
+        form.find('input[name="FullName"]').val(button.attr('data-full-name') || '');
+        form.find('input[name="Email"]').val(button.attr('data-email') || '');
+        form.find('input[name="PhoneNumber"]').val(button.attr('data-phone') || '');
+
+        const genderText = String(button.attr('data-gender') || '').toLowerCase();
+        const gender = genderText === 'female' ? 'F' : 'M';
+        form.find('select[name="Gender"]').val(gender);
+    });
+
+    $('#editStaffModal').on('show.bs.modal', function (event) {
+        const button = $(event.relatedTarget);
+        const form = $('#formEditStaff');
+
+        form.find('input[name="UserId"]').val(button.attr('data-user-id') || '');
+        form.find('input[name="UserCode"]').val(button.attr('data-user-code') || '');
+        form.find('input[name="FullName"]').val(button.attr('data-full-name') || '');
+        form.find('input[name="Email"]').val(button.attr('data-email') || '');
+        form.find('input[name="PhoneNumber"]').val(button.attr('data-phone') || '');
+
+        const genderText = String(button.attr('data-gender') || '').toLowerCase();
+        const roleText = String(button.attr('data-role') || '').toLowerCase();
+        const gender = genderText === 'female' ? 'F' : 'M';
+        const role = roleText === 'librarian' ? 'Librarian' : 'Admin';
+
+        form.find('select[name="Gender"]').val(gender);
+        form.find('select[name="Role"]').val(role);
+    });
+
+    $('.delete-user-form').on('submit', function (event) {
+        event.preventDefault();
+
+        const form = this;
+        const userName = $(form).data('user-name') || 'this user';
+
+        Swal.fire({
+            title: 'Are you sure?',
+            text: `You are about to delete ${userName}.`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit();
+            }
+        });
+    });
+
+    if (successMessage) {
+        Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: successMessage,
+            timer: 1800,
+            showConfirmButton: false
+        });
+    }
+
+    if (errorMessage) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Action Failed',
+            text: errorMessage,
+            confirmButtonColor: '#264A73'
+        });
+    }
+});

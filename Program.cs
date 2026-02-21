@@ -67,22 +67,6 @@ await using (var scope = app.Services.CreateAsyncScope())
     await EnsureRoleExistsAsync(roleManager, "Admin");
     await EnsureRoleExistsAsync(roleManager, "Librarian");
     await EnsureRoleExistsAsync(roleManager, "User");
-
-    await EnsureUserInRoleAsync(
-        userManager,
-        email: "admin@library.com",
-        userName: "SystemAdmin",
-        fullName: "System Admin",
-        password: "Admin@12345",
-        role: "Admin");
-
-    await EnsureUserInRoleAsync(
-        userManager,
-        email: "librarian@library.com",
-        userName: "SystemLibrarian",
-        fullName: "System Librarian",
-        password: "Librarian@12345",
-        role: "Librarian");
 }
 
 app.Run();
@@ -99,43 +83,5 @@ static async Task EnsureRoleExistsAsync(RoleManager<IdentityRole> roleManager, s
     {
         var errors = string.Join("; ", createRoleResult.Errors.Select(e => e.Description));
         throw new InvalidOperationException($"Failed to create role '{roleName}': {errors}");
-    }
-}
-
-static async Task EnsureUserInRoleAsync(
-    UserManager<ApplicationUser> userManager,
-    string email,
-    string userName,
-    string fullName,
-    string password,
-    string role)
-{
-    var user = await userManager.FindByEmailAsync(email);
-    if (user == null)
-    {
-        user = new ApplicationUser
-        {
-            Email = email,
-            UserName = userName,
-            FullName = fullName,
-            EmailConfirmed = true
-        };
-
-        var createUserResult = await userManager.CreateAsync(user, password);
-        if (!createUserResult.Succeeded)
-        {
-            var errors = string.Join("; ", createUserResult.Errors.Select(e => e.Description));
-            throw new InvalidOperationException($"Failed to create user '{email}': {errors}");
-        }
-    }
-
-    if (!await userManager.IsInRoleAsync(user, role))
-    {
-        var addToRoleResult = await userManager.AddToRoleAsync(user, role);
-        if (!addToRoleResult.Succeeded)
-        {
-            var errors = string.Join("; ", addToRoleResult.Errors.Select(e => e.Description));
-            throw new InvalidOperationException($"Failed to add user '{email}' to role '{role}': {errors}");
-        }
     }
 }
