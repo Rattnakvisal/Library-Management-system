@@ -75,7 +75,8 @@ namespace Library_Management_system.Areas.Identity.Pages.Account
             if (!ModelState.IsValid)
                 return Page();
 
-            var user = await _userManager.FindByEmailAsync(Input.Email.Trim());
+            var email = (Input.Email ?? string.Empty).Trim();
+            var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
             {
                 ModelState.AddModelError(string.Empty, "Invalid login attempt.");
@@ -83,7 +84,7 @@ namespace Library_Management_system.Areas.Identity.Pages.Account
             }
 
             var result = await _signInManager.PasswordSignInAsync(
-                user.UserName,
+                user,
                 Input.Password,
                 Input.RememberMe,
                 lockoutOnFailure: false);
@@ -95,13 +96,13 @@ namespace Library_Management_system.Areas.Identity.Pages.Account
                 // Admin -> Dashboard
                 if (await _userManager.IsInRoleAsync(user, "Admin"))
                 {
-                    return RedirectToAction("Index", "Dashboard");
+                    return Redirect("/admin/dashboard");
                 }
 
                 // Librarian -> Dashboard (but report hidden/blocked)
                 if (await _userManager.IsInRoleAsync(user, "Librarian"))
                 {
-                    return RedirectToAction("Index", "Dashboard");
+                    return Redirect("/admin/dashboard");
                 }
                 // Normal user -> Home
                 if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))

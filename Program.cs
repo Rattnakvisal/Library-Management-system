@@ -55,90 +55,87 @@ app.MapControllerRoute(
 
 app.MapRazorPages();
 
+await using (var scope = app.Services.CreateAsyncScope())
+{
+    var services = scope.ServiceProvider;
+    var dbContext = services.GetRequiredService<ApplicationDbContext>();
+    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+    var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
 
-// =========================
-// SEED ROLES + ADMIN USER
-// =========================
-//using (var scope = app.Services.CreateScope())
-//{
-//    var services = scope.ServiceProvider;
+    await dbContext.Database.MigrateAsync();
 
-//    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
-//    var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+    await EnsureRoleExistsAsync(roleManager, "Admin");
+    await EnsureRoleExistsAsync(roleManager, "Librarian");
+    await EnsureRoleExistsAsync(roleManager, "User");
 
-//    // Roles
-//    if (!await roleManager.RoleExistsAsync("Admin"))
-//        await roleManager.CreateAsync(new IdentityRole("Admin"));
+    await EnsureUserInRoleAsync(
+        userManager,
+        email: "admin@library.com",
+        userName: "SystemAdmin",
+        fullName: "System Admin",
+        password: "Admin@12345",
+        role: "Admin");
 
-//    if (!await roleManager.RoleExistsAsync("Librarian"))
-//        await roleManager.CreateAsync(new IdentityRole("Librarian"));
-
-//    if (!await roleManager.RoleExistsAsync("User"))
-//        await roleManager.CreateAsync(new IdentityRole("User"));
-
-//    //Admin credentials
-//    var adminEmail = "admin@library.com";
-//    var adminPassword = "Admin@12345";
-
-//    var adminUser = await userManager.FindByEmailAsync(adminEmail);
-
-//    if (adminUser == null)
-//    {
-//        // Create admin
-//        adminUser = new ApplicationUser
-//        {
-//            FullName = "System Admin",
-//            UserName = "SystemAdmin",
-//            Email = adminEmail,
-//            EmailConfirmed = true
-//        };
-
-//        var createResult = await userManager.CreateAsync(adminUser, adminPassword);
-//        if (createResult.Succeeded)
-//        {
-//            await userManager.AddToRoleAsync(adminUser, "Admin");
-//        }
-//    }
-//    else
-//    {
-//        // Ensure admin role
-//        if (!await userManager.IsInRoleAsync(adminUser, "Admin"))
-//            await userManager.AddToRoleAsync(adminUser, "Admin");
-
-//        // Ensure admin password (reset if needed)
-//        var token = await userManager.GeneratePasswordResetTokenAsync(adminUser);
-//        await userManager.ResetPasswordAsync(adminUser, token, adminPassword);
-//    }
-//    // =========================
-//    // Librarian account
-//    // =========================
-//    var librarianEmail = "librarian@library.com";
-//    var librarianPassword = "Librarian@12345";
-
-//    var librarianUser = await userManager.FindByEmailAsync(librarianEmail);
-
-//    if (librarianUser == null)
-//    {
-//        librarianUser = new ApplicationUser
-//        {
-//            FullName = "System Librarian",
-//            UserName = "SystemLibrarian",
-//            Email = librarianEmail,
-//            EmailConfirmed = true
-//        };
-
-//        var createResult = await userManager.CreateAsync(librarianUser, librarianPassword);
-//        if (createResult.Succeeded)
-//            await userManager.AddToRoleAsync(librarianUser, "Librarian");
-//    }
-//    else
-//    {
-//        if (!await userManager.IsInRoleAsync(librarianUser, "Librarian"))
-//            await userManager.AddToRoleAsync(librarianUser, "Librarian");
-
-//        var token = await userManager.GeneratePasswordResetTokenAsync(librarianUser);
-//        await userManager.ResetPasswordAsync(librarianUser, token, librarianPassword);
-//    }
-//}
+    await EnsureUserInRoleAsync(
+        userManager,
+        email: "librarian@library.com",
+        userName: "SystemLibrarian",
+        fullName: "System Librarian",
+        password: "Librarian@12345",
+        role: "Librarian");
+}
 
 app.Run();
+
+static async Task EnsureRoleExistsAsync(RoleManager<IdentityRole> roleManager, string roleName)
+{
+    if (await roleManager.RoleExistsAsync(roleName))
+    {
+        return;
+    }
+
+    var createRoleResult = await roleManager.CreateAsync(new IdentityRole(roleName));
+    if (!createRoleResult.Succeeded)
+    {
+        var errors = string.Join("; ", createRoleResult.Errors.Select(e => e.Description));
+        throw new InvalidOperationException($"Failed to create role '{roleName}': {errors}");
+    }
+}
+
+static async Task EnsureUserInRoleAsync(
+    UserManager<ApplicationUser> userManager,
+    string email,
+    string userName,
+    string fullName,
+    string password,
+    string role)
+{
+    var user = await userManager.FindByEmailAsync(email);
+    if (user == null)
+    {
+        user = new ApplicationUser
+        {
+            Email = email,
+            UserName = userName,
+            FullName = fullName,
+            EmailConfirmed = true
+        };
+
+        var createUserResult = await userManager.CreateAsync(user, password);
+        if (!createUserResult.Succeeded)
+        {
+            var errors = string.Join("; ", createUserResult.Errors.Select(e => e.Description));
+            throw new InvalidOperationException($"Failed to create user '{email}': {errors}");
+        }
+    }
+
+    if (!await userManager.IsInRoleAsync(user, role))
+    {
+        var addToRoleResult = await userManager.AddToRoleAsync(user, role);
+        if (!addToRoleResult.Succeeded)
+        {
+            var errors = string.Join("; ", addToRoleResult.Errors.Select(e => e.Description));
+            throw new InvalidOperationException($"Failed to add user '{email}' to role '{role}': {errors}");
+        }
+    }
+}

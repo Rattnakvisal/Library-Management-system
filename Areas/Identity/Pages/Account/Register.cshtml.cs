@@ -24,17 +24,20 @@ namespace Library_Management_system.Areas.Identity.Pages.Account
     {
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IUserStore<ApplicationUser> _userStore;
         private readonly IUserEmailStore<ApplicationUser> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
 
         public RegisterModel(
             UserManager<ApplicationUser> userManager,
+            RoleManager<IdentityRole> roleManager,
             IUserStore<ApplicationUser> userStore,
             SignInManager<ApplicationUser> signInManager,
             ILogger<RegisterModel> logger)
         {
             _userManager = userManager;
+            _roleManager = roleManager;
             _userStore = userStore;
             _emailStore = GetEmailStore();
             _signInManager = signInManager;
@@ -133,16 +136,40 @@ namespace Library_Management_system.Areas.Identity.Pages.Account
                 user.EmailConfirmed = true;
                 await _userManager.UpdateAsync(user);
 
-                // ADD ROLE "User"
-                // (Roles must be seeded in Program.cs: Admin + User)
-                await _userManager.AddToRoleAsync(user, "User");
+                const string memberRole = "User";
+
+                if (!await _roleManager.RoleExistsAsync(memberRole))
+                {
+                    var createRoleResult = await _roleManager.CreateAsync(new IdentityRole(memberRole));
+                    if (!createRoleResult.Succeeded)
+                    {
+                        foreach (var error in createRoleResult.Errors)
+                            ModelState.AddModelError(string.Empty, error.Description);
+
+                        await _userManager.DeleteAsync(user);
+                        return Page();
+                    }
+                }
+
+                var addToRoleResult = await _userManager.AddToRoleAsync(user, memberRole);
+                if (!addToRoleResult.Succeeded)
+                {
+                    foreach (var error in addToRoleResult.Errors)
+                        ModelState.AddModelError(string.Empty, error.Description);
+
+                    await _userManager.DeleteAsync(user);
+                    return Page();
+                }
 
                 // Sign in directly
                 await _signInManager.SignInAsync(user, isPersistent: false);
 
-                // Redirect: user goes to Users page (change route if you want)
-                return RedirectToAction("Index", "Users");
-                // or return LocalRedirect(returnUrl);
+                if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+                {
+                    return LocalRedirect(returnUrl);
+                }
+
+                return RedirectToAction("Index", "Home");
             }
 
             foreach (var error in result.Errors)

@@ -1,29 +1,51 @@
-﻿@using Microsoft.AspNetCore.Mvc.Rendering
-@using Microsoft.AspNetCore.Identity
+﻿@using Microsoft.AspNetCore.Identity
 @using Library_Management_system.Models
 @inject UserManager<ApplicationUser> UserManager
 @inject SignInManager<ApplicationUser> SignInManager
 
 @functions {
-    string IsActive(string controller)
+    string IsActive(string controller, string? action = null)
     {
         var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
-        return string.Equals(currentController, controller, StringComparison.OrdinalIgnoreCase) ? "active" : "";
+        var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+
+        var controllerMatch = string.Equals(currentController, controller, StringComparison.OrdinalIgnoreCase);
+        if (!controllerMatch) return "";
+
+        if (action is null) return "active";
+        return string.Equals(currentAction, action, StringComparison.OrdinalIgnoreCase) ? "active" : "";
     }
 }
 
 @{
     bool isAdmin = User.IsInRole("Admin");
     bool isLibrarian = User.IsInRole("Librarian");
+
+    string displayName = "Admin";
+    string roleText = isAdmin ? "Admin" : (isLibrarian ? "Librarian" : "Staff");
+    string initials = "A";
+
+    if (SignInManager.IsSignedIn(User))
+    {
+        var u = await UserManager.GetUserAsync(User);
+        displayName = u?.FullName ?? u?.UserName ?? "Admin";
+
+        var parts = displayName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        initials = parts.Length switch
+        {
+            >= 2 => $"{parts[0][0]}{parts[^1][0]}".ToUpper(),
+            1 => $"{parts[0][0]}".ToUpper(),
+            _ => "A"
+        };
+    }
 }
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin | Library Management System</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewBag.Title - Library Management System</title>
 
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
@@ -32,121 +54,204 @@
     @RenderSection("Styles", required: false)
 </head>
 
-<body>
+<body class="admin-shell">
 
-    <header class="header d-flex justify-content-between align-items-center px-4 shadow-sm">
-        <div class="d-flex align-items-center gap-2">
-            <img src="~/images/Admin/logo.png" alt="Logo" height="36" />
-            <h1 class="libraryName fw-semibold mb-0 fs-5">Library Management System</h1>
+    <!-- TOPBAR -->
+    <header class="topbar">
+        <div class="topbar-left">
+            <!-- Mobile menu button -->
+            <button class="btn btn-light d-lg-none me-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileSidebar">
+                <i class="bi bi-list fs-4"></i>
+            </button>
+
+            <!-- Desktop collapse button -->
+            <button class="btn btn-light d-none d-lg-inline-flex me-2" type="button" id="sidebarToggle" title="Toggle sidebar">
+                <i class="bi bi-layout-sidebar-inset"></i>
+            </button>
+
+            <a class="brand" asp-controller="Dashboard" asp-action="Index">
+                <img src="~/images/Admin/logo.png" alt="Logo" height="34" />
+                <span class="brand-text">Library Management System</span>
+            </a>
         </div>
 
-        @if (SignInManager.IsSignedIn(User))
-        {
-            var u = await UserManager.GetUserAsync(User);
-            var name = u?.FullName ?? u?.UserName ?? "Admin";
-            var roleText = isAdmin ? "Admin" : (isLibrarian ? "Librarian" : "Staff");
+        <div class="topbar-right">
+            @if (SignInManager.IsSignedIn(User))
+            {
+                <div class="dropdown">
+                    <button class="user-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="avatar">@initials</span>
+                        <span class="user-meta">
+                            <span class="user-name">@displayName</span>
+                            <span class="user-role">@roleText</span>
+                        </span>
+                    </button>
 
-            <div class="dropdown">
-                <button class="btn d-flex align-items-center gap-2 text-black" type="button" data-bs-toggle="dropdown"
-                        aria-expanded="false">
-                    <i class="bi bi-person-circle fs-4"></i>
-                    <div class="text-start">
-                        <div class="fw-semibold">@name</div>
-                        <small class="text-black-50">@roleText</small>
-                    </div>
-                </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                        <li class="px-3 py-2">
+                            <div class="fw-semibold">@displayName</div>
+                            <div class="text-muted small">@roleText</div>
+                        </li>
+                        <li><hr class="dropdown-divider" /></li>
 
-                <ul class="dropdown-menu dropdown-menu-end shadow">
-                    <li>
-                        <a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/ChangePassword">
-                            <i class="bi bi-key me-2"></i> Change Password
-                        </a>
-                    </li>
-                    <li>
-                        <hr class="dropdown-divider" />
-                    </li>
-                    <li>
-                        <form asp-area="Identity" asp-page="/Account/Logout" method="post" class="px-3">
-                            <button type="submit" class="btn btn-danger w-100">
-                                <i class="bi bi-box-arrow-right me-2"></i> Logout
-                            </button>
-                        </form>
-                    </li>
-                </ul>
-            </div>
-        }
+                        <li>
+                            <a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index">
+                                <i class="bi bi-person me-2"></i> Profile
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/ChangePassword">
+                                <i class="bi bi-key me-2"></i> Change Password
+                            </a>
+                        </li>
+
+                        <li><hr class="dropdown-divider" /></li>
+
+                        <li class="px-3 pb-2">
+                            <form asp-area="Identity" asp-page="/Account/Logout" method="post">
+                                <button type="submit" class="btn btn-danger w-100">
+                                    <i class="bi bi-box-arrow-right me-2"></i> Logout
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            }
+        </div>
     </header>
 
-    <div class="content d-flex">
+    <!-- LAYOUT -->
+    <div class="layout">
+        <!-- DESKTOP SIDEBAR -->
+        <aside class="sidebar d-none d-lg-flex" id="sidebar">
+            <div class="sidebar-inner">
 
-        <!-- SIDEBAR -->
-        <nav class="sidebar">
-            <ul class="menu-link">
+                <div class="sidebar-section">
+                    @if (isAdmin || isLibrarian)
+                    {
+                        <a class="nav-link @IsActive("Dashboard")" asp-controller="Dashboard" asp-action="Index">
+                            <i class="bi bi-speedometer2"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    }
 
-                @* Dashboard: Admin + Librarian *@
-                @if (isAdmin || isLibrarian)
-                {
-                    <li class="link @IsActive("Dashboard")">
-                        <i class="bi bi-speedometer2"></i>
-                        <a asp-controller="Dashboard" asp-action="Index">Dashboard</a>
-                    </li>
-                }
+                    <a class="nav-link @IsActive("ManageBooks")" asp-controller="ManageBooks" asp-action="Index">
+                        <i class="bi bi-book"></i>
+                        <span>Manage Books</span>
+                    </a>
 
-                <li class="link @IsActive("ManageBooks")">
-                    <i class="bi bi-book"></i>
-                    <a asp-controller="ManageBooks" asp-action="Index">Manage Books</a>
-                </li>
+                    <a class="nav-link @IsActive("ManageBorrowingBook")" asp-controller="ManageBorrowingBook" asp-action="Index">
+                        <i class="bi bi-journals"></i>
+                        <span>Borrowing Book</span>
+                    </a>
+                </div>
 
-                <li class="link @IsActive("ManageBorrowingBook")">
-                    <i class="bi bi-journals"></i>
-                    <a asp-controller="ManageBorrowingBook" asp-action="Index">Borrowing Book</a>
-                </li>
+                <div class="sidebar-divider"></div>
 
-                @* Manage User: Admin only *@
-                @if (isAdmin)
-                {
-                    <li class="link @IsActive("ManageUser")">
-                        <i class="bi bi-people"></i>
-                        <a asp-controller="ManageUser" asp-action="Index">Manage User</a>
-                    </li>
-                }
+                <div class="sidebar-section">
 
-                <li class="link @IsActive("ManageEvent")">
-                    <i class="bi bi-calendar-event"></i>
-                    <a asp-controller="ManageEvent" asp-action="Index">Event</a>
-                </li>
+                    @if (isAdmin)
+                    {
+                        <a class="nav-link @IsActive("ManageUser")" asp-controller="ManageUser" asp-action="Index">
+                            <i class="bi bi-people"></i>
+                            <span>Manage User</span>
+                        </a>
+                    }
 
-                <li class="link @IsActive("ManageFeedback")">
-                    <i class="bi bi-envelope-exclamation"></i>
-                    <a asp-controller="ManageFeedback" asp-action="Index">Feedbacks</a>
-                </li>
+                    <a class="nav-link @IsActive("ManageEvent")" asp-controller="ManageEvent" asp-action="Index">
+                        <i class="bi bi-calendar-event"></i>
+                        <span>Event</span>
+                    </a>
 
-<<<<<<< HEAD
-=======
-                @* Report: Admin only (close for Librarian) *@
-                @if (isAdmin)
-                {
-                    <li class="link @IsActive("ManageReport")">
-                        <i class="bi bi-receipt"></i>
-                        <a asp-controller="ManageReport" asp-action="Index">Report</a>
-                    </li>
-                }
->>>>>>> 134b3303f1b98ec3c45b61939130c51f37509319
-            </ul>
-        </nav>
+                    <a class="nav-link @IsActive("ManageFeedback")" asp-controller="ManageFeedback" asp-action="Index">
+                        <i class="bi bi-envelope-exclamation"></i>
+                        <span>Feedbacks</span>
+                    </a>
 
-        <!-- MAIN -->
-        <main class="main-content">
+                    @if (isAdmin)
+                    {
+                        <a class="nav-link @IsActive("ManageReport")" asp-controller="ManageReport" asp-action="Index">
+                            <i class="bi bi-receipt"></i>
+                            <span>Report</span>
+                        </a>
+                    }
+                </div>
+
+            </div>
+        </aside>
+
+        <!-- CONTENT -->
+        <main class="content">
             @RenderBody()
         </main>
+    </div>
 
+    <!-- MOBILE SIDEBAR (Offcanvas) -->
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="mobileSidebar">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title">Menu</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+        </div>
+        <div class="offcanvas-body p-0">
+            <div class="mobile-nav">
+
+                @if (isAdmin || isLibrarian)
+                {
+                    <a class="nav-link @IsActive("Dashboard")" asp-controller="Dashboard" asp-action="Index">
+                        <i class="bi bi-speedometer2"></i><span>Dashboard</span>
+                    </a>
+                }
+
+                <a class="nav-link @IsActive("ManageBooks")" asp-controller="ManageBooks" asp-action="Index">
+                    <i class="bi bi-book"></i><span>Manage Books</span>
+                </a>
+
+                <a class="nav-link @IsActive("ManageBorrowingBook")" asp-controller="ManageBorrowingBook" asp-action="Index">
+                    <i class="bi bi-journals"></i><span>Borrowing Book</span>
+                </a>
+
+                @if (isAdmin)
+                {
+                    <a class="nav-link @IsActive("ManageUser")" asp-controller="ManageUser" asp-action="Index">
+                        <i class="bi bi-people"></i><span>Manage User</span>
+                    </a>
+                }
+
+                <a class="nav-link @IsActive("ManageEvent")" asp-controller="ManageEvent" asp-action="Index">
+                    <i class="bi bi-calendar-event"></i><span>Event</span>
+                </a>
+
+                <a class="nav-link @IsActive("ManageFeedback")" asp-controller="ManageFeedback" asp-action="Index">
+                    <i class="bi bi-envelope-exclamation"></i><span>Feedbacks</span>
+                </a>
+
+                @if (isAdmin)
+                {
+                    <a class="nav-link @IsActive("ManageReport")" asp-controller="ManageReport" asp-action="Index">
+                        <i class="bi bi-receipt"></i><span>Report</span>
+                    </a>
+                }
+            </div>
+        </div>
     </div>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+    <script>
+        // Desktop sidebar collapse
+        (function () {
+            const sidebar = document.getElementById('sidebar');
+            const btn = document.getElementById('sidebarToggle');
+            if (!sidebar || !btn) return;
+
+            btn.addEventListener('click', () => {
+                document.body.classList.toggle('sidebar-collapsed');
+            });
+        })();
+    </script>
+
     @RenderSection("Scripts", required: false)
 </body>
-
 </html>

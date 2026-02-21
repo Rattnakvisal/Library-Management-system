@@ -1,153 +1,226 @@
-﻿/* =========================
-   RESET
-========================= */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+
+/* ===== Shell ===== */
+.admin-shell {
+  background: #f4f6f8;
+  font-family: "Inter", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-weight: 400;
 }
 
-html,
-body {
-  height: 100%;
-  font-family: Arial, Helvetica, sans-serif;
-  background: #f8f9fa;
+/* ===== Topbar ===== */
+.topbar {
+  height: 64px;
+  background: #fff;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 18px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 
-/* =========================
-   HEADER
-========================= */
-.header {
-  height: 80px; /* cleaner than 105px */
-  background: #ffffff;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.header .libraryName {
-  font-size: 18px;
-  color: #294765;
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: #0f172a;
+}
+
+.brand-text {
+  font-weight: 700;
   letter-spacing: 0.2px;
 }
 
-/* logo group */
-.header img {
-  width: auto;
-  height: 36px;
-}
-
-/* Dropdown button (admin profile) */
-.header .dropdown > button {
-  background: transparent;
-  border: 0;
-  padding: 6px 10px;
-  border-radius: 10px;
-}
-
-.header .dropdown > button:hover {
-  background: rgba(41, 71, 101, 0.06);
-}
-
-.header .dropdown > button:focus {
-  outline: none;
-  box-shadow: 0 0 0 4px rgba(41, 71, 101, 0.12);
-}
-
-.header .dropdown-menu {
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 12px;
-  padding: 8px;
-  min-width: 220px;
-}
-
-.header .dropdown-item {
-  border-radius: 10px;
-  padding: 10px 12px;
+/* ===== Layout ===== */
+.layout {
   display: flex;
-  align-items: center;
-  gap: 8px;
+  min-height: calc(100vh - 64px);
 }
 
-.header .dropdown-item:hover {
-  background: rgba(41, 71, 101, 0.08);
-}
-
-/* Make only header icons dark */
-.header i.bi {
-  color: #111827;
-}
-
-/* =========================
-   CONTENT LAYOUT
-========================= */
-.content {
-  height: calc(100vh - 80px);
-}
-
-/* =========================
-   SIDEBAR
-========================= */
 .sidebar {
   width: 260px;
-  background-color: #294765;
-  padding: 16px 10px;
-  overflow-y: auto;
+  background: #1b3451;
+  color: #fff;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.menu-link {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+.sidebar-inner {
+  padding: 14px;
 }
 
-.link {
+.sidebar-title {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.75);
+  font-weight: 700;
+  letter-spacing: 0.35px;
+  text-transform: uppercase;
+  margin: 10px 8px;
+}
+
+.sidebar-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 12px 0;
+}
+
+.sidebar .nav-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.88);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 14px;
+  transition:
+    background 0.15s ease,
+    transform 0.15s ease;
+}
+
+.sidebar .nav-link i {
+  font-size: 17px;
+  font-weight: 400;
+}
+
+.sidebar .nav-link:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-1px);
+}
+
+.sidebar .nav-link.active {
+  background: rgba(37, 99, 235, 0.22);
+  color: #fff;
+}
+
+/* Collapsed sidebar */
+.sidebar-collapsed .sidebar {
+  width: 86px;
+}
+
+.sidebar-collapsed .sidebar .nav-link span {
+  display: none;
+}
+
+.sidebar-collapsed .sidebar-title,
+.sidebar-collapsed .sidebar-divider {
+  display: none;
+}
+
+/* ===== Content ===== */
+.content {
+  flex: 1 1 auto;
+  padding: 18px;
+  min-width: 0;
+}
+
+/* ===== User button ===== */
+.user-btn {
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  background: #fff;
+  padding: 8px 10px;
+  border-radius: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  background: rgba(37, 99, 235, 0.12);
+  color: #2563eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+.user-meta {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+  text-align: left;
+}
+
+.user-name {
+  font-weight: 700;
+  font-size: 14px;
+  color: #0f172a;
+}
+
+.user-role {
+  font-size: 12px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+/* ===== Mobile nav inside offcanvas ===== */
+.mobile-nav .nav-link {
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 12px 14px;
-  border-radius: 10px;
-  color: #ffffff;
-  cursor: pointer;
-  transition:
-    background 0.15s ease,
-    transform 0.05s ease;
-}
-
-.link:hover {
-  background: rgba(255, 255, 255, 0.12);
-}
-
-.link:active {
-  transform: translateY(1px);
-}
-
-.link i {
-  font-size: 18px;
-  color: #ffffff;
-}
-
-.link a {
-  color: inherit;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
   text-decoration: none;
+  color: #0f172a;
   font-weight: 500;
 }
 
-/* Active sidebar item */
-.link.active {
-  background-color: #c7e5fa;
-  color: #264a73 !important;
-  font-weight: 700;
+.mobile-nav .nav-link i {
+  font-size: 17px;
+  font-weight: 400;
 }
 
-.link.active i {
-  color: #264a73 !important;
+.mobile-nav .nav-link.active {
+  background: rgba(37, 99, 235, 0.1);
+  color: #1d4ed8;
 }
 
-/* =========================
-   MAIN CONTENT
-========================= */
-.main-content {
-  flex: 1;
-  padding: 20px;
-  overflow-y: auto;
-  background-color: #f8f9fa;
+@media (max-width: 991.98px) {
+  .topbar {
+    padding: 0 10px;
+  }
+
+  .topbar-left {
+    gap: 6px;
+  }
+
+  .brand {
+    gap: 6px;
+  }
+
+  .brand-text {
+    display: none;
+  }
+
+  .user-btn {
+    padding: 6px 8px;
+    gap: 6px;
+  }
+
+  .user-meta {
+    display: none;
+  }
+
+  .avatar {
+    width: 34px;
+    height: 34px;
+  }
 }

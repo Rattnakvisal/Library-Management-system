@@ -6,34 +6,53 @@ namespace Library_Management_system.Data
 {
     public class DbHelper
     {
-        private readonly IConfiguration _configuration;
+        private readonly string _connectionString;
 
         public DbHelper(IConfiguration configuration)
         {
-            _configuration = configuration;
+            _connectionString = configuration.GetConnectionString("DefaultConnection")
+                ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
         }
 
-        public SqlConnection GetConnection()
-        {
-            string connectionString = _configuration.GetConnectionString("DefaultConnection");
-            return new SqlConnection(connectionString);
-        }
+        public SqlConnection GetConnection() => new SqlConnection(_connectionString);
 
-        public List<T> ExecuteReader<T>(string procName, Dictionary<string, object>? parameters = null)
+        // -------------------------
+        // Reader -> List<T>
+        // -------------------------
+        public List<T> ExecuteReader<T>(string procName, Dictionary<string, object?>? parameters = null)
             where T : new()
         {
-            DataTable dt = ExecuteStoredProcedure(procName, parameters);
-            List<T> list = new();
+            var dt = ExecuteStoredProcedure(procName, parameters);
+            var list = new List<T>();
+
+            var props = typeof(T)
+                .GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                .Where(p => p.CanWrite)
+                .ToList();
 
             foreach (DataRow row in dt.Rows)
             {
-                T obj = new T();
+                var obj = new T();
 
-                foreach (PropertyInfo prop in typeof(T).GetProperties())
+                foreach (var prop in props)
                 {
-                    if (dt.Columns.Contains(prop.Name) && row[prop.Name] != DBNull.Value)
+                    if (!dt.Columns.Contains(prop.Name)) continue;
+
+                    var value = row[prop.Name];
+                    if (value == DBNull.Value) continue;
+
+                    // handle Nullable<T>
+                    var targetType = Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType;
+
+                    try
                     {
-                        prop.SetValue(obj, row[prop.Name]);
+                        var safeValue = Convert.ChangeType(value, targetType);
+                        prop.SetValue(obj, safeValue);
+                    }
+                    catch
+                    {
+                        // if conversion fails, skip or throw (your choice)
+                        // throw new InvalidOperationException($"Cannot map column '{prop.Name}' to '{targetType.Name}'.");
                     }
                 }
 
@@ -43,68 +62,55 @@ namespace Library_Management_system.Data
             return list;
         }
 
-        public DataTable ExecuteStoredProcedure(string procName, Dictionary<string, object>? parameters = null)
+        // -------------------------
+        // Stored Procedure -> DataTable
+        // -------------------------
+        public DataTable ExecuteStoredProcedure(string procName, Dictionary<string, object?>? parameters = null)
         {
-            using SqlConnection con = GetConnection();
-            using SqlCommand cmd = new SqlCommand(procName, con)
-            {
-                CommandType = CommandType.StoredProcedure
-            };
+            using var con = GetConnection();
+            using var cmd = new SqlCommand(procName, con) { CommandType = CommandType.StoredProcedure };
 
-            if (parameters != null)
-            {
-                foreach (var param in parameters)
-                {
-                    cmd.Parameters.AddWithValue("@" + param.Key, param.Value ?? DBNull.Value);
-                }
-            }
+            AddParameters(cmd, parameters);
 
-            using SqlDataAdapter da = new SqlDataAdapter(cmd);
-            DataTable dt = new DataTable();
+            using var da = new SqlDataAdapter(cmd);
+            var dt = new DataTable();
             da.Fill(dt);
             return dt;
         }
 
-        public int ExecuteNonQuery(string procName, Dictionary<string, object>? parameters = null)
+        // -------------------------
+        // NonQuery
+        // -------------------------
+        public int ExecuteNonQuery(string procName, Dictionary<string, object?>? parameters = null)
         {
-            using SqlConnection con = GetConnection();
-            using SqlCommand cmd = new SqlCommand(procName, con)
-            {
-                CommandType = CommandType.StoredProcedure
-            };
+            using var con = GetConnection();
+            using var cmd = new SqlCommand(procName, con) { CommandType = CommandType.StoredProcedure };
 
-            if (parameters != null)
-            {
-                foreach (var param in parameters)
-                {
-                    cmd.Parameters.AddWithValue("@" + param.Key, param.Value ?? DBNull.Value);
-                }
-            }
+            AddParameters(cmd, parameters);
 
             con.Open();
             return cmd.ExecuteNonQuery();
         }
 
-        public string ExecuteNonQueryWithOutput(string procName, Dictionary<string, object>? parameters,
-            string outputParamName, SqlDbType outputType, int size = 200)
+        // -------------------------
+        // Output Param
+        // -------------------------
+        public string ExecuteNonQueryWithOutput(
+            string procName,
+            Dictionary<string, object?>? parameters,
+            string outputParamName,
+            SqlDbType outputType,
+            int size = 200)
         {
-            using SqlConnection con = GetConnection();
-            using SqlCommand cmd = new SqlCommand(procName, con)
-            {
-                CommandType = CommandType.StoredProcedure
-            };
+            using var con = GetConnection();
+            using var cmd = new SqlCommand(procName, con) { CommandType = CommandType.StoredProcedure };
 
-            if (parameters != null)
-            {
-                foreach (var param in parameters)
-                {
-                    cmd.Parameters.AddWithValue("@" + param.Key, param.Value ?? DBNull.Value);
-                }
-            }
+            AddParameters(cmd, parameters);
 
-            SqlParameter outputParam = new SqlParameter("@" + outputParamName, outputType, size)
+            var outputParam = new SqlParameter("@" + outputParamName, outputType)
             {
-                Direction = ParameterDirection.Output
+                Direction = ParameterDirection.Output,
+                Size = size
             };
             cmd.Parameters.Add(outputParam);
 
@@ -114,30 +120,38 @@ namespace Library_Management_system.Data
             return outputParam.Value?.ToString() ?? string.Empty;
         }
 
-        // New method for scalar operations
-        public T ExecuteScalar<T>(string procName, Dictionary<string, object>? parameters = null)
+        // -------------------------
+        // Scalar
+        // -------------------------
+        public T? ExecuteScalar<T>(string procName, Dictionary<string, object?>? parameters = null)
         {
-            using SqlConnection con = GetConnection();
-            using SqlCommand cmd = new SqlCommand(procName, con)
-            {
-                CommandType = CommandType.StoredProcedure
-            };
+            using var con = GetConnection();
+            using var cmd = new SqlCommand(procName, con) { CommandType = CommandType.StoredProcedure };
 
-            if (parameters != null)
-            {
-                foreach (var param in parameters)
-                {
-                    cmd.Parameters.AddWithValue("@" + param.Key, param.Value ?? DBNull.Value);
-                }
-            }
+            AddParameters(cmd, parameters);
 
             con.Open();
             var result = cmd.ExecuteScalar();
 
-            if (result == DBNull.Value || result == null)
-                return default(T);
+            if (result == null || result == DBNull.Value) return default;
 
-            return (T)Convert.ChangeType(result, typeof(T));
+            var targetType = Nullable.GetUnderlyingType(typeof(T)) ?? typeof(T);
+            return (T)Convert.ChangeType(result, targetType);
+        }
+
+        // -------------------------
+        // Helper: safer parameters (avoid AddWithValue)
+        // -------------------------
+        private static void AddParameters(SqlCommand cmd, Dictionary<string, object?>? parameters)
+        {
+            if (parameters == null) return;
+
+            foreach (var (key, value) in parameters)
+            {
+                // DBNull.Value for null
+                var p = cmd.Parameters.Add("@" + key, SqlDbType.Variant);
+                p.Value = value ?? DBNull.Value;
+            }
         }
     }
 }

@@ -49,7 +49,7 @@
                 </div>
 
                 <!-- Identity Login Form -->
-                <form id="account" method="post">
+                <form id="account" method="post" asp-route-returnUrl="@Model.ReturnUrl">
                     <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
 
                     <div>
@@ -125,11 +125,8 @@
         </div>
     </div>
 
-    @section Scripts {
-        <partial name="_ValidationScriptsPartial" />
-        <script src="~/js/admin/login.js"></script>
-        <script src="~/js/script.js" asp-append-version="true"></script>
-    }
+    <script src="~/js/admin/login.js"></script>
+    <partial name="_ValidationScriptsPartial" />
 </body>
 
 </html>

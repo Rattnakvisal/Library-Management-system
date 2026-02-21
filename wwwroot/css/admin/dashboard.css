@@ -1,4 +1,6 @@
-﻿/* =========================================================
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+
+/* =========================================================
    THEME
 ========================================================= */
 :root {
@@ -12,28 +14,29 @@
 }
 
 .dashboard-page {
-    max-width: 1280px;
+  max-width: 1280px;
+  font-family: "Inter", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-weight: 400;
 }
 
 .dash-header .welcome {
-    font-family: "Segoe UI", sans-serif;
-    font-size: 26px;
-    font-weight: 650;
-    margin: 0;
+  font-size: 26px;
+  font-weight: 700;
+  margin: 0;
 }
 
 .dash-header .date-line {
   margin-top: 6px;
   color: var(--navy);
-  font-weight: 700;
+  font-weight: 500;
   font-size: 14px;
 }
 
 .divider {
-    height: 1px;
-    background: #BFC6C4;
-    opacity: 0.6;
-    margin: 10px 0 18px;
+  height: 1px;
+  background: #bfc6c4;
+  opacity: 0.6;
+  margin: 10px 0 18px;
 }
 
 /* =========================================================
@@ -58,38 +61,40 @@
 }
 
 .sum-icon {
-    width: 64px;
-    height: 64px;
-    border-radius: 10px;
-    background: #bfe1fb;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  width: 64px;
+  height: 64px;
+  border-radius: 10px;
+  background: #bfe1fb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
 
 .sum-icon i {
-  font-size: 34px;
-  color: #000;
+  font-size: 30px;
+  color: #0f172a;
+  font-weight: 400;
 }
 
 .sum-title {
-  font-weight: 800;
+  font-weight: 600;
   font-size: 12px;
   margin-bottom: 6px;
 }
 
 .sum-value {
-  font-weight: 800;
+  font-weight: 700;
   font-size: 18px;
   color: var(--navy);
 }
+
 /* =========================================================
-   QUICK PANELS WITH TABS   
+   QUICK PANELS WITH TABS
 ========================================================= */
 .quick-title {
   font-size: 18px;
-  font-weight: 800;
+  font-weight: 700;
   margin: 6px 0;
 }
 
@@ -105,7 +110,7 @@
   background: transparent;
   border: none;
   padding: 10px 14px;
-  font-weight: 800;
+  font-weight: 600;
   font-size: 14px;
   color: #000;
   position: relative;
@@ -135,7 +140,7 @@
 }
 
 .panel-title {
-  font-weight: 800;
+  font-weight: 700;
   font-size: 18px;
   margin: 2px 0 14px;
 }
@@ -143,6 +148,7 @@
 .qtab-content {
   display: none;
 }
+
 .qtab-content.show {
   display: block;
 }
@@ -164,7 +170,7 @@
 .dash-table thead th {
   background: #efefef;
   font-size: 11px;
-  font-weight: 900;
+  font-weight: 700;
   padding: 12px;
   border-bottom: 1px solid #c9c9c9;
 }
@@ -179,7 +185,6 @@
   border-bottom: none;
 }
 
-/* small book image */
 .book-img {
   width: 26px;
   height: 34px;
@@ -188,9 +193,8 @@
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
-/* status & action icons */
 .status {
-  font-weight: 900;
+  font-weight: 600;
   font-size: 11px;
 }
 
@@ -203,10 +207,11 @@
 }
 
 .action-ico {
-  font-size: 16px;
+  font-size: 18px;
   margin: 0 8px;
-  color: #000;
+  color: #111827;
   opacity: 0.9;
+  font-weight: 400;
 }
 
 /* =========================================================
@@ -219,13 +224,14 @@
   border-radius: 999px;
   padding: 4px 10px;
   font-size: 10px;
-  font-weight: 900;
+  font-weight: 600;
   border: 1px solid transparent;
   white-space: nowrap;
 }
 
 .pill i {
   font-size: 12px;
+  font-weight: 400;
 }
 
 .pill.danger {
@@ -255,6 +261,7 @@
   border: 1px solid #3a3a3a;
   color: #2b2b2b;
   font-size: 12px;
+  font-weight: 500;
   padding: 6px 12px;
   border-radius: 0 !important;
 }
@@ -315,7 +322,6 @@
   display: block;
 }
 
-/* legend */
 .legend-area {
   flex: 1 1 auto;
   min-width: 0;
@@ -333,7 +339,7 @@
   gap: 10px;
   margin: 8px 0;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .dot {
@@ -346,19 +352,19 @@
 .dot.edu {
   background: #8b5e53;
 }
+
 .dot.art {
   background: #1534ff;
 }
+
 .dot.rel {
   background: #1dd13a;
 }
+
 .dot.other {
   background: #ff2b2b;
 }
 
-/* =========================================================
-   RESPONSIVE
-========================================================= */
 @media (max-width: 992px) {
   .summary-row {
     grid-template-columns: repeat(2, minmax(0, 1fr));
