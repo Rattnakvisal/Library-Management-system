@@ -31,6 +31,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 builder.Services.AddScoped<DbHelper>();
+builder.Services.AddTransient<Microsoft.AspNetCore.Identity.UI.Services.IEmailSender, Library_Management_system.Services.EmailSender>();
 
 var app = builder.Build();
 
@@ -70,6 +71,26 @@ await using (var scope = app.Services.CreateAsyncScope())
     await EnsureRoleExistsAsync(roleManager, "Admin");
     await EnsureRoleExistsAsync(roleManager, "Librarian");
     await EnsureRoleExistsAsync(roleManager, "User");
+
+    // Seed Admin User
+    var adminEmail = "admin@library.com";
+    var adminUser = await userManager.FindByEmailAsync(adminEmail);
+    if (adminUser == null)
+    {
+        adminUser = new ApplicationUser
+        {
+            UserName = adminEmail,
+            Email = adminEmail,
+            FullName = "System Admin",
+            EmailConfirmed = true
+        };
+        await userManager.CreateAsync(adminUser, "Admin@123");
+    }
+
+    if (adminUser != null && !await userManager.IsInRoleAsync(adminUser, "Admin"))
+    {
+        await userManager.AddToRoleAsync(adminUser, "Admin");
+    }
 }
 
 app.Run();

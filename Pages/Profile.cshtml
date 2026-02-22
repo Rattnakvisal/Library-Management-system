@@ -1,0 +1,28 @@
+@page
+@model Library_Management_system.Pages.ProfileModel
+@{
+    ViewData["Title"] = "User Profile";
+}
+
+<div class="container mt-5">
+    <h2>@ViewData["Title"]</h2>
+    <hr />
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Account Information</h5>
+                    <p class="card-text"><strong>Full Name:</strong> @Model.CurrentUser?.FullName</p>
+                    <p class="card-text"><strong>Email:</strong> @Model.CurrentUser?.Email</p>
+                </div>
+            </div>
+
+            <div class="actions">
+                <!-- Use the explicit path. Ensure this file exists at Areas/Identity/Pages/Account/ResetPassword.cshtml -->
+                <a href="/Identity/Account/ForgotPassword" class="btn btn-warning">
+                    <i class="bi bi-key-fill"></i> Reset Password
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
