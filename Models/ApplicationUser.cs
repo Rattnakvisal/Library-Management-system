@@ -13,5 +13,9 @@ namespace Library_Management_system.Models
         public string? CreatedBy { get; set; }
 
         public DateTime? CreatedDate { get; set; }
+
+        public string? ResetPasswordToken { get; set; }
+
+        public DateTime? ResetPasswordTokenExpiry { get; set; }  
     }
 }
