@@ -20,6 +20,8 @@ namespace Library_Management_system.Models.Admin
         public string BookTitle { get; set; } = string.Empty;
         public DateTime BorrowDate { get; set; }
         public DateTime DueDate { get; set; }
+        public string CreatedBy { get; set; } = "System";
+        public DateTime CreatedDate { get; set; }
         public string Status { get; set; } = "active";
     }
 

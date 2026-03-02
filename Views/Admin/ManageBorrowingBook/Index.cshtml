@@ -100,6 +100,8 @@
                             <th scope="col">Book Title</th>
                             <th scope="col">Borrow Date</th>
                             <th scope="col">Due Date</th>
+                            <th scope="col">Created By</th>
+                            <th scope="col">Created Date</th>
                             <th scope="col">Status</th>
                             <th scope="col">Action</th>
                         </tr>
@@ -135,6 +137,8 @@
                                     <td>@borrowing.BookTitle</td>
                                     <td>@borrowing.BorrowDate.ToString("yyyy-MM-dd")</td>
                                     <td>@borrowing.DueDate.ToString("yyyy-MM-dd")</td>
+                                    <td>@borrowing.CreatedBy</td>
+                                    <td>@borrowing.CreatedDate.ToString("yyyy-MM-dd")</td>
                                     <td><span class="table-status @statusClass">@statusLabel</span></td>
                                     <td>
                                         <div class="action-container">
@@ -161,7 +165,7 @@
                         else
                         {
                             <tr>
-                                <td colspan="7" class="text-center text-muted py-4">No borrowing records found.</td>
+                                <td colspan="9" class="text-center text-muted py-4">No borrowing records found.</td>
                             </tr>
                         }
                     </tbody>

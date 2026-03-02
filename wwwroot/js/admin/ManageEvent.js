@@ -1,46 +1,71 @@
-﻿$(document).ready(function() {
+$(document).ready(function () {
     initializeAddEventButton();
     initializeUpdateEventButton();
     initializeEditEventButton();
     initializeDeleteEventButton();
 });
 
-// Extract event data from table row
+function showAlert(title, text, icon, confirmButtonColor = '#1f4a73') {
+    return Swal.fire({
+        title,
+        text,
+        icon,
+        confirmButtonColor
+    });
+}
+
+async function postForm(url, formData) {
+    const response = await fetch(url, {
+        method: 'POST',
+        body: formData
+    });
+
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok || !payload.success) {
+        throw new Error(payload.message || 'Request failed.');
+    }
+
+    return payload;
+}
+
+async function postNoBody(url) {
+    const response = await fetch(url, { method: 'POST' });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok || !payload.success) {
+        throw new Error(payload.message || 'Request failed.');
+    }
+
+    return payload;
+}
+
 function extractEventDataFromRow(row) {
     return {
-        rowIndex: row.find('th').text(),
-        eventImage: row.find('td').eq(0).find('img').attr('src'),
-        eventName: row.find('td').eq(1).text().trim(),
-        description: row.find('td').eq(2).text().trim(),
-        startDate: row.find('td').eq(3).text().trim(),
-        endDate: row.find('td').eq(4).text().trim(),
-        location: row.find('td').eq(5).text().trim(),
-        fullDescription: row.data('description') || row.find('td').eq(2).text().trim()
+        id: (row.data('event-id') || '').toString().trim(),
+        eventName: (row.data('event-name') || '').toString().trim(),
+        description: (row.data('description') || '').toString().trim(),
+        location: (row.data('location') || '').toString().trim(),
+        startDate: (row.data('start-date') || '').toString().trim(),
+        endDate: (row.data('end-date') || '').toString().trim()
     };
 }
 
-// Populate edit modal with event data
 function populateEditEventModal(eventData) {
+    $('#editEventIdInput').val(eventData.id);
     $('#edit-eventNameInput').val(eventData.eventName);
     $('#edit-locationInput').val(eventData.location);
     $('#edit-startDateInput').val(eventData.startDate);
     $('#edit-endDateInput').val(eventData.endDate);
-    $('#edit-descriptionTextarea').val(eventData.fullDescription);
-
-    // Store row index for later use
-    $('#editEventModal').data('rowIndex', eventData.rowIndex);
+    $('#edit-descriptionTextarea').val(eventData.description);
 }
 
-// Initialize edit event button click handler
 function initializeEditEventButton() {
-    $('.event-table').on('click', '.edit-event-btn', function() {
-        var row = $(this).closest('tr');
-        var eventData = extractEventDataFromRow(row);
+    $('.event-table').on('click', '.edit-event-btn', function () {
+        const row = $(this).closest('tr');
+        const eventData = extractEventDataFromRow(row);
         populateEditEventModal(eventData);
     });
 }
 
-// Get event data from add form
 function getAddEventFormData() {
     return {
         eventName: $('#eventNameInput').val().trim(),
@@ -52,9 +77,9 @@ function getAddEventFormData() {
     };
 }
 
-// Get event data from edit form
 function getEditEventFormData() {
     return {
+        id: ($('#editEventIdInput').val() || '').toString().trim(),
         eventName: $('#edit-eventNameInput').val().trim(),
         location: $('#edit-locationInput').val().trim(),
         startDate: $('#edit-startDateInput').val(),
@@ -64,124 +89,119 @@ function getEditEventFormData() {
     };
 }
 
-// Validate event data
 function validateEventData(eventData) {
     if (!eventData.eventName || !eventData.location ||
         !eventData.startDate || !eventData.endDate || !eventData.description) {
-        Swal.fire({
-            title: 'Missing Information!',
-            text: 'Please fill in all required fields marked with *',
-            icon: 'warning',
-            confirmButtonText: 'OK',
-            confirmButtonColor: '#ffc107'
-        });
+        showAlert('Missing Information', 'Please fill in all required fields.', 'warning', '#f59e0b');
         return false;
     }
 
-    // Validate date range
     if (new Date(eventData.startDate) > new Date(eventData.endDate)) {
-        Swal.fire({
-            title: 'Invalid Date Range!',
-            text: 'End date must be after or equal to start date',
-            icon: 'error',
-            confirmButtonText: 'OK',
-            confirmButtonColor: '#dc3545'
-        });
+        showAlert('Invalid Date Range', 'End date must be after or equal to start date.', 'error', '#dc2626');
         return false;
     }
 
     return true;
 }
 
-// Bootstrap 5 compatible - Show success message and close modal
-function showSuccessAndCloseModal(message, modalId, formId) {
-    Swal.fire({
-        title: 'Success!',
-        text: message,
-        icon: 'success',
-        confirmButtonText: 'OK',
-        confirmButtonColor: '#28a745'
-    }).then(function(result) {
-        if (result.isConfirmed) {
-            // Bootstrap 5 way to hide modal
-            const modalElement = document.querySelector(modalId);
-            const modal = bootstrap.Modal.getInstance(modalElement);
-            if (modal) {
-                modal.hide();
-            }
-            $(formId)[0].reset();
-        }
-    });
+function hideModal(modalId) {
+    const element = document.querySelector(modalId);
+    const modal = bootstrap.Modal.getInstance(element);
+    if (modal) {
+        modal.hide();
+    }
 }
 
-// Initialize add event button
+function buildEventFormData(eventData) {
+    const formData = new FormData();
+    formData.append('eventName', eventData.eventName);
+    formData.append('location', eventData.location);
+    formData.append('startDate', eventData.startDate);
+    formData.append('endDate', eventData.endDate);
+    formData.append('description', eventData.description);
+
+    if (eventData.eventImage) {
+        formData.append('eventImage', eventData.eventImage);
+    }
+
+    return formData;
+}
+
 function initializeAddEventButton() {
-    $('#addEventBtn').on('click', function() {
-        var eventData = getAddEventFormData();
-
+    $('#addEventBtn').on('click', async function () {
+        const eventData = getAddEventFormData();
         if (!validateEventData(eventData)) {
             return;
         }
 
-        console.log('Event Data:', eventData);
-
-        showSuccessAndCloseModal(
-            'Event has been added successfully!',
-            '#addEventModal',
-            '#addEventForm'
-        );
+        try {
+            const payload = await postForm('/admin/manageevent/add', buildEventFormData(eventData));
+            await showAlert('Success', payload.message || 'Event has been added successfully.', 'success', '#16a34a');
+            hideModal('#addEventModal');
+            $('#addEventForm')[0].reset();
+            window.location.reload();
+        } catch (error) {
+            await showAlert('Add Failed', error.message, 'error', '#dc2626');
+        }
     });
 }
 
-// Initialize update event button
 function initializeUpdateEventButton() {
-    $('#updateEventBtn').on('click', function() {
-        var eventData = getEditEventFormData();
+    $('#updateEventBtn').on('click', async function () {
+        const eventData = getEditEventFormData();
+        if (!eventData.id) {
+            await showAlert('Missing Information', 'Could not find event id.', 'warning', '#f59e0b');
+            return;
+        }
 
         if (!validateEventData(eventData)) {
             return;
         }
 
-        console.log('Updated Event Data:', eventData);
-
-        showSuccessAndCloseModal(
-            'Event has been updated successfully!',
-            '#editEventModal',
-            '#editEventForm'
-        );
+        try {
+            const payload = await postForm(`/admin/manageevent/update/${eventData.id}`, buildEventFormData(eventData));
+            await showAlert('Success', payload.message || 'Event has been updated successfully.', 'success', '#16a34a');
+            hideModal('#editEventModal');
+            $('#editEventForm')[0].reset();
+            window.location.reload();
+        } catch (error) {
+            await showAlert('Update Failed', error.message, 'error', '#dc2626');
+        }
     });
 }
 
-// Initialize delete event button
 function initializeDeleteEventButton() {
     $('.event-table').on('click', '.delete-event-btn', function () {
         const row = $(this).closest('tr');
-        const eventName = row.find('td').eq(1).text().trim();
-        const startDate = row.find('td').eq(3).text().trim();
+        const id = ($(this).data('event-id') || '').toString().trim();
+        const eventName = (row.data('event-name') || '').toString().trim();
+        const startDate = (row.data('start-date') || '').toString().trim();
+
+        if (!id) {
+            showAlert('Missing Id', 'Could not find event id.', 'error', '#dc2626');
+            return;
+        }
 
         Swal.fire({
-            title: 'Are you sure?',
-            text: `You are about to delete "${eventName}" scheduled for ${startDate}. This action cannot be undone.`,
+            title: 'Delete Event?',
+            text: `Delete "${eventName}" scheduled on ${startDate}?`,
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#dc3545',
-            cancelButtonColor: '#6c757d',
+            confirmButtonColor: '#dc2626',
+            cancelButtonColor: '#64748b',
             confirmButtonText: 'Yes, delete it',
             cancelButtonText: 'Cancel'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Here you would make an API call to delete the event
-                console.log('Deleting event:', eventName);
+        }).then(async function (result) {
+            if (!result.isConfirmed) {
+                return;
+            }
 
-                // Remove row from table
-                row.remove();
-
-                Swal.fire({
-                    title: 'Deleted!',
-                    text: 'The event has been deleted successfully.',
-                    icon: 'success',
-                    confirmButtonColor: '#28a745'
-                });
+            try {
+                const payload = await postNoBody(`/admin/manageevent/delete/${id}`);
+                await showAlert('Deleted', payload.message || 'The event has been deleted.', 'success', '#16a34a');
+                window.location.reload();
+            } catch (error) {
+                await showAlert('Delete Failed', error.message, 'error', '#dc2626');
             }
         });
     });

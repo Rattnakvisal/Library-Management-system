@@ -65,10 +65,17 @@ namespace Library_Management_system.Controllers
         }
 
         [HttpGet("event")]
-        public IActionResult Event()
+        public async Task<IActionResult> Event()
         {
             ViewBag.Title = "Events";
-            return View("~/Views/User/Event/Event.cshtml");
+
+            var events = await _context.Events
+                .AsNoTracking()
+                .OrderBy(e => e.StartDate)
+                .ThenBy(e => e.Id)
+                .ToListAsync();
+
+            return View("~/Views/User/Event/Event.cshtml", events);
         }
 
         [HttpGet("contact")]

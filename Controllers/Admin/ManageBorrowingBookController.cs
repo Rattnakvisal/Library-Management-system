@@ -67,6 +67,8 @@ public class ManageBorrowingBookController : Controller
                     BookTitle = x.Book?.Title ?? "(Missing book)",
                     BorrowDate = x.BorrowDate,
                     DueDate = x.DueDate,
+                    CreatedBy = string.IsNullOrWhiteSpace(x.CreatedBy) ? "System" : x.CreatedBy,
+                    CreatedDate = x.CreatedDate == default ? x.BorrowDate : x.CreatedDate,
                     Status = status
                 };
             })

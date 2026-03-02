@@ -1,38 +1,65 @@
+@using System.Globalization
+@model IReadOnlyList<Library_Management_system.Models.LibraryEvent>
 @{
     ViewBag.Title = "Events";
 }
 <div class="events-container">
     <h1 class="page-title">Upcoming Events</h1>
 
-    <div class="event-card">
-        <div class="event-image">
-            <img src="~/images/User/Contact/contact-3.png" alt="Event">
-        </div>
+    @if (Model.Any())
+    {
+        foreach (var item in Model)
+        {
+            var imagePath = string.IsNullOrWhiteSpace(item.ImageUrl)
+                ? Url.Content("~/images/User/Contact/contact-3.png")
+                : Url.Content(item.ImageUrl);
+            var host = string.IsNullOrWhiteSpace(item.CreatedBy) ? "Library Team" : item.CreatedBy;
+            var eventDate = item.StartDate.Date == item.EndDate.Date
+                ? item.StartDate.ToString("dddd, dd MMM yyyy", CultureInfo.InvariantCulture)
+                : $"{item.StartDate:dd MMM yyyy} - {item.EndDate:dd MMM yyyy}";
 
-        <div class="event-details">
-            <h2 class="event-title">AFTER PARTY FOR ACLEDA UNDERGRADUATE</h2>
+            <div class="event-card">
+                <div class="event-image">
+                    <img src="@imagePath" alt="@item.Name">
+                </div>
 
-            <div class="event-content">
-                <p class="event-description">
-                    Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source.
-                </p>
+                <div class="event-details">
+                    <h2 class="event-title">@item.Name</h2>
+
+                    <div class="event-content">
+                        <p class="event-description">@item.Description</p>
+                    </div>
+
+                    <div class="event-meta">
+                        <div class="meta-item">
+                            <strong>Host:</strong> @host
+                        </div>
+                        <div class="meta-item">
+                            <strong>Location:</strong> @item.Location
+                        </div>
+                        <div class="meta-item">
+                            <strong>Date:</strong> @eventDate
+                        </div>
+                        <div class="meta-item">
+                            <strong>Created Date:</strong> @item.CreatedDate.ToString("dd MMM yyyy", CultureInfo.InvariantCulture)
+                        </div>
+                        <div class="meta-item">
+                            <strong>Accommodation:</strong> Free
+                        </div>
+                    </div>
+                </div>
             </div>
-
-            <div class="event-meta">
-                <div class="meta-item">
-                    <strong>Host:</strong> Vised
-                </div>
-                <div class="meta-item">
-                    <strong>Location:</strong> AUB University of Business
-                </div>
-                <div class="meta-item">
-                    <strong>Date:</strong> Monday, 25th June - 29th
-                </div>
-                <div class="meta-item">
-                    <strong>Accommodation:</strong> Free
+        }
+    }
+    else
+    {
+        <div class="event-card">
+            <div class="event-details">
+                <h2 class="event-title">No upcoming events</h2>
+                <div class="event-content">
+                    <p class="event-description">There are no events published yet. Please check again soon.</p>
                 </div>
             </div>
         </div>
-    </div>
-
+    }
 </div>

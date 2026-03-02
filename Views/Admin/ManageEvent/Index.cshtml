@@ -1,3 +1,4 @@
+@model IReadOnlyList<Library_Management_system.Models.LibraryEvent>
 @{
     ViewBag.Title = "Manage Events";
 }
@@ -31,66 +32,64 @@
                         <th scope="col">Start Date</th>
                         <th scope="col">End Date</th>
                         <th scope="col">Location</th>
+                        <th scope="col">Created By</th>
+                        <th scope="col">Created Date</th>
                         <th scope="col">Action</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr data-description="Annual book fair featuring new releases and author signings">
-                        <th scope="row">1</th>
-                        <td>
-                            <img class="event-cover" src="~/images/User/Book/book2.png" alt="Event image" />
-                        </td>
-                        <td>Book Fair 2024</td>
-                        <td>Annual book fair featuring new releases</td>
-                        <td>2026-01-15</td>
-                        <td>2026-01-20</td>
-                        <td>Main Library Hall</td>
-                        <td>
-                            <div class="action-container">
-                                <button class="edit-event-btn" type="button" data-bs-toggle="modal" data-bs-target="#editEventModal" aria-label="Edit event">
-                                    <i class="bi bi-pencil-square"></i>
-                                </button>
-                                <button class="delete-event-btn" type="button" aria-label="Delete event">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr data-description="Reading workshop for children aged 5-12">
-                        <th scope="row">2</th>
-                        <td>
-                            <img class="event-cover" src="~/images/User/Book/book2.png" alt="Event image" />
-                        </td>
-                        <td>Reading Workshop</td>
-                        <td>Interactive reading session for kids</td>
-                        <td>2026-02-01</td>
-                        <td>2026-02-01</td>
-                        <td>Children's Section</td>
-                        <td>
-                            <div class="action-container">
-                                <button class="edit-event-btn" type="button" data-bs-toggle="modal" data-bs-target="#editEventModal" aria-label="Edit event">
-                                    <i class="bi bi-pencil-square"></i>
-                                </button>
-                                <button class="delete-event-btn" type="button" aria-label="Delete event">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
+                    @if (Model.Any())
+                    {
+                        var rowNo = 0;
+                        foreach (var item in Model)
+                        {
+                            rowNo++;
+                            var eventImage = string.IsNullOrWhiteSpace(item.ImageUrl)
+                                ? Url.Content("~/images/User/Book/book2.png")
+                                : Url.Content(item.ImageUrl);
+                            var shortDescription = item.Description.Length > 70
+                                ? $"{item.Description[..70]}..."
+                                : item.Description;
+
+                            <tr data-event-id="@item.Id"
+                                data-event-name="@item.Name"
+                                data-description="@item.Description"
+                                data-location="@item.Location"
+                                data-start-date="@item.StartDate.ToString("yyyy-MM-dd")"
+                                data-end-date="@item.EndDate.ToString("yyyy-MM-dd")"
+                                data-image-url="@eventImage">
+                                <th scope="row">@rowNo</th>
+                                <td>
+                                    <img class="event-cover" src="@eventImage" alt="Event image" />
+                                </td>
+                                <td>@item.Name</td>
+                                <td>@shortDescription</td>
+                                <td>@item.StartDate.ToString("yyyy-MM-dd")</td>
+                                <td>@item.EndDate.ToString("yyyy-MM-dd")</td>
+                                <td>@item.Location</td>
+                                <td>@(string.IsNullOrWhiteSpace(item.CreatedBy) ? "System" : item.CreatedBy)</td>
+                                <td>@item.CreatedDate.ToString("yyyy-MM-dd")</td>
+                                <td>
+                                    <div class="action-container">
+                                        <button class="edit-event-btn" type="button" data-bs-toggle="modal" data-bs-target="#editEventModal" aria-label="Edit event">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </button>
+                                        <button class="delete-event-btn" type="button" data-event-id="@item.Id" aria-label="Delete event">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="10" class="text-center text-muted py-4">No events found.</td>
+                        </tr>
+                    }
                 </tbody>
             </table>
-        </div>
-
-        <div class="pagination-wrapper">
-            <nav aria-label="Event pagination">
-                <ul class="pagination justify-content-end">
-                    <li class="page-item disabled"><a class="page-link">Previous</a></li>
-                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                    <li class="page-item"><a class="page-link" href="#">Next</a></li>
-                </ul>
-            </nav>
         </div>
     </section>
 
@@ -106,7 +105,7 @@
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label" for="eventNameInput">Event Name <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="eventNameInput" placeholder="eg. Book Fair 2024" required />
+                                <input type="text" class="form-control" id="eventNameInput" placeholder="eg. Book Fair 2026" required />
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label" for="locationInput">Location <span class="text-danger">*</span></label>
@@ -148,10 +147,11 @@
                 </div>
                 <div class="modal-body">
                     <form id="editEventForm">
+                        <input type="hidden" id="editEventIdInput" />
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label" for="edit-eventNameInput">Event Name <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="edit-eventNameInput" placeholder="eg. Book Fair 2024" required />
+                                <input type="text" class="form-control" id="edit-eventNameInput" placeholder="eg. Book Fair 2026" required />
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label" for="edit-locationInput">Location <span class="text-danger">*</span></label>

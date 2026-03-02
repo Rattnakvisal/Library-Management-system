@@ -12,6 +12,7 @@ namespace Library_Management_system.Data
         {
         }
         public DbSet<Book> Books { get; set; }
+        public DbSet<LibraryEvent> Events { get; set; }
         public DbSet<CartItem> CartItems { get; set; }
         public DbSet<FavoriteBook> FavoriteBooks { get; set; }
         public DbSet<BorrowingRecord> BorrowingRecords { get; set; }
