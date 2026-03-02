@@ -7,6 +7,15 @@ namespace Library_Management_system.Controllers.Admin;
 
 public class ManageBooksController : Controller
 {
+    private static readonly HashSet<string> AllowedStatuses = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "available",
+        "unavailable",
+        "borrowed",
+        "reserved",
+        "maintenance"
+    };
+
     private readonly ApplicationDbContext _context;
     private readonly IWebHostEnvironment _environment;
 
@@ -27,7 +36,18 @@ public class ManageBooksController : Controller
             booksQuery = booksQuery.Where(b =>
                 b.Title.Contains(keyword) ||
                 b.Author.Contains(keyword) ||
-                b.CategoryName.Contains(keyword));
+                b.CategoryName.Contains(keyword) ||
+                b.BookCode.Contains(keyword) ||
+                (b.Isbn != null && b.Isbn.Contains(keyword)));
+        }
+
+        if (!string.IsNullOrWhiteSpace(status))
+        {
+            var normalizedStatus = NormalizeStatus(status);
+            if (!string.IsNullOrWhiteSpace(normalizedStatus))
+            {
+                booksQuery = booksQuery.Where(b => b.Status == normalizedStatus);
+            }
         }
 
         var books = await booksQuery
@@ -41,9 +61,14 @@ public class ManageBooksController : Controller
             .ToListAsync();
 
         ViewBag.TotalBooks = books.Count;
-        ViewBag.AvailableCopies = books.Count;
-        ViewBag.UnavailableBooks = 0;
-        ViewBag.BorrowedBooks = 0;
+        ViewBag.AvailableCopies = books
+            .Where(b => string.Equals(b.Status, "available", StringComparison.OrdinalIgnoreCase))
+            .Sum(b => b.Quantity);
+        ViewBag.UnavailableBooks = books.Count(b =>
+            string.Equals(b.Status, "unavailable", StringComparison.OrdinalIgnoreCase) || b.Quantity <= 0);
+        ViewBag.BorrowedBooks = books
+            .Where(b => string.Equals(b.Status, "borrowed", StringComparison.OrdinalIgnoreCase))
+            .Sum(b => b.Quantity);
         ViewBag.BookCategories = categories;
 
         return View("~/Views/Admin/ManageBooks/Index.cshtml", books);
@@ -52,11 +77,24 @@ public class ManageBooksController : Controller
     [HttpPost("admin/managebooks/add")]
     public async Task<IActionResult> Add([FromForm] AddBookRequest request)
     {
-        if (string.IsNullOrWhiteSpace(request.BookTitle) ||
+        if (string.IsNullOrWhiteSpace(request.BookCode) ||
+            string.IsNullOrWhiteSpace(request.BookTitle) ||
             string.IsNullOrWhiteSpace(request.Author) ||
-            string.IsNullOrWhiteSpace(request.CategoryName))
+            string.IsNullOrWhiteSpace(request.CategoryName) ||
+            !request.Quantity.HasValue ||
+            request.Quantity.Value < 0 ||
+            !request.Pages.HasValue ||
+            request.Pages.Value <= 0 ||
+            !request.Year.HasValue ||
+            !IsValidYear(request.Year.Value))
         {
-            return BadRequest(new { success = false, message = "Book title, author, and category are required." });
+            return BadRequest(new { success = false, message = "Please fill all required fields correctly." });
+        }
+
+        var normalizedStatus = NormalizeStatus(request.Status);
+        if (string.IsNullOrWhiteSpace(normalizedStatus))
+        {
+            return BadRequest(new { success = false, message = "Please select a valid status." });
         }
 
         var imageUrl = "/images/User/Book/book2.png";
@@ -81,9 +119,16 @@ public class ManageBooksController : Controller
 
         var book = new Book
         {
+            BookCode = request.BookCode.Trim(),
             Title = request.BookTitle.Trim(),
             Author = request.Author.Trim(),
             CategoryName = request.CategoryName.Trim(),
+            Isbn = NormalizeOptionalText(request.Isbn),
+            Quantity = request.Quantity.Value,
+            Pages = request.Pages.Value,
+            Year = request.Year.Value,
+            Status = normalizedStatus,
+            Description = NormalizeOptionalText(request.Description),
             ImageUrl = imageUrl,
             Rating = Math.Clamp(request.Rating ?? 5, 0, 5),
             CreatedBy = actor,
@@ -126,11 +171,24 @@ public class ManageBooksController : Controller
     [HttpPost("admin/managebooks/update/{id:int}")]
     public async Task<IActionResult> Update(int id, [FromForm] UpdateBookRequest request)
     {
-        if (string.IsNullOrWhiteSpace(request.BookTitle) ||
+        if (string.IsNullOrWhiteSpace(request.BookCode) ||
+            string.IsNullOrWhiteSpace(request.BookTitle) ||
             string.IsNullOrWhiteSpace(request.Author) ||
-            string.IsNullOrWhiteSpace(request.CategoryName))
+            string.IsNullOrWhiteSpace(request.CategoryName) ||
+            !request.Quantity.HasValue ||
+            request.Quantity.Value < 0 ||
+            !request.Pages.HasValue ||
+            request.Pages.Value <= 0 ||
+            !request.Year.HasValue ||
+            !IsValidYear(request.Year.Value))
         {
-            return BadRequest(new { success = false, message = "Book title, author, and category are required." });
+            return BadRequest(new { success = false, message = "Please fill all required fields correctly." });
+        }
+
+        var normalizedStatus = NormalizeStatus(request.Status);
+        if (string.IsNullOrWhiteSpace(normalizedStatus))
+        {
+            return BadRequest(new { success = false, message = "Please select a valid status." });
         }
 
         var book = await _context.Books.FindAsync(id);
@@ -139,9 +197,16 @@ public class ManageBooksController : Controller
             return NotFound(new { success = false, message = "Book not found." });
         }
 
+        book.BookCode = request.BookCode.Trim();
         book.Title = request.BookTitle.Trim();
         book.Author = request.Author.Trim();
         book.CategoryName = request.CategoryName.Trim();
+        book.Isbn = NormalizeOptionalText(request.Isbn);
+        book.Quantity = request.Quantity.Value;
+        book.Pages = request.Pages.Value;
+        book.Year = request.Year.Value;
+        book.Status = normalizedStatus;
+        book.Description = NormalizeOptionalText(request.Description);
 
         if (request.Rating.HasValue)
         {
@@ -181,20 +246,56 @@ public class ManageBooksController : Controller
 
     public sealed class AddBookRequest
     {
+        public string BookCode { get; set; } = string.Empty;
         public string BookTitle { get; set; } = string.Empty;
         public string Author { get; set; } = string.Empty;
         public string CategoryName { get; set; } = string.Empty;
+        public string? Isbn { get; set; }
+        public int? Quantity { get; set; }
+        public int? Pages { get; set; }
+        public int? Year { get; set; }
+        public string Status { get; set; } = string.Empty;
+        public string? Description { get; set; }
         public int? Rating { get; set; }
         public IFormFile? BookImage { get; set; }
     }
 
     public sealed class UpdateBookRequest
     {
+        public string BookCode { get; set; } = string.Empty;
         public string BookTitle { get; set; } = string.Empty;
         public string Author { get; set; } = string.Empty;
         public string CategoryName { get; set; } = string.Empty;
+        public string? Isbn { get; set; }
+        public int? Quantity { get; set; }
+        public int? Pages { get; set; }
+        public int? Year { get; set; }
+        public string Status { get; set; } = string.Empty;
+        public string? Description { get; set; }
         public int? Rating { get; set; }
         public IFormFile? BookImage { get; set; }
+    }
+
+    private static bool IsValidYear(int year)
+    {
+        return year is >= 1000 and <= 9999;
+    }
+
+    private static string? NormalizeOptionalText(string? value)
+    {
+        var normalized = value?.Trim();
+        return string.IsNullOrWhiteSpace(normalized) ? null : normalized;
+    }
+
+    private static string NormalizeStatus(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return string.Empty;
+        }
+
+        var normalized = value.Trim().ToLowerInvariant();
+        return AllowedStatuses.Contains(normalized) ? normalized : string.Empty;
     }
 
     private string GetCurrentActor()

@@ -38,7 +38,7 @@
                 var rating = Math.Clamp(book.Rating, 0, 5);
 
                 <div class="col-6 col-md-4 col-lg-3">
-                    <div class="card book-card border-0 shadow-sm h-100">
+                    <div class="card book-card border-0 shadow-sm h-100 position-relative">
                         <div class="p-2 position-relative">
                             <img src="@imagePath" class="card-img-top rounded-3" alt="Book Cover" style="height: 200px; object-fit: cover;">
                         </div>
@@ -60,6 +60,11 @@
                                 }
                             </div>
                         </div>
+                        <a asp-controller="Home"
+                           asp-action="BookDetail"
+                           asp-route-id="@book.Id"
+                           class="stretched-link"
+                           aria-label="View details for @book.Title"></a>
                     </div>
                 </div>
             }

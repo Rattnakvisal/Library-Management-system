@@ -160,6 +160,62 @@ namespace Library_Management_system.Controllers
             return View("~/Views/User/Category/category.cshtml", model);
         }
 
+        [HttpGet("book/{id:int}")]
+        public async Task<IActionResult> BookDetail(int id)
+        {
+            const int recommendationCount = 4;
+
+            var book = await _context.Books
+                .AsNoTracking()
+                .FirstOrDefaultAsync(b => b.Id == id);
+
+            if (book is null)
+            {
+                return NotFound();
+            }
+
+            var relatedBooks = await _context.Books
+                .AsNoTracking()
+                .Where(b => b.Id != id && b.CategoryName == book.CategoryName)
+                .OrderByDescending(b => b.Id)
+                .Take(recommendationCount)
+                .ToListAsync();
+
+            if (relatedBooks.Count < recommendationCount)
+            {
+                var selectedIds = relatedBooks.Select(b => b.Id).ToList();
+                var sameCategoryExtras = await _context.Books
+                    .AsNoTracking()
+                    .Where(b => b.CategoryName == book.CategoryName && !selectedIds.Contains(b.Id))
+                    .OrderByDescending(b => b.Id)
+                    .Take(recommendationCount - relatedBooks.Count)
+                    .ToListAsync();
+
+                relatedBooks.AddRange(sameCategoryExtras);
+            }
+
+            if (relatedBooks.Count < recommendationCount)
+            {
+                var selectedIds = relatedBooks.Select(b => b.Id).ToList();
+                var crossCategoryBooks = await _context.Books
+                    .AsNoTracking()
+                    .Where(b => !selectedIds.Contains(b.Id))
+                    .OrderByDescending(b => b.Id)
+                    .Take(recommendationCount - relatedBooks.Count)
+                    .ToListAsync();
+
+                relatedBooks.AddRange(crossCategoryBooks);
+            }
+
+            var model = new BookDetailViewModel
+            {
+                Book = book,
+                RelatedBooks = relatedBooks
+            };
+
+            return View("~/Views/User/Books/BookDetail.cshtml", model);
+        }
+
         public IActionResult Privacy()
         {
             return View();

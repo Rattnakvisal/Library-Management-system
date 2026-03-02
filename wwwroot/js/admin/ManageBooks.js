@@ -29,28 +29,42 @@ function initializeSearchIcon() {
 // Style status badges based on their text
 function styleBookStatuses() {
     const bookStatuses = $('.table-status');
+    const stylesByStatus = {
+        available: {
+            backgroundColor: '#DBFCE7',
+            border: '1px solid #7BF1A6'
+        },
+        unavailable: {
+            backgroundColor: '#FEA8A9',
+            border: '1px solid #FF0A0A'
+        },
+        borrowed: {
+            backgroundColor: '#FFF4D6',
+            border: '1px solid #F5C34B'
+        },
+        reserved: {
+            backgroundColor: '#E0ECFF',
+            border: '1px solid #6EA8FE'
+        },
+        maintenance: {
+            backgroundColor: '#E9ECEF',
+            border: '1px solid #ADB5BD'
+        }
+    };
 
     bookStatuses.each(function() {
         const status = $(this);
+        const normalizedStatus = status.text().toString().trim().toLowerCase();
+        const style = stylesByStatus[normalizedStatus];
 
-        if (status.text() === 'Available') {
+        if (style) {
             status.css({
-                'backgroundColor': '#DBFCE7',
-                'border': '1px solid #7BF1A6',
-                'display': 'flex',
-                'justifyContent': 'center',
-                'borderRadius': '10px',
-                'padding': '2px 6px'
-            });
-        }
-        else if (status.text() === 'Unavailable') {
-            status.css({
-                'backgroundColor': '#FEA8A9',
-                'border': '1px solid #FF0A0A',
-                'display': 'flex',
-                'justifyContent': 'center',
-                'borderRadius': '10px',
-                'padding': '2px 6px'
+                backgroundColor: style.backgroundColor,
+                border: style.border,
+                display: 'flex',
+                justifyContent: 'center',
+                borderRadius: '10px',
+                padding: '2px 6px'
             });
         }
     });
@@ -77,6 +91,30 @@ function getSelectedCategoryName() {
 
 function getSelectedEditCategoryName() {
     return ($('#edit-categorySelect').val() || '').toString().trim();
+}
+
+function upsertEditBookCodeOption(bookCode) {
+    const select = $('#edit-bookCodeSelect');
+    if (!select.length) {
+        return;
+    }
+    if (!bookCode || !bookCode.trim()) {
+        select.val('');
+        return;
+    }
+
+    const normalized = bookCode.trim().toLowerCase();
+    const existing = select.find('option').filter(function () {
+        return ($(this).val() || '').toString().trim().toLowerCase() === normalized;
+    });
+
+    if (existing.length > 0) {
+        select.val(existing.first().val());
+        return;
+    }
+
+    $('<option>', { value: bookCode, text: bookCode }).appendTo(select);
+    select.val(bookCode);
 }
 
 function upsertCategoryOption(categoryName) {
@@ -207,42 +245,47 @@ function initializeCategoryControls() {
 // Extract book data from table row
 function extractBookDataFromRow(row) {
     const categoryText = (row.data('category-name') || '').toString().trim();
+    const rawIsbn = (row.data('isbn') || '').toString().trim();
+    const isbn = rawIsbn === '-' ? '' : rawIsbn;
+    const rowStatus = (row.data('status') || '').toString().trim();
     return {
         bookId: row.data('book-id'),
         rowIndex: row.index(),
-        bookCode: '',
+        bookCode: (row.data('book-code') || '').toString().trim(),
         bookCover: row.find('td').eq(0).text().trim(),
         bookTitle: row.find('td').eq(1).find('div').first().text().trim(),
         categoryName: categoryText,
         author: row.find('td').eq(2).text().trim(),
-        isbn: row.find('td').eq(3).text().trim(),
-        pages: '',
-        year: '',
-        quantity: row.find('td').eq(4).text().trim(),
-        status: row.find('td').eq(5).find('.table-status').text().trim(),
-        description: row.data('description') || ''
+        isbn,
+        pages: (row.data('pages') || '').toString().trim(),
+        year: (row.data('year') || '').toString().trim(),
+        quantity: (row.data('quantity') || row.find('td').eq(4).text().trim()).toString().trim(),
+        status: rowStatus || row.find('td').eq(5).find('.table-status').text().trim(),
+        rating: (row.data('rating') || '5').toString().trim(),
+        description: (row.data('description') || '').toString().trim()
     };
 }
 
 // Map status text to select dropdown values
 function mapStatusToValue(status) {
     const statusMap = {
-        'Available': 'available',
-        'Unavailable': 'unavailable',
-        'Borrowed': 'borrowed',
-        'Reserved': 'reserved',
-        'Maintenance': 'maintenance'
+        available: 'available',
+        unavailable: 'unavailable',
+        borrowed: 'borrowed',
+        reserved: 'reserved',
+        maintenance: 'maintenance'
     };
     if (!status) {
         return 'available';
     }
-    return statusMap[status] || status.toLowerCase();
+    const normalized = status.toString().trim().toLowerCase();
+    return statusMap[normalized] || normalized;
 }
 
 // Populate edit modal with book data
 function populateEditModal(bookData) {
     $('#editBookIdInput').val(bookData.bookId || '');
-    $('#edit-bookCodeSelect').val(bookData.bookCode);
+    upsertEditBookCodeOption(bookData.bookCode || '');
     $('#edit-bookTitleInput').val(bookData.bookTitle);
     upsertEditCategoryOption(bookData.categoryName || '');
     $('#edit-quantityInput').val(bookData.quantity);
@@ -251,6 +294,7 @@ function populateEditModal(bookData) {
     $('#edit-pagesInput').val(bookData.pages);
     $('#edit-yearInput').val(bookData.year);
     $('#edit-statusSelect').val(mapStatusToValue(bookData.status));
+    $('#edit-ratingSelect').val(bookData.rating || '5');
     $('#edit-descriptionTextarea').val(bookData.description);
 
     // Store row index for later use
@@ -294,10 +338,21 @@ function showMissingInformationAlert() {
     });
 }
 
+function hasValidBookNumbers(bookData) {
+    const quantity = Number(bookData.quantity);
+    const pages = Number(bookData.pages);
+    const year = Number(bookData.year);
+
+    return Number.isInteger(quantity) && quantity >= 0 &&
+        Number.isInteger(pages) && pages > 0 &&
+        Number.isInteger(year) && year >= 1000 && year <= 9999;
+}
+
 // Validate required add-book fields
 function validateAddBookData(bookData) {
     if (!bookData.bookCode || !bookData.bookTitle || !bookData.categoryName || !bookData.quantity ||
-        !bookData.author || !bookData.pages || !bookData.year || !bookData.status) {
+        !bookData.author || !bookData.pages || !bookData.year || !bookData.status ||
+        !hasValidBookNumbers(bookData)) {
         showMissingInformationAlert();
         return false;
     }
@@ -306,7 +361,9 @@ function validateAddBookData(bookData) {
 
 // Validate required edit-book fields
 function validateEditBookData(bookData) {
-    if (!bookData.bookId || !bookData.bookTitle || !bookData.categoryName || !bookData.author || !bookData.status) {
+    if (!bookData.bookId || !bookData.bookCode || !bookData.bookTitle || !bookData.categoryName ||
+        !bookData.quantity || !bookData.author || !bookData.pages || !bookData.year || !bookData.status ||
+        !hasValidBookNumbers(bookData)) {
         showMissingInformationAlert();
         return false;
     }
@@ -368,9 +425,17 @@ async function submitNewBook(bookData) {
 
 async function submitUpdatedBook(bookData) {
     const formData = new FormData();
+    formData.append('bookCode', bookData.bookCode);
     formData.append('bookTitle', bookData.bookTitle);
     formData.append('author', bookData.author);
     formData.append('categoryName', bookData.categoryName);
+    formData.append('isbn', bookData.isbn || '');
+    formData.append('quantity', bookData.quantity || '0');
+    formData.append('status', bookData.status);
+    formData.append('pages', bookData.pages || '0');
+    formData.append('year', bookData.year || '0');
+    formData.append('description', bookData.description || '');
+    formData.append('rating', bookData.rating || '5');
 
     if (bookData.bookImage) {
         formData.append('bookImage', bookData.bookImage);
@@ -445,6 +510,7 @@ function getEditBookFormData() {
         pages: $('#edit-pagesInput').val().trim(),
         year: $('#edit-yearInput').val().trim(),
         status: $('#edit-statusSelect').val(),
+        rating: $('#edit-ratingSelect').val(),
         isbn: $('#edit-isbnInput').val().trim(),
         description: $('#edit-descriptionTextarea').val().trim(),
         bookImage: $('#edit-bookImageInput')[0].files[0]

@@ -1,13 +1,18 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
+
 namespace Library_Management_system.Controllers.user
 {
     public class BooksController : Controller
     {
-        [Route("user/books")]
-        public IActionResult BookDetail()
+        [HttpGet("user/books/{id:int?}")]
+        public IActionResult BookDetail(int? id)
         {
-            //return View();
-            return View("~/Views/User/Books/BookDetail.cshtml");
+            if (id.HasValue)
+            {
+                return RedirectToAction("BookDetail", "Home", new { id = id.Value });
+            }
+
+            return RedirectToAction("Category", "Home");
         }
     }
 }
