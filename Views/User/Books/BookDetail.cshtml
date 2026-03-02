@@ -67,9 +67,13 @@
 
             <div class="btn-group-custom">
                 <button type="button" class="btn-read">Read</button>
-                <a href="/Cart" class="btn-cart text-decoration-none">
-                    <i class="bi bi-cart2 me-2"></i> Add to cart
-                </a>
+                <form method="post" asp-controller="Home" asp-action="AddToCart" asp-route-bookId="@book.Id"
+                      class="d-inline">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn-cart text-decoration-none border-0">
+                        <i class="bi bi-cart2 me-2"></i> Add to cart
+                    </button>
+                </form>
                 <button type="button" class="btn-fav-circle" aria-label="favorite"><i class="bi bi-heart"></i></button>
                 <button type="button" class="btn-share-circle" aria-label="share"><i class="bi bi-share"></i></button>
             </div>

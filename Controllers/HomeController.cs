@@ -3,6 +3,7 @@ using Library_Management_system.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
+using System.Security.Claims;
 
 namespace Library_Management_system.Controllers
 {
@@ -85,10 +86,162 @@ namespace Library_Management_system.Controllers
         }
 
         [HttpGet("cart")]
-        public IActionResult Cart()
+        public async Task<IActionResult> Cart()
         {
             ViewBag.Title = "Cart";
-            return View("~/Views/User/Cart/Cart.cshtml");
+
+            var ownerKey = ResolveCartOwnerKey();
+            var items = await _context.CartItems
+                .AsNoTracking()
+                .Include(ci => ci.Book)
+                .Where(ci => ci.OwnerKey == ownerKey && ci.Book != null)
+                .OrderByDescending(ci => ci.CreatedDate)
+                .ToListAsync();
+
+            var model = new CartPageViewModel
+            {
+                TotalBooks = items.Count,
+                RequestedBooks = items.Count(ci =>
+                    string.Equals(ci.ReservationStatus, "pending", StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(ci.ReservationStatus, "approved", StringComparison.OrdinalIgnoreCase)),
+                ApprovedReservationsCount = items.Count(ci =>
+                    string.Equals(ci.ReservationStatus, "approved", StringComparison.OrdinalIgnoreCase)),
+                RejectedReservationsCount = items.Count(ci =>
+                    string.Equals(ci.ReservationStatus, "rejected", StringComparison.OrdinalIgnoreCase)),
+                LastReservationDecisionVersion = items
+                    .Where(ci =>
+                        string.Equals(ci.ReservationStatus, "approved", StringComparison.OrdinalIgnoreCase) ||
+                        string.Equals(ci.ReservationStatus, "rejected", StringComparison.OrdinalIgnoreCase))
+                    .Select(ci => ci.ReservationUpdatedDate ?? ci.RequestedDate ?? ci.CreatedDate)
+                    .DefaultIfEmpty(DateTime.MinValue)
+                    .Max()
+                    .Ticks,
+                Items = items.Select(ci =>
+                {
+                    var book = ci.Book!;
+                    return new CartItemCardViewModel
+                    {
+                        CartItemId = ci.Id,
+                        BookId = book.Id,
+                        Title = book.Title,
+                        Author = book.Author,
+                        BookCode = string.IsNullOrWhiteSpace(book.BookCode) ? $"A{book.Id:0000}" : book.BookCode,
+                        Year = book.Year,
+                        Rating = Math.Clamp(book.Rating, 0, 5),
+                        ImageUrl = string.IsNullOrWhiteSpace(book.ImageUrl) ? "/images/User/Book/book2.png" : book.ImageUrl,
+                        CreatedDate = ci.CreatedDate,
+                        IsRequested = ci.IsRequested,
+                        ReservationStatus = string.IsNullOrWhiteSpace(ci.ReservationStatus) ? "none" : ci.ReservationStatus
+                    };
+                }).ToList()
+            };
+
+            return View("~/Views/User/Cart/Cart.cshtml", model);
+        }
+
+        [HttpPost("cart/add/{bookId:int}")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddToCart(int bookId)
+        {
+            var book = await _context.Books
+                .AsNoTracking()
+                .FirstOrDefaultAsync(b => b.Id == bookId);
+
+            if (book == null)
+            {
+                TempData["CartError"] = "Book not found.";
+                return RedirectToAction(nameof(Cart));
+            }
+
+            var ownerKey = ResolveCartOwnerKey();
+            var existingItem = await _context.CartItems
+                .FirstOrDefaultAsync(ci => ci.OwnerKey == ownerKey && ci.BookId == bookId);
+
+            if (existingItem != null)
+            {
+                TempData["CartMessage"] = "This book is already in your cart.";
+                return RedirectToAction(nameof(Cart));
+            }
+
+            _context.CartItems.Add(new CartItem
+            {
+                OwnerKey = ownerKey,
+                BookId = bookId,
+                CreatedDate = DateTime.UtcNow,
+                IsRequested = false,
+                ReservationStatus = "none"
+            });
+
+            await _context.SaveChangesAsync();
+            TempData["CartMessage"] = "Book added to cart.";
+            return RedirectToAction(nameof(Cart));
+        }
+
+        [HttpPost("cart/delete-selected")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteSelectedCartItems([FromForm] int[] itemIds)
+        {
+            if (itemIds == null || itemIds.Length == 0)
+            {
+                TempData["CartError"] = "Please select book(s) to delete.";
+                return RedirectToAction(nameof(Cart));
+            }
+
+            var ownerKey = ResolveCartOwnerKey();
+            var itemsToDelete = await _context.CartItems
+                .Where(ci => ci.OwnerKey == ownerKey && itemIds.Contains(ci.Id))
+                .ToListAsync();
+
+            if (itemsToDelete.Count == 0)
+            {
+                TempData["CartError"] = "No matching cart items found.";
+                return RedirectToAction(nameof(Cart));
+            }
+
+            _context.CartItems.RemoveRange(itemsToDelete);
+            await _context.SaveChangesAsync();
+
+            TempData["CartMessage"] = $"{itemsToDelete.Count} item(s) removed.";
+            return RedirectToAction(nameof(Cart));
+        }
+
+        [HttpPost("cart/proceed-request")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ProceedToRequest([FromForm] int[] itemIds)
+        {
+            if (itemIds == null || itemIds.Length == 0)
+            {
+                TempData["CartError"] = "Please select book(s) to request.";
+                return RedirectToAction(nameof(Cart));
+            }
+
+            var ownerKey = ResolveCartOwnerKey();
+            var itemsToRequest = await _context.CartItems
+                .Where(ci => ci.OwnerKey == ownerKey &&
+                             itemIds.Contains(ci.Id) &&
+                             ci.ReservationStatus != "pending" &&
+                             ci.ReservationStatus != "approved")
+                .ToListAsync();
+
+            if (itemsToRequest.Count == 0)
+            {
+                TempData["CartError"] = "Selected item(s) were already requested or not found.";
+                return RedirectToAction(nameof(Cart));
+            }
+
+            var now = DateTime.UtcNow;
+            foreach (var item in itemsToRequest)
+            {
+                item.IsRequested = true;
+                item.RequestedDate = now;
+                item.ReservationStatus = "pending";
+                item.ReservationUpdatedDate = now;
+            }
+
+            await _context.SaveChangesAsync();
+
+            TempData["CartMessage"] = $"Request submitted for {itemsToRequest.Count} item(s).";
+            return RedirectToAction(nameof(Cart));
         }
 
         [HttpGet("profile")]
@@ -225,6 +378,31 @@ namespace Library_Management_system.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        private string ResolveCartOwnerKey()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!string.IsNullOrWhiteSpace(userId))
+            {
+                return $"user:{userId}";
+            }
+
+            const string cookieName = "library_cart_id";
+            if (!Request.Cookies.TryGetValue(cookieName, out var guestCartId) || string.IsNullOrWhiteSpace(guestCartId))
+            {
+                guestCartId = Guid.NewGuid().ToString("N");
+                Response.Cookies.Append(cookieName, guestCartId, new CookieOptions
+                {
+                    HttpOnly = true,
+                    IsEssential = true,
+                    SameSite = SameSiteMode.Lax,
+                    Secure = Request.IsHttps,
+                    Expires = DateTimeOffset.UtcNow.AddYears(1)
+                });
+            }
+
+            return $"guest:{guestCartId}";
         }
     }
     

@@ -77,6 +77,20 @@
   flex-wrap: wrap;
 }
 
+.borrowing-page .filters {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.borrowing-page .filters form {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+}
+
 .borrowing-page .search-form {
   position: relative;
   min-width: 320px;
@@ -134,6 +148,11 @@
     border-color 0.15s ease,
     color 0.15s ease,
     background 0.15s ease;
+}
+
+.borrowing-page select.filter-btn.form-select {
+  min-width: 170px;
+  padding-right: 36px;
 }
 
 .borrowing-page .filter-btn i {
@@ -302,6 +321,12 @@
   color: #9a3412;
 }
 
+.borrowing-page .status-returned {
+  background: #e2e8f0;
+  border-color: #cbd5e1;
+  color: #334155;
+}
+
 .borrowing-page .action-container {
   display: flex;
   align-items: center;
@@ -333,15 +358,14 @@
 
 .borrowing-page .action-container>button>i {
   font-size: 18px;
-  color: #111827;
+  color: #0f2d4d;
 }
 
-.borrowing-page .approve-reservation-btn i {
-  color: #198754;
-}
-
-.borrowing-page .reject-reservation-btn i {
-  color: #dc3545;
+.borrowing-page .action-container > button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
 }
 
 /* =========================
@@ -456,9 +480,23 @@
     width: 100%;
   }
 
+  .borrowing-page .filters {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .borrowing-page .filters form {
+    width: 100%;
+  }
+
   .borrowing-page .filters,
   .borrowing-page .filters .filter-btn,
   .borrowing-page .new-borrowing-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .borrowing-page .clear-filter-btn {
     width: 100%;
     justify-content: center;
   }

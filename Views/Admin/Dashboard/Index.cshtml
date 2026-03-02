@@ -7,6 +7,10 @@
         Model.CategoryDistribution.Select(x => x.CategoryName).ToArray());
     var categoryCountsJson = JsonSerializer.Serialize(
         Model.CategoryDistribution.Select(x => x.BookCount).ToArray());
+    var borrowingTrendLabelsJson = JsonSerializer.Serialize(
+        Model.BorrowingTrends.Select(x => x.Label).ToArray());
+    var borrowingTrendCountsJson = JsonSerializer.Serialize(
+        Model.BorrowingTrends.Select(x => x.Count).ToArray());
 }
 
 @section Styles {
@@ -65,7 +69,7 @@
             <button type="button" class="qtab active" data-target="#panel-overview">Overview</button>
             <button type="button" class="qtab" data-target="#panel-members">New Member(s) <span class="qtab-badge">@Model.NewMembers.Count</span></button>
             <button type="button" class="qtab" data-target="#panel-books">New Book(s) <span class="qtab-badge">@Model.NewBooks.Count</span></button>
-            <button type="button" class="qtab" data-target="#panel-borrow">Borrowing Book(s)</button>
+            <button type="button" class="qtab" data-target="#panel-borrow">Borrowing Book(s) <span class="qtab-badge">@Model.RecentBorrowings.Count</span></button>
         </nav>
 
         <div class="quick-panel">
@@ -85,25 +89,34 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>Dream Count</td>
-                                <td>Sok Sabbay</td>
-                                <td>10-10-2025</td>
-                                <td>
-                                    <span class="pill danger">
-                                        <i class="bi bi-exclamation-triangle"></i> 15 Days
-                                    </span>
-                                </td>
-                                <td>$ 5.50</td>
-                                <td class="text-center">
-                                    <button type="button" class="ico-btn" aria-label="Notify">
-                                        <i class="bi bi-bell"></i>
-                                    </button>
-                                    <button type="button" class="ico-btn" aria-label="Details">
-                                        <i class="bi bi-question-circle"></i>
-                                    </button>
-                                </td>
-                            </tr>
+                            @if (Model.OverdueBorrowings.Any())
+                            {
+                                foreach (var row in Model.OverdueBorrowings)
+                                {
+                                    <tr>
+                                        <td>@row.BookTitle</td>
+                                        <td>@row.Borrower</td>
+                                        <td>@row.DueDate.ToString("yyyy-MM-dd")</td>
+                                        <td>
+                                            <span class="pill danger">
+                                                <i class="bi bi-exclamation-triangle"></i> @row.DaysOverdue Day(s)
+                                            </span>
+                                        </td>
+                                        <td>$ @row.Fine.ToString("N2")</td>
+                                        <td class="text-center">
+                                            <a class="ico-btn" aria-label="Open borrowing management" href="@Url.Action("Index", "ManageBorrowingBook")">
+                                                <i class="bi bi-box-arrow-up-right"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted py-4">No overdue books.</td>
+                                </tr>
+                            }
                         </tbody>
                     </table>
                 </div>
@@ -219,13 +232,38 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>Sok Sabbay</td>
-                                <td>Cambridge English for Engineering Students Book</td>
-                                <td class="text-center">11/15/2025</td>
-                                <td class="text-center">11/20/2025</td>
-                                <td class="text-center"><span class="status pending">Pending</span></td>
-                            </tr>
+                            @if (Model.RecentBorrowings.Any())
+                            {
+                                foreach (var row in Model.RecentBorrowings)
+                                {
+                                    var statusClass = row.Status switch
+                                    {
+                                        "active" => "status active",
+                                        "overdue" => "status overdue",
+                                        _ => "status returned"
+                                    };
+                                    var statusLabel = row.Status switch
+                                    {
+                                        "active" => "Active",
+                                        "overdue" => "Overdue",
+                                        _ => "Returned"
+                                    };
+
+                                    <tr>
+                                        <td>@row.Username</td>
+                                        <td>@row.BookTitle</td>
+                                        <td class="text-center">@row.BorrowDate.ToString("yyyy-MM-dd")</td>
+                                        <td class="text-center">@row.DueDate.ToString("yyyy-MM-dd")</td>
+                                        <td class="text-center"><span class="@statusClass">@statusLabel</span></td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted py-4">No borrowing records found.</td>
+                                </tr>
+                            }
                         </tbody>
                     </table>
                 </div>
@@ -299,6 +337,10 @@
         window.dashboardCategoryChart = {
             labels: @Html.Raw(categoryLabelsJson),
             counts: @Html.Raw(categoryCountsJson)
+        };
+        window.dashboardBorrowingTrend = {
+            labels: @Html.Raw(borrowingTrendLabelsJson),
+            counts: @Html.Raw(borrowingTrendCountsJson)
         };
     </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>

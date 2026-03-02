@@ -367,6 +367,18 @@ body {
   color: #1e40af;
 }
 
+.status.active {
+  color: #166534;
+}
+
+.status.overdue {
+  color: #b91c1c;
+}
+
+.status.returned {
+  color: #334155;
+}
+
 /* icon buttons */
 .ico-btn {
   width: 36px;

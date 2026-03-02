@@ -1,391 +1,364 @@
-﻿$(document).ready(function() {
+$(document).ready(function () {
     initializeSearchIcon();
-    styleBorrowingStatuses();
     initializeCustomSelects();
-    styleReservationStatuses();
+    initializeBookCodeBindings();
+    initializeEditBorrowingButton();
+    initializeEditReservationButton();
     initializeAddBorrowingButton();
     initializeUpdateBorrowingButton();
     initializeUpdateReservationButton();
     initializeProcessBorrowingButton();
     initializeApproveReservationButton();
     initializeRejectReservationButton();
-    initializeEditBorrowingButton();
-    initializeEditReservationButton();
 });
 
 function initializeSearchIcon() {
-    const search_borrowing_input = $('#search-borrowing-input');
-    const search_borrowing_icon = $('#search-borrowing-icon');
-    const search_reservation_input = $('#search-reservation-input');
-    const search_reservation_icon = $('#search-reservation-icon');
+    const borrowingInput = $('#search-borrowing-input');
+    const borrowingIcon = $('#search-borrowing-icon');
+    const reservationInput = $('#search-reservation-input');
+    const reservationIcon = $('#search-reservation-icon');
 
-    // Borrowing search
-    search_borrowing_input.on('focus', function () {
-        search_borrowing_icon.hide();
+    borrowingInput.on('focus', function () {
+        borrowingIcon.hide();
     });
 
-    search_borrowing_input.on('blur', function () {
-        if (search_borrowing_input.val().trim() === '') {
-            search_borrowing_icon.show();
+    borrowingInput.on('blur', function () {
+        if (!borrowingInput.val().trim()) {
+            borrowingIcon.show();
         }
     });
 
-    // Reservation search
-    search_reservation_input.on('focus', function () {
-        search_reservation_icon.hide();
+    reservationInput.on('focus', function () {
+        reservationIcon.hide();
     });
 
-    search_reservation_input.on('blur', function () {
-        if (search_reservation_input.val().trim() === '') {
-            search_reservation_icon.show();
-        }
-    });
-}
-
-function styleBorrowingStatuses() {
-    const borrowingStatuses = $('.table-status');
-
-    borrowingStatuses.each(function() {
-        const status = $(this);
-        const statusText = status.text().trim().toLowerCase();
-
-        status.removeClass('status-active status-overdue');
-
-        if (statusText === 'active') {
-            status.addClass('status-active');
-        } else if (statusText === 'overdue') {
-            status.addClass('status-overdue');
-        }
-    });
-}
-
-function styleReservationStatuses() {
-    const reservationStatuses = $('.reservation-table-status');
-
-    reservationStatuses.each(function() {
-        const status = $(this);
-        const statusText = status.text().trim().toLowerCase();
-
-        status.removeClass('reservation-approved reservation-rejected reservation-pending');
-
-        if (statusText === 'approved') {
-            status.addClass('reservation-approved');
-        } else if (statusText === 'rejected') {
-            status.addClass('reservation-rejected');
-        } else if (statusText === 'pending') {
-            status.addClass('reservation-pending');
+    reservationInput.on('blur', function () {
+        if (!reservationInput.val().trim()) {
+            reservationIcon.show();
         }
     });
 }
 
 function initializeCustomSelects() {
-    $('.custom-select-wrapper select').on('mousedown', function() {
+    $('.custom-select-wrapper select').on('mousedown', function () {
         $(this).parent().addClass('active');
     });
 
-    $('.custom-select-wrapper select').on('blur change', function() {
+    $('.custom-select-wrapper select').on('blur change', function () {
         $(this).parent().removeClass('active');
     });
 }
 
-// Bootstrap 5 compatible - uses Bootstrap's Modal instance
-function showSuccessAndCloseModal(message, modalId, formId) {
-    Swal.fire({
-        title: 'Success!',
-        text: message,
-        icon: 'success',
-        confirmButtonText: 'OK',
-        confirmButtonColor: '#28a745'
-    }).then(function(result) {
-        if (result.isConfirmed) {
-            // Bootstrap 5 way to hide modal
-            const modalElement = document.querySelector(modalId);
-            const modal = bootstrap.Modal.getInstance(modalElement);
-            if (modal) {
-                modal.hide();
-            }
-            $(formId)[0].reset();
-        }
-    });
-}
-
-// ============= BORROWING FUNCTIONS =============
-
-// Extract borrowing data from table row
-function extractBorrowingDataFromRow(row) {
-    return {
-        rowIndex: row.find('th').text(),
-        username: row.find('td').eq(0).text().trim(),
-        bookTitle: row.find('td').eq(1).text().trim(),
-        borrowDate: row.find('td').eq(2).text().trim(),
-        dueDate: row.find('td').eq(3).text().trim(),
-        status: row.find('td').eq(4).find('.table-status').text().trim()
-    };
-}
-
-// Populate edit borrowing modal with data
-function populateEditBorrowingModal(borrowingData) {
-    $('#edit-borrowing-usernameInput').val(borrowingData.username);
-    $('#edit-borrowing-bookTitleInput').val(borrowingData.bookTitle);
-    $('#edit-borrowing-borrowingDateInput').val(borrowingData.borrowDate);
-
-    // Store row index for later use
-    $('#updateBorrowingModal').data('rowIndex', borrowingData.rowIndex);
-}
-
-// Initialize edit borrowing button click handler
-function initializeEditBorrowingButton() {
-    $('.borrowing-book-table').on('click', '.edit-borrowing-btn', function() {
-        var row = $(this).closest('tr');
-        var borrowingData = extractBorrowingDataFromRow(row);
-        populateEditBorrowingModal(borrowingData);
-    });
-}
-
-// Get borrowing data from add form
-function getAddBorrowingFormData() {
-    return {
-        username: $('#usernameInput').val().trim(),
-        bookCode: $('#bookCodeSelect').val(),
-        bookTitle: $('#bookTitleInput').val().trim(),
-        borrowingDate: $('#borrowingDateInput').val()
-    };
-}
-
-// Get borrowing data from edit form
-function getEditBorrowingFormData() {
-    return {
-        username: $('#edit-borrowing-usernameInput').val().trim(),
-        bookCode: $('#edit-borrowing-bookCodeSelect').val(),
-        bookTitle: $('#edit-borrowing-bookTitleInput').val().trim(),
-        borrowingDate: $('#edit-borrowing-borrowingDateInput').val()
-    };
-}
-
-// Validate borrowing data
-function validateBorrowingData(borrowingData) {
-    if (!borrowingData.username || !borrowingData.bookCode ||
-        !borrowingData.bookTitle || !borrowingData.borrowingDate) {
-        Swal.fire({
-            title: 'Missing Information!',
-            text: 'Please fill in all required fields marked with *',
-            icon: 'warning',
-            confirmButtonText: 'OK',
-            confirmButtonColor: '#ffc107'
-        });
-        return false;
+function bindCodeToTitle(selectId, inputId) {
+    const select = $(selectId);
+    const input = $(inputId);
+    if (!select.length || !input.length) {
+        return;
     }
-    return true;
+
+    select.on('change', function () {
+        const selected = select.find('option:selected');
+        const title = (selected.data('title') || '').toString();
+        input.val(title);
+    });
+}
+
+function initializeBookCodeBindings() {
+    bindCodeToTitle('#bookCodeSelect', '#bookTitleInput');
+    bindCodeToTitle('#edit-borrowing-bookCodeSelect', '#edit-borrowing-bookTitleInput');
+    bindCodeToTitle('#edit-reservation-bookCodeSelect', '#edit-reservation-bookTitleInput');
+}
+
+function upsertBookCodeOption(select, code, title) {
+    if (!code) {
+        return;
+    }
+
+    const existing = select.find('option').filter(function () {
+        return ($(this).val() || '').toString().trim().toLowerCase() === code.trim().toLowerCase();
+    });
+
+    if (existing.length > 0) {
+        select.val(existing.first().val());
+        return;
+    }
+
+    $('<option>', {
+        value: code,
+        text: code,
+        'data-title': title || ''
+    }).appendTo(select);
+    select.val(code);
+}
+
+function showAlert(title, text, icon, confirmButtonColor = '#1f4a73') {
+    return Swal.fire({
+        title,
+        text,
+        icon,
+        confirmButtonColor
+    });
+}
+
+async function postForm(url, formData) {
+    const response = await fetch(url, {
+        method: 'POST',
+        body: formData
+    });
+
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok || !payload.success) {
+        throw new Error(payload.message || 'Request failed.');
+    }
+
+    return payload;
+}
+
+async function postNoBody(url) {
+    const response = await fetch(url, {
+        method: 'POST'
+    });
+
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok || !payload.success) {
+        throw new Error(payload.message || 'Request failed.');
+    }
+
+    return payload;
+}
+
+function getRowBorrowingData(row) {
+    return {
+        id: row.data('borrowing-id'),
+        username: (row.data('username') || '').toString().trim(),
+        bookCode: (row.data('book-code') || '').toString().trim(),
+        bookTitle: (row.data('book-title') || '').toString().trim(),
+        borrowDate: (row.data('borrow-date') || '').toString().trim()
+    };
+}
+
+function getRowReservationData(row) {
+    return {
+        id: row.data('reservation-id'),
+        username: (row.data('username') || '').toString().trim(),
+        bookCode: (row.data('book-code') || '').toString().trim(),
+        bookTitle: (row.data('book-title') || '').toString().trim(),
+        reservationDate: (row.data('reservation-date') || '').toString().trim()
+    };
+}
+
+function initializeEditBorrowingButton() {
+    $('.borrowing-book-table').on('click', '.edit-borrowing-btn', function () {
+        const row = $(this).closest('tr');
+        const data = getRowBorrowingData(row);
+
+        $('#editBorrowingIdInput').val(data.id || '');
+        $('#edit-borrowing-usernameInput').val(data.username);
+
+        const codeSelect = $('#edit-borrowing-bookCodeSelect');
+        upsertBookCodeOption(codeSelect, data.bookCode, data.bookTitle);
+        $('#edit-borrowing-bookTitleInput').val(data.bookTitle);
+        $('#edit-borrowing-borrowingDateInput').val(data.borrowDate);
+    });
+}
+
+function initializeEditReservationButton() {
+    $('.reservation-book-table').on('click', '.edit-reservation-btn', function () {
+        const row = $(this).closest('tr');
+        const data = getRowReservationData(row);
+
+        $('#editReservationIdInput').val(data.id || '');
+        $('#edit-reservation-usernameInput').val(data.username);
+
+        const codeSelect = $('#edit-reservation-bookCodeSelect');
+        upsertBookCodeOption(codeSelect, data.bookCode, data.bookTitle);
+        $('#edit-reservation-bookTitleInput').val(data.bookTitle);
+        $('#edit-reservation-reservationDateInput').val(data.reservationDate);
+    });
 }
 
 function initializeAddBorrowingButton() {
-    $('#confirmBorrowing').on('click', function() {
-        var borrowingData = getAddBorrowingFormData();
+    $('#confirmBorrowing').on('click', async function () {
+        const username = $('#usernameInput').val().trim();
+        const bookCode = ($('#bookCodeSelect').val() || '').toString().trim();
+        const borrowDate = $('#borrowingDateInput').val();
 
-        if (!validateBorrowingData(borrowingData)) {
+        if (!username || !bookCode) {
+            await showAlert('Missing Information', 'Username and book code are required.', 'warning', '#f59e0b');
             return;
         }
 
-        console.log('Borrowing Data:', borrowingData);
+        const formData = new FormData();
+        formData.append('username', username);
+        formData.append('bookCode', bookCode);
+        if (borrowDate) {
+            formData.append('borrowDate', borrowDate);
+        }
 
-        showSuccessAndCloseModal(
-            'Borrowing has been added successfully!',
-            '#addNewBorrowingModal',
-            '#addNewBorrowingForm'
-        );
+        try {
+            const payload = await postForm('/admin/manageborrowingbook/borrowing/create', formData);
+            await showAlert('Success', payload.message || 'Borrowing created successfully.', 'success', '#16a34a');
+            window.location.reload();
+        } catch (error) {
+            await showAlert('Create Failed', error.message, 'error', '#dc2626');
+        }
     });
 }
 
 function initializeUpdateBorrowingButton() {
-    $('#updateBorrowing').on('click', function() {
-        var borrowingData = getEditBorrowingFormData();
+    $('#updateBorrowing').on('click', async function () {
+        const id = ($('#editBorrowingIdInput').val() || '').toString().trim();
+        const username = $('#edit-borrowing-usernameInput').val().trim();
+        const bookCode = ($('#edit-borrowing-bookCodeSelect').val() || '').toString().trim();
+        const borrowDate = $('#edit-borrowing-borrowingDateInput').val();
 
-        if (!validateBorrowingData(borrowingData)) {
+        if (!id || !username || !bookCode) {
+            await showAlert('Missing Information', 'Username and book code are required.', 'warning', '#f59e0b');
             return;
         }
 
-        console.log('Updated Borrowing Data:', borrowingData);
+        const formData = new FormData();
+        formData.append('username', username);
+        formData.append('bookCode', bookCode);
+        if (borrowDate) {
+            formData.append('borrowDate', borrowDate);
+        }
 
-        showSuccessAndCloseModal(
-            'Borrowing has been updated successfully!',
-            '#updateBorrowingModal',
-            '#updateBorrowingForm'
-        );
+        try {
+            const payload = await postForm(`/admin/manageborrowingbook/borrowing/update/${id}`, formData);
+            await showAlert('Success', payload.message || 'Borrowing updated successfully.', 'success', '#16a34a');
+            window.location.reload();
+        } catch (error) {
+            await showAlert('Update Failed', error.message, 'error', '#dc2626');
+        }
+    });
+}
+
+function initializeUpdateReservationButton() {
+    $('#updateReservation').on('click', async function () {
+        const id = ($('#editReservationIdInput').val() || '').toString().trim();
+        const bookCode = ($('#edit-reservation-bookCodeSelect').val() || '').toString().trim();
+        const reservationDate = $('#edit-reservation-reservationDateInput').val();
+
+        if (!id || !bookCode) {
+            await showAlert('Missing Information', 'Reservation id and book code are required.', 'warning', '#f59e0b');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('bookCode', bookCode);
+        if (reservationDate) {
+            formData.append('reservationDate', reservationDate);
+        }
+
+        try {
+            const payload = await postForm(`/admin/manageborrowingbook/reservation/update/${id}`, formData);
+            await showAlert('Success', payload.message || 'Reservation updated.', 'success', '#16a34a');
+            window.location.reload();
+        } catch (error) {
+            await showAlert('Update Failed', error.message, 'error', '#dc2626');
+        }
     });
 }
 
 function initializeProcessBorrowingButton() {
-    $('.borrowing-book-table').on('click', '.process-borrowing-btn', function() {
+    $('.borrowing-book-table').on('click', '.process-borrowing-btn', function () {
+        const id = ($(this).data('borrowing-id') || '').toString().trim();
         const row = $(this).closest('tr');
-        const bookTitle = row.find('td').eq(1).text().trim();
-        const username = row.find('td').eq(0).text().trim();
+        const title = row.data('book-title') || 'this book';
+        const username = row.data('username') || 'this user';
+
+        if (!id) {
+            showAlert('Missing Id', 'Could not find borrowing id.', 'error', '#dc2626');
+            return;
+        }
 
         Swal.fire({
             title: 'Process Return',
-            text: `Mark "${bookTitle}" borrowed by ${username} as returned?`,
+            text: `Mark "${title}" borrowed by ${username} as returned?`,
             icon: 'question',
             showCancelButton: true,
             confirmButtonText: 'Yes, return it',
             cancelButtonText: 'Cancel',
-            confirmButtonColor: '#28a745',
-            cancelButtonColor: '#6c757d'
-        }).then(function(result) {
-            if (result.isConfirmed) {
-                // Here you would make an API call to process the return
-                console.log('Processing return for:', {username, bookTitle});
+            confirmButtonColor: '#16a34a',
+            cancelButtonColor: '#64748b'
+        }).then(async function (result) {
+            if (!result.isConfirmed) {
+                return;
+            }
 
-                Swal.fire({
-                    title: 'Returned!',
-                    text: 'The book has been marked as returned.',
-                    icon: 'success',
-                    confirmButtonColor: '#28a745'
-                });
+            try {
+                const payload = await postNoBody(`/admin/manageborrowingbook/borrowing/return/${id}`);
+                await showAlert('Returned', payload.message || 'Book marked as returned.', 'success', '#16a34a');
+                window.location.reload();
+            } catch (error) {
+                await showAlert('Return Failed', error.message, 'error', '#dc2626');
             }
         });
     });
 }
 
-// ============= RESERVATION FUNCTIONS =============
-
-// Extract reservation data from table row
-function extractReservationDataFromRow(row) {
-    return {
-        rowIndex: row.find('th').text(),
-        username: row.find('td').eq(0).text().trim(),
-        bookTitle: row.find('td').eq(1).text().trim(),
-        reservationDate: row.find('td').eq(2).text().trim(),
-        status: row.find('td').eq(3).find('.reservation-table-status').text().trim()
-    };
-}
-
-// Populate edit reservation modal with data
-function populateEditReservationModal(reservationData) {
-    $('#edit-reservation-usernameInput').val(reservationData.username);
-    $('#edit-reservation-bookTitleInput').val(reservationData.bookTitle);
-    $('#edit-reservation-reservationDateInput').val(reservationData.reservationDate);
-
-    // Store row index for later use
-    $('#updateReservationModal').data('rowIndex', reservationData.rowIndex);
-}
-
-// Initialize edit reservation button click handler
-function initializeEditReservationButton() {
-    $('.reservation-book-table').on('click', '.edit-reservation-btn', function() {
-        var row = $(this).closest('tr');
-        var reservationData = extractReservationDataFromRow(row);
-        populateEditReservationModal(reservationData);
-    });
-}
-
-// Get reservation data from edit form
-function getEditReservationFormData() {
-    return {
-        username: $('#edit-reservation-usernameInput').val().trim(),
-        bookCode: $('#edit-reservation-bookCodeSelect').val(),
-        bookTitle: $('#edit-reservation-bookTitleInput').val().trim(),
-        reservationDate: $('#edit-reservation-reservationDateInput').val()
-    };
-}
-
-// Validate reservation data
-function validateReservationData(reservationData) {
-    if (!reservationData.username || !reservationData.bookCode ||
-        !reservationData.bookTitle || !reservationData.reservationDate) {
-        Swal.fire({
-            title: 'Missing Information!',
-            text: 'Please fill in all required fields marked with *',
-            icon: 'warning',
-            confirmButtonText: 'OK',
-            confirmButtonColor: '#ffc107'
-        });
-        return false;
-    }
-    return true;
-}
-
-function initializeUpdateReservationButton() {
-    $('#updateReservation').on('click', function() {
-        var reservationData = getEditReservationFormData();
-
-        if (!validateReservationData(reservationData)) {
+function initializeApproveReservationButton() {
+    $('.reservation-book-table').on('click', '.approve-reservation-btn', function () {
+        const id = ($(this).data('reservation-id') || '').toString().trim();
+        if (!id) {
+            showAlert('Missing Id', 'Could not find reservation id.', 'error', '#dc2626');
             return;
         }
 
-        console.log('Updated Reservation Data:', reservationData);
-
-        showSuccessAndCloseModal(
-            'Reservation has been updated successfully!',
-            '#updateReservationModal',
-            '#updateReservationForm'
-        );
-    });
-}
-
-function initializeApproveReservationButton() {
-    $('.reservation-book-table').on('click', '.approve-reservation-btn', function() {
-        const row = $(this).closest('tr');
-        const bookTitle = row.find('td').eq(1).text().trim();
-        const username = row.find('td').eq(0).text().trim();
-
         Swal.fire({
             title: 'Approve Reservation',
-            text: `Approve reservation for "${bookTitle}" by ${username}?`,
+            text: 'Approve this reservation request?',
             icon: 'question',
             showCancelButton: true,
-            confirmButtonText: 'Yes, approve it',
+            confirmButtonText: 'Approve',
             cancelButtonText: 'Cancel',
-            confirmButtonColor: '#28a745',
-            cancelButtonColor: '#6c757d'
-        }).then(function(result) {
-            if (result.isConfirmed) {
-                // Here you would make an API call to approve the reservation
-                console.log('Approving reservation for:', {username, bookTitle});
+            confirmButtonColor: '#16a34a',
+            cancelButtonColor: '#64748b'
+        }).then(async function (result) {
+            if (!result.isConfirmed) {
+                return;
+            }
 
-                // Update status in the table
-                row.find('.reservation-table-status').text('Approved');
-                styleReservationStatuses();
-
-                Swal.fire({
-                    title: 'Approved!',
-                    text: 'The reservation has been approved.',
-                    icon: 'success',
-                    confirmButtonColor: '#28a745'
-                });
+            try {
+                const payload = await postNoBody(`/admin/manageborrowingbook/reservation/approve/${id}`);
+                await showAlert('Approved', payload.message || 'Reservation approved.', 'success', '#16a34a');
+                window.location.reload();
+            } catch (error) {
+                await showAlert('Approve Failed', error.message, 'error', '#dc2626');
             }
         });
     });
 }
 
 function initializeRejectReservationButton() {
-    $('.reservation-book-table').on('click', '.reject-reservation-btn', function() {
-        const row = $(this).closest('tr');
-        const bookTitle = row.find('td').eq(1).text().trim();
-        const username = row.find('td').eq(0).text().trim();
+    $('.reservation-book-table').on('click', '.reject-reservation-btn', function () {
+        const id = ($(this).data('reservation-id') || '').toString().trim();
+        if (!id) {
+            showAlert('Missing Id', 'Could not find reservation id.', 'error', '#dc2626');
+            return;
+        }
 
         Swal.fire({
             title: 'Reject Reservation',
-            text: `Reject reservation for "${bookTitle}" by ${username}?`,
+            text: 'Reject this reservation request?',
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonText: 'Yes, reject it',
+            confirmButtonText: 'Reject',
             cancelButtonText: 'Cancel',
-            confirmButtonColor: '#dc3545',
-            cancelButtonColor: '#6c757d'
-        }).then(function(result) {
-            if (result.isConfirmed) {
-                // Here you would make an API call to reject the reservation
-                console.log('Rejecting reservation for:', {username, bookTitle});
+            confirmButtonColor: '#dc2626',
+            cancelButtonColor: '#64748b'
+        }).then(async function (result) {
+            if (!result.isConfirmed) {
+                return;
+            }
 
-                // Update status in the table
-                row.find('.reservation-table-status').text('Rejected');
-                styleReservationStatuses();
-
-                Swal.fire({
-                    title: 'Rejected!',
-                    text: 'The reservation has been rejected.',
-                    icon: 'success',
-                    confirmButtonColor: '#28a745'
-                });
+            try {
+                const payload = await postNoBody(`/admin/manageborrowingbook/reservation/reject/${id}`);
+                await showAlert('Rejected', payload.message || 'Reservation rejected.', 'success', '#16a34a');
+                window.location.reload();
+            } catch (error) {
+                await showAlert('Reject Failed', error.message, 'error', '#dc2626');
             }
         });
     });

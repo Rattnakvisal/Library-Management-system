@@ -128,14 +128,23 @@ $(function () {
   }
 
   function createTrendsChart(ctx) {
+    const source = window.dashboardBorrowingTrend || {};
+    const labels = Array.isArray(source.labels) ? source.labels : [];
+    const counts = Array.isArray(source.counts) ? source.counts : [];
+    const hasData = labels.length > 0 && counts.length > 0;
+
     return new Chart(ctx, {
       type: "bar",
       data: {
-        labels: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
+        labels: hasData
+          ? labels
+          : ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
         datasets: [
           {
             label: "Months",
-            data: [120, 140, 95, 110, 80, 175, 160, 90, 125, 110, 140, 155],
+            data: hasData
+              ? counts
+              : [120, 140, 95, 110, 80, 175, 160, 90, 125, 110, 140, 155],
             backgroundColor: "#2b6da3",
           },
         ],

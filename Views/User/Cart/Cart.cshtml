@@ -1,245 +1,192 @@
-﻿@{
+@using System.Globalization
+@using Library_Management_system.Models
+@model CartPageViewModel
+@{
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewBag.Title = "Cart";
+
+    string GetGroupLabel(DateTime createdUtc)
+    {
+        var localDate = createdUtc.ToLocalTime().Date;
+        var today = DateTime.Now.Date;
+        if (localDate == today) return "Today";
+        if (localDate == today.AddDays(-1)) return "Yesterday";
+        return localDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+    }
+
+    var groupedItems = Model.Items
+        .GroupBy(i => GetGroupLabel(i.CreatedDate))
+        .ToList();
+
+    var normalizedStatuses = Model.Items
+        .Select(i => (i.ReservationStatus ?? "none").Trim().ToLowerInvariant())
+        .ToList();
+    var pendingCount = normalizedStatuses.Count(s => s == "pending");
+    var approvedCount = normalizedStatuses.Count(s => s == "approved");
+    var rejectedCount = normalizedStatuses.Count(s => s == "rejected");
+    var totalCount = Model.Items.Count;
+    var allLockedRequested = totalCount > 0 && normalizedStatuses.All(s => s is "pending" or "approved");
+    var showPendingState = allLockedRequested && pendingCount > 0;
+    var showRejectedState = totalCount > 0 && rejectedCount == totalCount;
+    var showApprovedState = allLockedRequested && pendingCount == 0 && approvedCount > 0;
 }
 
-<div class="container">
-    <div class="card cart-card p-4 mb-3">
-        <div class="d-flex justify-content-between align-items-center">
-            <h1 class="h2 fw-bold mb-0">Cart</h1>
-            <div>
-                <button class="btn btn-delete me-2">Delete</button>
-                <button class="btn btn-request">Proceed to request</button>
+<section class="cart-page">
+    <div id="reservation-alert-meta"
+         data-approved="@Model.ApprovedReservationsCount"
+         data-rejected="@Model.RejectedReservationsCount"
+         data-version="@Model.LastReservationDecisionVersion"></div>
+
+    @if (TempData["CartMessage"] is string successMessage && !string.IsNullOrWhiteSpace(successMessage))
+    {
+        <div class="alert alert-success cart-alert">@successMessage</div>
+    }
+
+    @if (TempData["CartError"] is string errorMessage && !string.IsNullOrWhiteSpace(errorMessage))
+    {
+        <div class="alert alert-danger cart-alert">@errorMessage</div>
+    }
+
+    <form id="cartForm" method="post">
+        @Html.AntiForgeryToken()
+
+        <div class="cart-toolbar">
+            <h1 class="cart-title">Cart</h1>
+            <div class="cart-toolbar-actions">
+                <span class="cart-total">Total: @Model.TotalBooks books</span>
+
+                @if (showPendingState)
+                {
+                    <span class="toolbar-pill toolbar-pending">Request Pending</span>
+                    <button type="button" class="toolbar-btn toolbar-cancel" disabled>Cancel</button>
+                }
+                else if (showRejectedState)
+                {
+                    <span class="toolbar-pill toolbar-rejected">Request Decline</span>
+                }
+                else if (showApprovedState)
+                {
+                    <span class="toolbar-pill toolbar-approved">Request Approved</span>
+                }
+                else
+                {
+                    <button type="submit"
+                            class="toolbar-btn toolbar-delete"
+                            formaction="@Url.Action("DeleteSelectedCartItems", "Home")">
+                        Delete
+                    </button>
+                    <button type="submit"
+                            class="toolbar-btn toolbar-request"
+                            formaction="@Url.Action("ProceedToRequest", "Home")">
+                        Proceed to request
+                    </button>
+                }
             </div>
         </div>
-    </div>
-
-    <div class="inventory-group mb-4">
-        <div class="d-flex align-items-center mb-3">
-            <label class="checkbox-container me-3">
-                <input type="checkbox" class="hidden-input master-tick"> <span class="custom-check"></span>
-            </label>
-            <h5 class="fw-bold text-secondary mb-0">Today</h5>
-        </div>
-
-        <div class="card cart-card p-4 mb-3">
-            <div class="row align-items-center">
-                <div class="col-auto">
-                    <label class="checkbox-container">
-                        <input type="checkbox" class="hidden-input">
-                        <span class="custom-check"></span>
-                    </label>
-                </div>
-                <div class="col-auto cart-img-width">
-                    <img src="~/images/User/Book/general2.jpg" alt="Book Cover" class="book-img shadow-sm">
-                </div>
-                <div class="col">
-                    <h4 class="fw-bold mb-1" style="color: #1e293b;">Financial Statement Analysis</h4>
-                    <p class="text-muted small mb-0 mt-3">Author: Jame Bonds</p>
-                    <p class="text-muted small mb-0">Publish Year: 2023</p>
-                    <p class="text-muted small mb-0">Book Code: A168168</p>
-                    <div class="star-rating text-warning small mt-3">
-                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half-stroke"></i>
-                    </div>
-                </div>
+        
+        @if (!Model.Items.Any())
+        {
+            <div class="cart-empty-state">
+                Your cart is empty.
             </div>
-        </div>
-        <div class="card cart-card p-4 mb-3">
-            <div class="row align-items-center">
-                <div class="col-auto">
-                    <label class="checkbox-container">
-                        <input type="checkbox" class="hidden-input">
-                        <span class="custom-check"></span>
-                    </label>
+        }
+        else
+        {
+            foreach (var group in groupedItems)
+            {
+                var selectableInGroup = group.Any(item =>
+                {
+                    var status = (item.ReservationStatus ?? "none").Trim().ToLowerInvariant();
+                    return status is not ("pending" or "approved");
+                });
+
+                <div class="inventory-group">
+                    <div class="group-header">
+                        <label class="checkbox-container">
+                            <input type="checkbox"
+                                   class="hidden-input master-tick"
+                                   @(selectableInGroup ? null : "disabled")>
+                            <span class="custom-check"></span>
+                        </label>
+                        <h5 class="group-title">@group.Key</h5>
+                    </div>
+
+                    <div class="group-items">
+                        @foreach (var item in group)
+                        {
+                            var imagePath = string.IsNullOrWhiteSpace(item.ImageUrl)
+                                ? Url.Content("~/images/User/Book/book2.png")
+                                : Url.Content(item.ImageUrl);
+                            var publishYear = item.Year > 0 ? item.Year.ToString(CultureInfo.InvariantCulture) : "N/A";
+                            var bookCode = string.IsNullOrWhiteSpace(item.BookCode) ? $"A{item.BookId:0000}" : item.BookCode;
+                            var reservationStatus = (item.ReservationStatus ?? "none").Trim().ToLowerInvariant();
+                            var isLockedRequest = reservationStatus is "pending" or "approved";
+                            var badgeClass = reservationStatus switch
+                            {
+                                "approved" => "request-badge request-approved",
+                                "rejected" => "request-badge request-rejected",
+                                "pending" => "request-badge request-pending",
+                                _ => string.Empty
+                            };
+                            var badgeLabel = reservationStatus switch
+                            {
+                                "approved" => "Approved",
+                                "rejected" => "Declined",
+                                "pending" => "Pending",
+                                _ => string.Empty
+                            };
+
+                            <article class="cart-item-card">
+                                <div class="cart-item-select">
+                                    <label class="checkbox-container">
+                                        <input type="checkbox"
+                                               class="hidden-input cart-item-checkbox"
+                                               name="itemIds"
+                                               value="@item.CartItemId"
+                                               @(isLockedRequest ? "checked disabled" : null)>
+                                        <span class="custom-check"></span>
+                                    </label>
+                                </div>
+
+                                <div class="cart-item-cover">
+                                    <img src="@imagePath" alt="@item.Title" class="book-img">
+                                </div>
+
+                                <div class="cart-item-content">
+                                    <h4 class="book-title">@item.Title</h4>
+                                    <p class="book-meta">Author: @item.Author</p>
+                                    <p class="book-meta">Publish Year: @publishYear</p>
+                                    <p class="book-meta">Book Code: @bookCode</p>
+                                    <div class="star-rating">
+                                        @for (var i = 0; i < 5; i++)
+                                        {
+                                            if (i < item.Rating)
+                                            {
+                                                <i class="fa-solid fa-star"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="fa-regular fa-star"></i>
+                                            }
+                                        }
+                                    </div>
                 </div>
-                <div class="col-auto cart-img-width">
-                    <img src="~/images/User/Book/general2.jpg" alt="Book Cover" class="book-img shadow-sm">
-                </div>
-                <div class="col">
-                    <h4 class="fw-bold mb-1" style="color: #1e293b;">Financial Statement Analysis</h4>
-                    <p class="text-muted small mb-0 mt-3">Author: Jame Bonds</p>
-                    <p class="text-muted small mb-0">Publish Year: 2023</p>
-                    <p class="text-muted small mb-0">Book Code: A168168</p>
-                    <div class="star-rating text-warning small mt-3">
-                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half-stroke"></i>
+
+                                <div class="cart-item-state">
+                                    @if (!string.IsNullOrWhiteSpace(badgeClass))
+                                    {
+                                        <span class="@badgeClass">@badgeLabel</span>
+                                    }
+                                </div>
+                            </article>
+                        }
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
+            }
+        }
+    </form>
+</section>
 
-    <div class="inventory-group mb-4">
-        <div class="d-flex align-items-center mb-3">
-            <label class="checkbox-container me-3">
-                <input type="checkbox" class="hidden-input master-tick"> <span class="custom-check"></span>
-            </label>
-            <h5 class="fw-bold text-secondary mb-0">Yesterday</h5>
-        </div>
-
-        <div class="card cart-card p-4 mb-3"><div class="row align-items-center">
-                <div class="col-auto">
-                    <label class="checkbox-container">
-                        <input type="checkbox" class="hidden-input">
-                        <span class="custom-check"></span>
-                    </label>
-                </div>
-                <div class="col-auto cart-img-width">
-                    <img src="~/images/User/Book/general2.jpg" alt="Book Cover" class="book-img shadow-sm">
-                </div>
-                <div class="col">
-                    <h4 class="fw-bold mb-1" style="color: #1e293b;">Financial Statement Analysis</h4>
-                    <p class="text-muted small mb-0 mt-3">Author: Jame Bonds</p>
-                    <p class="text-muted small mb-0">Publish Year: 2023</p>
-                    <p class="text-muted small mb-0">Book Code: A168168</p>
-                    <div class="star-rating text-warning small mt-3">
-                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half-stroke"></i>
-                    </div>
-                </div>
-            </div></div>
-    </div>
-
-    @* <div class="mb-2">
-        <div class="d-flex align-items-center mb-3 me-2">
-            <label class="checkbox-container me-3">
-                <input type="checkbox" class="hidden-input mt-2" id="master-tick">
-                <span class="custom-check"></span>
-            </label>
-            <h5 class="fw-bold text-secondary mb-3">Today</h5>
-        </div>
-
-        <div class="card cart-card p-4 mb-3">
-            <div class="row align-items-center">
-                <div class="col-auto">
-                    <label class="checkbox-container">
-                        <input type="checkbox" class="hidden-input">
-                        <span class="custom-check"></span>
-                    </label>
-                </div>
-                <div class="col-auto cart-img-width">
-                    <img src="~/images/User/Book/general2.jpg" alt="Book Cover" class="book-img shadow-sm">
-                </div>
-                <div class="col">
-                    <h4 class="fw-bold mb-1" style="color: #1e293b;">Financial Statement Analysis</h4>
-                    <p class="text-muted small mb-0">Author: Jame Bonds</p>
-                    <p class="text-muted small mb-0">Publish Year: 2023</p>
-                    <p class="text-muted small mb-0">Book Code: A168168</p>
-                    <div class="rating-stars mt-2">
-                        ★★★★<span class="text-light">★</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="card cart-card p-4 mb-3">
-            <div class="row align-items-center">
-                <div class="col-auto">
-                    <label class="checkbox-container">
-                        <input type="checkbox" class="hidden-input">
-                        <span class="custom-check"></span>
-                    </label>
-                </div>
-                <div class="col-auto">
-                    <img src="~/images/User/Book/general.jpg" alt="Book Cover" class="book-img shadow-sm">
-                </div>
-                <div class="col">
-                    <h4 class="fw-bold mb-1" style="color: #1e293b;">Financial Statement Analysis</h4>
-                    <p class="text-muted small mb-0">Author: Jame Bonds</p>
-                    <p class="text-muted small mb-0">Publish Year: 2023</p>
-                    <p class="text-muted small mb-0">Book Code: A168168</p>
-                    <div class="rating-stars mt-2">
-                        ★★★★<span class="text-light">★</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div>
-        <div class="d-flex align-items-center mb-3 me-2">
-            <label class="checkbox-container me-3">
-                <input type="checkbox" class="hidden-input mt-2" id="master-tick">
-                <span class="custom-check"></span>
-            </label>
-            <h5 class="fw-bold text-secondary mb-3">Yesterday</h5>
-        </div>
-
-        <div class="card cart-card p-4 mb-3">
-            <div class="row align-items-center">
-                <div class="col-auto">
-                    <label class="checkbox-container">
-                        <input type="checkbox" class="hidden-input">
-                        <span class="custom-check"></span>
-                    </label>
-                </div>
-                <div class="col-auto cart-img-width">
-                    <img src="~/images/User/Book/general2.jpg" alt="Book Cover" class="book-img shadow-sm">
-                </div>
-                <div class="col">
-                    <h4 class="fw-bold mb-1" style="color: #1e293b;">Financial Statement Analysis</h4>
-                    <p class="text-muted small mb-0">Author: Jame Bonds</p>
-                    <p class="text-muted small mb-0">Publish Year: 2023</p>
-                    <p class="text-muted small mb-0">Book Code: A168168</p>
-                    
-                    <div class="star-rating text-warning small mt-2">
-                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half-stroke"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div> *@
-</div>
-
-<script>
-
-        $(document).ready(function () {
-        $('.master-tick').on('change', function () {
-            const $group = $(this).closest('.inventory-group');
-
-            $group.find('.cart-card .hidden-input').prop('checked', this.checked);
-        });
-
-        $('.cart-card .hidden-input').on('change', function () {
-            const $group = $(this).closest('.inventory-group');
-            const $master = $group.find('.master-tick');
-            const $allChildren = $group.find('.cart-card .hidden-input');
-
-            const allChecked = $allChildren.length === $allChildren.filter(':checked').length;
-
-            $master.prop('checked', allChecked);
-        });
-    });
-
-    //     document.addEventListener('DOMContentLoaded', function () {
-    //     const masterTicks = document.querySelectorAll('.master-tick');
-
-    //     masterTicks.forEach(master => {
-    //         master.addEventListener('change', function () {
-    //             const group = this.closest('.inventory-group');
-    //             const childTicks = group.querySelectorAll('.cart-card .hidden-input');
-
-    //             childTicks.forEach(checkbox => {
-    //                 checkbox.checked = this.checked;
-    //             });
-    //         });
-    //     });
-
-    //     const allChildTicks = document.querySelectorAll('.cart-card .hidden-input');
-    //     allChildTicks.forEach(child => {
-    //         child.addEventListener('change', function () {
-    //             const group = this.closest('.inventory-group');
-    //             const master = group.querySelector('.master-tick');
-    //             const groupChildren = group.querySelectorAll('.cart-card .hidden-input');
-
-    //             If any child is unchecked, master becomes unchecked
-    //             if (!this.checked) {
-    //                 master.checked = false;
-    //             } else {
-    //                 If every child in this group is checked, check the master
-    //                 const allChecked = Array.from(groupChildren).every(c => c.checked);
-    //                 master.checked = allChecked;
-    //             }
-    //         });
-    //     });
-    // });
-
-</script>
+@section Scripts {
+    <script src="~/js/users/cart.js" asp-append-version="true"></script>
+}

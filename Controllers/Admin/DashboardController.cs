@@ -11,6 +11,7 @@ namespace Library_Management_system.Controllers.Admin
     public class DashboardController : Controller
     {
         private const int QuickActionsLimit = 5;
+        private const decimal FinePerLateDay = 1.00m;
         private readonly ApplicationDbContext _context;
 
         public DashboardController(ApplicationDbContext context)
@@ -22,6 +23,7 @@ namespace Library_Management_system.Controllers.Admin
         {
             var totalBooks = await _context.Books.CountAsync();
             var totalUsers = await _context.Users.CountAsync();
+            var utcToday = DateTime.UtcNow.Date;
 
             var latestUsers = await _context.Users
                 .AsNoTracking()
@@ -79,18 +81,118 @@ namespace Library_Management_system.Controllers.Admin
                 .ThenBy(x => x.CategoryName)
                 .ToListAsync();
 
+            var borrowingRowsRaw = await _context.BorrowingRecords
+                .AsNoTracking()
+                .Include(br => br.Book)
+                .OrderByDescending(br => br.BorrowDate)
+                .ThenByDescending(br => br.Id)
+                .ToListAsync();
+
+            var borrowingRows = borrowingRowsRaw
+                .Select(br =>
+                {
+                    var status = ComputeBorrowingStatus(br.Status, br.DueDate, br.ReturnDate, utcToday);
+                    var lateDays = CalculateLateDays(br.DueDate, utcToday, status);
+                    return new
+                    {
+                        Row = br,
+                        Status = status,
+                        LateDays = lateDays
+                    };
+                })
+                .ToList();
+
+            var borrowedBooks = borrowingRows.Count(x => x.Status is "active" or "overdue");
+            var overdueBorrowings = borrowingRows
+                .Where(x => x.Status == "overdue")
+                .OrderByDescending(x => x.LateDays)
+                .ThenBy(x => x.Row.DueDate)
+                .Take(QuickActionsLimit)
+                .Select(x => new DashboardOverdueBorrowingItemViewModel
+                {
+                    BorrowingId = x.Row.Id,
+                    BookTitle = x.Row.Book?.Title ?? "(Missing book)",
+                    Borrower = x.Row.Username,
+                    DueDate = x.Row.DueDate,
+                    DaysOverdue = x.LateDays,
+                    Fine = x.LateDays * FinePerLateDay
+                })
+                .ToList();
+
+            var totalFines = borrowingRows
+                .Where(x => x.Status == "overdue")
+                .Sum(x => x.LateDays * FinePerLateDay);
+
+            var recentBorrowings = borrowingRows
+                .Take(QuickActionsLimit)
+                .Select(x => new DashboardRecentBorrowingItemViewModel
+                {
+                    BorrowingId = x.Row.Id,
+                    Username = x.Row.Username,
+                    BookTitle = x.Row.Book?.Title ?? "(Missing book)",
+                    BorrowDate = x.Row.BorrowDate,
+                    DueDate = x.Row.DueDate,
+                    Status = x.Status
+                })
+                .ToList();
+
+            var monthStartUtc = new DateTime(utcToday.Year, utcToday.Month, 1).AddMonths(-11);
+            var borrowingsForTrend = borrowingRowsRaw
+                .Where(br => br.BorrowDate.Date >= monthStartUtc.Date)
+                .ToList();
+            var trendLookup = borrowingsForTrend
+                .GroupBy(br => new DateTime(br.BorrowDate.Year, br.BorrowDate.Month, 1))
+                .ToDictionary(g => g.Key, g => g.Count());
+
+            var borrowingTrends = Enumerable.Range(0, 12)
+                .Select(offset =>
+                {
+                    var month = monthStartUtc.AddMonths(offset);
+                    trendLookup.TryGetValue(month, out var count);
+                    return new DashboardBorrowingTrendItemViewModel
+                    {
+                        Label = month.ToString("MMM"),
+                        Count = count
+                    };
+                })
+                .ToList();
+
             var model = new DashboardViewModel
             {
                 TotalBooks = totalBooks,
                 TotalUsers = totalUsers,
-                BorrowedBooks = 0,
-                TotalFines = 0m,
+                BorrowedBooks = borrowedBooks,
+                TotalFines = totalFines,
+                OverdueBorrowings = overdueBorrowings,
+                RecentBorrowings = recentBorrowings,
+                BorrowingTrends = borrowingTrends,
                 CategoryDistribution = categoryDistribution,
                 NewMembers = newMembers,
                 NewBooks = newBooks
             };
 
             return View("~/Views/Admin/Dashboard/Index.cshtml", model);
+        }
+
+        private static string ComputeBorrowingStatus(string? currentStatus, DateTime dueDate, DateTime? returnDate, DateTime utcToday)
+        {
+            if (returnDate.HasValue || string.Equals(currentStatus, "returned", StringComparison.OrdinalIgnoreCase))
+            {
+                return "returned";
+            }
+
+            return dueDate.Date < utcToday ? "overdue" : "active";
+        }
+
+        private static int CalculateLateDays(DateTime dueDate, DateTime utcToday, string status)
+        {
+            if (!string.Equals(status, "overdue", StringComparison.OrdinalIgnoreCase))
+            {
+                return 0;
+            }
+
+            var delta = (utcToday - dueDate.Date).Days;
+            return Math.Max(0, delta);
         }
 
         private static string NormalizeGender(string? value)

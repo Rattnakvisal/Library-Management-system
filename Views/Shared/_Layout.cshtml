@@ -1,7 +1,84 @@
 ﻿@using Library_Management_system.Models
 @using Microsoft.AspNetCore.Identity
+@using Library_Management_system.Data
+@using Microsoft.EntityFrameworkCore
+@using System.Security.Claims
+@using System.Globalization
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
+@inject ApplicationDbContext DbContext
+
+@{
+    var cartOwnerKey = string.Empty;
+    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    if (!string.IsNullOrWhiteSpace(userId))
+    {
+        cartOwnerKey = $"user:{userId}";
+    }
+    else if (Context.Request.Cookies.TryGetValue("library_cart_id", out var guestCartId) &&
+             !string.IsNullOrWhiteSpace(guestCartId))
+    {
+        cartOwnerKey = $"guest:{guestCartId}";
+    }
+
+    var cartCount = 0;
+    var reservationNotificationCount = 0;
+    var reservationNotifications = new List<(string Status, string BookTitle, DateTime UpdatedAt)>();
+    var currentPath = Context.Request.Path.Value ?? "/";
+
+    string ToBreadcrumbLabel(string segment)
+    {
+        if (string.IsNullOrWhiteSpace(segment))
+        {
+            return string.Empty;
+        }
+
+        var clean = segment.Replace("-", " ").Replace("_", " ").Trim();
+        if (int.TryParse(clean, out _))
+        {
+            return (ViewData["Title"]?.ToString() ?? "Detail").Trim();
+        }
+
+        return CultureInfo.CurrentCulture.TextInfo.ToTitleCase(clean.ToLowerInvariant());
+    }
+
+    var pathSegments = currentPath.Split('/', StringSplitOptions.RemoveEmptyEntries);
+    var breadcrumbTrail = new List<(string Label, string Url)>();
+    var builtPath = string.Empty;
+
+    if (!string.IsNullOrWhiteSpace(cartOwnerKey))
+    {
+        cartCount = await DbContext.CartItems
+            .AsNoTracking()
+            .Where(ci => ci.OwnerKey == cartOwnerKey)
+            .CountAsync();
+
+        reservationNotificationCount = await DbContext.CartItems
+            .AsNoTracking()
+            .Where(ci => ci.OwnerKey == cartOwnerKey &&
+                         (ci.ReservationStatus == "approved" || ci.ReservationStatus == "rejected"))
+            .CountAsync();
+
+        var rawNotifications = await DbContext.CartItems
+            .AsNoTracking()
+            .Include(ci => ci.Book)
+            .Where(ci => ci.OwnerKey == cartOwnerKey &&
+                         (ci.ReservationStatus == "approved" || ci.ReservationStatus == "rejected"))
+            .OrderByDescending(ci => ci.ReservationUpdatedDate ?? ci.RequestedDate ?? ci.CreatedDate)
+            .Take(5)
+            .Select(ci => new
+            {
+                Status = ci.ReservationStatus,
+                BookTitle = ci.Book != null ? ci.Book.Title : "Book",
+                UpdatedAt = ci.ReservationUpdatedDate ?? ci.RequestedDate ?? ci.CreatedDate
+            })
+            .ToListAsync();
+
+        reservationNotifications = rawNotifications
+            .Select(x => (x.Status ?? string.Empty, x.BookTitle ?? "Book", x.UpdatedAt))
+            .ToList();
+    }
+}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -22,7 +99,7 @@
 
     <link rel="stylesheet" href="~/css/users/detail.css" asp-append-version="true" />
 
-	<link rel="stylesheet" href="~/css/users/History.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/users/History.css" asp-append-version="true" />
 
     <link rel="stylesheet" href="~/css/users/cart.css" asp-append-version="true" />
 
@@ -63,7 +140,7 @@
                         </a>
 
                         <span>
-                            <a href="/Profile" class="bi bi-person" >
+                            <a href="/Profile">
                                 <i class="bi bi-person"></i>
                                 @fullName
                             </a>
@@ -116,77 +193,102 @@
                                 <circle cx="20" cy="21" r="1"></circle>
                                 <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
                             </svg>
-                            <span class="badge">2</span>
+                            <span class="badge @(cartCount > 0 ? "" : "d-none")" id="userCartBadge">@cartCount</span>
                         </a>
 
-                        <a class="icon-btn" title="Notifications" href="/Notification">
-                            <svg viewBox="0 0 24 24">
-                                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-                            </svg>
-                            <span class="badge">3</span>
-                        </a>
+                        <div class="dropdown">
+                            <a class="icon-btn dropdown-toggle no-caret" title="Notifications" href="#" role="button"
+                                   data-bs-toggle="dropdown" aria-expanded="false">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                                    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                                </svg>
+                                <span class="badge @(reservationNotificationCount > 0 ? "" : "d-none")"
+                                      id="userReservationBadge">@reservationNotificationCount</span>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-end user-notification-menu shadow-sm">
+                                <div class="notification-head">Reservation Notifications</div>
+                                @if (reservationNotifications.Any())
+                                {
+                                    foreach (var notification in reservationNotifications)
+                                    {
+                                        var status = notification.Status.ToLowerInvariant();
+                                        var label = status == "approved" ? "Approved" : "Rejected";
+                                        var cssClass = status == "approved" ? "notif-approved" : "notif-rejected";
+                                        <a class="dropdown-item notification-item" href="/Cart">
+                                            <div class="notification-title @cssClass">@label</div>
+                                            <div class="notification-text">@notification.BookTitle</div>
+                                            <div class="notification-time">
+                                                @notification.UpdatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</div>
+                                            </a>
+                                        }
+                                    }
+                                else
+                                    {
+                                        <div class="notification-empty">No reservation updates.</div>
+                                    }
+                                </div>
+                            </div>
 
-                        <a class="icon-btn" title="History" href="/History">
-                            <svg viewBox="0 0 24 24">
-                                <circle cx="12" cy="12" r="10"></circle>
-                                <polyline points="12 6 12 12 16 14"></polyline>
-                            </svg>
-                        </a>
+                            <a class="icon-btn" title="History" href="/History">
+                                <svg viewBox="0 0 24 24">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <polyline points="12 6 12 12 16 14"></polyline>
+                                </svg>
+                            </a>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </nav>
-    </header>
-
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
-
-    <footer>
-        <div class="container-footer">
-            <div class="footer-content">
-                <div class="footer-left">
-                    <img src="/images/logo.png" />
-                    <p>
-                        The library preserves knowledge and makes it available to future generations — knowledge never
-                        dies here.
-                    </p>
-                </div>
-                <div class="footer-right">
-                    <div class="footer-links">
-                        <h3>About Library</h3>
-                        <a href="/About/Faq">FAQ</a>
-                        <a href="/About/Support">Support</a>
-                        <a href="/About">Policies</a>
-                        <a asp-area="Identity" asp-page="/Account/Login">Account & Login</a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="footer-bottom">
-                <p class="copyright">
-                    &copy; 2025 ACLEDA University of Business's Library. All right reserved
-                </p>
-                <div class="footer-bottom-links">
-                    <a href="/Terms">Terms of service</a>
-                    <a href="/Privacy">Privacy Policy</a>
-                    <a href="/Cookie">Cookie Setting</a>
-                </div>
-            </div>
+            </nav>
+        </header>
+        <div class="container">
+            <main role="main" class="pb-3">
+                @RenderBody()
+            </main>
         </div>
-    </footer>
 
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="~/js/sweetalert-theme.js" asp-append-version="true"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    <script src="~/js/users/navbar.js" asp-append-version="true"></script>
+        <footer>
+            <div class="container-footer">
+                <div class="footer-content">
+                    <div class="footer-left">
+                        <img src="/images/logo.png" />
+                        <p>
+                            The library preserves knowledge and makes it available to future generations — knowledge never
+                            dies here.
+                        </p>
+                    </div>
+                    <div class="footer-right">
+                        <div class="footer-links">
+                            <h3>About Library</h3>
+                            <a href="/About/Faq">FAQ</a>
+                            <a href="/About/Support">Support</a>
+                            <a href="/About">Policies</a>
+                            <a asp-area="Identity" asp-page="/Account/Login">Account & Login</a>
+                        </div>
+                    </div>
+                </div>
 
-    @await RenderSectionAsync("Scripts", required: false)
-</body>
+                <div class="footer-bottom">
+                    <p class="copyright">
+                        &copy; 2025 ACLEDA University of Business's Library. All right reserved
+                    </p>
+                    <div class="footer-bottom-links">
+                        <a href="/Terms">Terms of service</a>
+                        <a href="/Privacy">Privacy Policy</a>
+                        <a href="/Cookie">Cookie Setting</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+        <script src="~/lib/jquery/dist/jquery.min.js"></script>
+        <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script src="~/js/sweetalert-theme.js" asp-append-version="true"></script>
+        <script src="~/js/site.js" asp-append-version="true"></script>
+        <script src="~/js/users/navbar.js" asp-append-version="true"></script>
+
+        @await RenderSectionAsync("Scripts", required: false)
+    </body>
 
 </html>
