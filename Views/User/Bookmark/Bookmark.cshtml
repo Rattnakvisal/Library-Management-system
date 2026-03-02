@@ -1,52 +1,117 @@
-﻿@{
+@using System.Globalization
+@model Library_Management_system.Models.BookmarkViewModel
+@{
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewBag.Title = "Bookmark";
+    var returnUrl = $"{Context.Request.Path}{Context.Request.QueryString}";
 }
 
-
-<div class="container px-0">
-    <div id="heroCarousel" class="carousel slide mx-2" data-bs-ride="carousel">
-
-        <div class="carousel-indicators custom-indicators">
-            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active"
-                    aria-current="true"></button>
-            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1"></button>
-            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2"></button>
-            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="3"></button>
-        </div>
-
-        <div class="carousel-inner">
-            <div class="carousel-item active">
-                <img src="/images/User/Slideshow/img_library1.jpg" class="d-block w-100 main-slider-img" alt="slide 1">
+<section class="bookmark-page">
+    <div class="bookmark-hero-wrap">
+        <div id="favoriteHeroCarousel" class="carousel slide bookmark-hero" data-bs-ride="carousel">
+            <div class="carousel-indicators custom-indicators">
+                <button type="button" data-bs-target="#favoriteHeroCarousel" data-bs-slide-to="0" class="active"
+                        aria-current="true"></button>
+                <button type="button" data-bs-target="#favoriteHeroCarousel" data-bs-slide-to="1"></button>
             </div>
-            <div class="carousel-item">
-                <img src="/images/User/Slideshow/img_library2.jpg" class="d-block w-100 main-slider-img" alt="Slide 2">
-            </div>
-        </div>
 
-        <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-        </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-        </button>
-    </div>
-
-    <section class="container-fluid mt-4">
-        <h3 class="fw-bold text-navy mb-4">Book Favorites </h3>
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <div class="row row-cols-2 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3 g-md-4">
-                <div class="col">
-                    <div id="favoriteList"></div>
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <img src="/images/User/Slideshow/img_library1.jpg" class="d-block w-100 main-slider-img" alt="slide 1">
+                </div>
+                <div class="carousel-item">
+                    <img src="/images/User/Slideshow/img_library2.jpg" class="d-block w-100 main-slider-img" alt="slide 2">
                 </div>
             </div>
         </div>
-    
-    </section>
-</div>
+    </div>
 
-<script>
-    let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
-    document.getElementById("favoriteList").innerHTML =
-        favorites.map(id => `<b>${id}</b>`).join('');
-</script>
+    <section class="bookmark-content">
+        <h2 class="bookmark-title">Books Favorite</h2>
+
+        @if (Model.Items.Any())
+        {
+            <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3 bookmark-grid">
+                @foreach (var item in Model.Items)
+                {
+                    <div class="col">
+                        <article class="bookmark-card">
+                            <a asp-controller="Home" asp-action="BookDetail" asp-route-id="@item.BookId" class="bookmark-image-link">
+                                <img src="@Url.Content(item.ImageUrl)" alt="@item.Title" class="bookmark-image" />
+                            </a>
+
+                            <div class="bookmark-card-body">
+                                <div class="bookmark-meta-row">
+                                    <span class="bookmark-category">@item.CategoryName</span>
+
+                                    <form method="post" asp-controller="Home" asp-action="RemoveFavorite" asp-route-bookId="@item.BookId">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="returnUrl" value="@returnUrl" />
+                                        <button type="submit" class="bookmark-heart-btn" title="Remove favorite"
+                                                aria-label="Remove favorite">
+                                            <i class="bi bi-heart-fill"></i>
+                                        </button>
+                                    </form>
+                                </div>
+
+                                <h3 class="bookmark-book-title">@item.Title</h3>
+                                <div class="bookmark-author">@item.Author</div>
+
+                                <div class="bookmark-footer-row">
+                                    <span class="bookmark-date">@item.AddedAt.ToLocalTime().ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)</span>
+
+                                    <span class="bookmark-stars" aria-label="Book rating">
+                                        @for (var i = 0; i < 5; i++)
+                                        {
+                                            if (i < item.Rating)
+                                            {
+                                                <i class="bi bi-star-fill"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="bi bi-star"></i>
+                                            }
+                                        }
+                                    </span>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+                }
+            </div>
+
+            @if (Model.TotalPages > 1)
+            {
+                var prevPage = Math.Max(1, Model.CurrentPage - 1);
+                var nextPage = Math.Min(Model.TotalPages, Model.CurrentPage + 1);
+                var pageStart = Math.Max(1, Model.CurrentPage - 2);
+                var pageEnd = Math.Min(Model.TotalPages, pageStart + 4);
+
+                <nav class="bookmark-pagination-wrap" aria-label="Bookmark pagination">
+                    <ul class="pagination bookmark-pagination">
+                        <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : string.Empty)">
+                            <a class="page-link" asp-controller="Home" asp-action="Bookmark" asp-route-page="@prevPage">Previous</a>
+                        </li>
+
+                        @for (var i = pageStart; i <= pageEnd; i++)
+                        {
+                            <li class="page-item @(i == Model.CurrentPage ? "active" : string.Empty)">
+                                <a class="page-link" asp-controller="Home" asp-action="Bookmark" asp-route-page="@i">@i</a>
+                            </li>
+                        }
+
+                        <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : string.Empty)">
+                            <a class="page-link" asp-controller="Home" asp-action="Bookmark" asp-route-page="@nextPage">Next</a>
+                        </li>
+                    </ul>
+                </nav>
+            }
+        }
+        else
+        {
+            <article class="bookmark-empty">
+                No favorite books yet. Open a book and click the heart icon to add it.
+            </article>
+        }
+    </section>
+</section>

@@ -43,8 +43,39 @@
     }
 
     var pathSegments = currentPath.Split('/', StringSplitOptions.RemoveEmptyEntries);
-    var breadcrumbTrail = new List<(string Label, string Url)>();
+    var breadcrumbTrail = new List<(string Label, string Url)>
+    {
+        ("Home", "/")
+    };
     var builtPath = string.Empty;
+
+    for (var i = 0; i < pathSegments.Length; i++)
+    {
+        var segment = pathSegments[i];
+        builtPath += $"/{segment}";
+
+        if (string.Equals(segment, "index", StringComparison.OrdinalIgnoreCase))
+        {
+            continue;
+        }
+
+        if (i == 0 &&
+            string.Equals(segment, "home", StringComparison.OrdinalIgnoreCase))
+        {
+            continue;
+        }
+
+        breadcrumbTrail.Add((ToBreadcrumbLabel(segment), builtPath));
+    }
+
+    var currentCategory = (ViewBag.CurrentCategory as string)?.Trim();
+    if (currentPath.Contains("category", StringComparison.OrdinalIgnoreCase) &&
+        !string.IsNullOrWhiteSpace(currentCategory))
+    {
+        breadcrumbTrail.Add((currentCategory, string.Empty));
+    }
+
+    var showBreadcrumb = breadcrumbTrail.Count > 1;
 
     if (!string.IsNullOrWhiteSpace(cartOwnerKey))
     {
@@ -95,6 +126,7 @@
     <link rel="stylesheet" href="~/css/users/Home.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/users/About.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/users/Event.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/users/Bookmark.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/users/Category.css" asp-append-version="true" />
 
     <link rel="stylesheet" href="~/css/users/detail.css" asp-append-version="true" />
@@ -117,7 +149,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 
-<body>
+<body class="@(showBreadcrumb ? "has-breadcrumb" : null)">
     <header id="main-header">
         <div class="top-header">
             <div class="top-header-content">
@@ -239,56 +271,90 @@
                         </div>
                     </div>
                 </div>
-            </nav>
-        </header>
-        <div class="container">
-            <main role="main" class="pb-3">
-                @RenderBody()
-            </main>
+            </div>
+        </nav>
+    </header>
+    @if (showBreadcrumb)
+    {
+        <div class="breadcrumb-bar">
+            <div class="main-navbar-content breadcrumb-content">
+                <nav class="library-breadcrumb" aria-label="Breadcrumb">
+                    <img src="/images/Login/logoac.png" class="breadcrumb-logo" alt="Logo">
+
+                    @for (var i = 0; i < breadcrumbTrail.Count; i++)
+                    {
+                        var item = breadcrumbTrail[i];
+                        var isLast = i == breadcrumbTrail.Count - 1;
+                        var hasLink = !string.IsNullOrWhiteSpace(item.Url) && !isLast;
+
+                        if (i > 0)
+                        {
+                            <span class="breadcrumb-separator" aria-hidden="true">
+                                <i class="bi bi-chevron-right"></i>
+                            </span>
+                        }
+
+                        if (hasLink)
+                        {
+                            <a class="breadcrumb-link" href="@item.Url">@item.Label</a>
+                        }
+                        else
+                        {
+                            <span class="breadcrumb-current" aria-current="page">@item.Label</span>
+                        }
+                    }
+                </nav>
+            </div>
         </div>
-
-        <footer>
-            <div class="container-footer">
-                <div class="footer-content">
-                    <div class="footer-left">
-                        <img src="/images/logo.png" />
-                        <p>
-                            The library preserves knowledge and makes it available to future generations — knowledge never
-                            dies here.
-                        </p>
-                    </div>
-                    <div class="footer-right">
-                        <div class="footer-links">
-                            <h3>About Library</h3>
-                            <a href="/About/Faq">FAQ</a>
-                            <a href="/About/Support">Support</a>
-                            <a href="/About">Policies</a>
-                            <a asp-area="Identity" asp-page="/Account/Login">Account & Login</a>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="footer-bottom">
-                    <p class="copyright">
-                        &copy; 2025 ACLEDA University of Business's Library. All right reserved
+    }
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+    <footer>
+        <div class="container-footer">
+            <div class="footer-content">
+                <div class="footer-left">
+                    <img src="/images/logo.png" />
+                    <p>
+                        The library preserves knowledge and makes it available to future generations — knowledge
+                        never
+                        dies here.
                     </p>
-                    <div class="footer-bottom-links">
-                        <a href="/Terms">Terms of service</a>
-                        <a href="/Privacy">Privacy Policy</a>
-                        <a href="/Cookie">Cookie Setting</a>
+                </div>
+                <div class="footer-right">
+                    <div class="footer-links">
+                        <h3>About Library</h3>
+                        <a href="/About/Faq">FAQ</a>
+                        <a href="/About/Support">Support</a>
+                        <a href="/About">Policies</a>
+                        <a asp-area="Identity" asp-page="/Account/Login">Account & Login</a>
                     </div>
                 </div>
             </div>
-        </footer>
 
-        <script src="~/lib/jquery/dist/jquery.min.js"></script>
-        <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-        <script src="~/js/sweetalert-theme.js" asp-append-version="true"></script>
-        <script src="~/js/site.js" asp-append-version="true"></script>
-        <script src="~/js/users/navbar.js" asp-append-version="true"></script>
+            <div class="footer-bottom">
+                <p class="copyright">
+                    &copy; 2025 ACLEDA University of Business's Library. All right reserved
+                </p>
+                <div class="footer-bottom-links">
+                    <a href="/Terms">Terms of service</a>
+                    <a href="/Privacy">Privacy Policy</a>
+                    <a href="/Cookie">Cookie Setting</a>
+                </div>
+            </div>
+        </div>
+    </footer>
 
-        @await RenderSectionAsync("Scripts", required: false)
-    </body>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="~/js/sweetalert-theme.js" asp-append-version="true"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/users/navbar.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
 
 </html>

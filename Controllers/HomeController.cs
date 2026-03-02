@@ -79,10 +79,132 @@ namespace Library_Management_system.Controllers
         }
 
         [HttpGet("history")]
-        public IActionResult History()
+        public async Task<IActionResult> History()
         {
             ViewBag.Title = "History";
-            return View("~/Views/User/History/History.cshtml");
+
+            var ownerKey = ResolveCartOwnerKey();
+            var usernameCandidates = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (!string.IsNullOrWhiteSpace(userId))
+            {
+                var currentUser = await _context.Users
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(u => u.Id == userId);
+
+                if (currentUser != null)
+                {
+                    if (!string.IsNullOrWhiteSpace(currentUser.FullName))
+                    {
+                        usernameCandidates.Add(currentUser.FullName.Trim());
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(currentUser.UserName))
+                    {
+                        usernameCandidates.Add(currentUser.UserName.Trim());
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(currentUser.Email))
+                    {
+                        usernameCandidates.Add(currentUser.Email.Trim());
+                    }
+                }
+            }
+
+            var reservationSourceKeys = await _context.CartItems
+                .AsNoTracking()
+                .Where(ci => ci.OwnerKey == ownerKey)
+                .Select(ci => $"reservation:{ci.Id}")
+                .ToListAsync();
+
+            var borrowingRecords = new List<BorrowingRecord>();
+
+            if (usernameCandidates.Count > 0)
+            {
+                var byUsername = await _context.BorrowingRecords
+                    .AsNoTracking()
+                    .Include(br => br.Book)
+                    .Where(br => usernameCandidates.Contains(br.Username))
+                    .OrderByDescending(br => br.BorrowDate)
+                    .ThenByDescending(br => br.Id)
+                    .ToListAsync();
+
+                borrowingRecords.AddRange(byUsername);
+            }
+
+            if (reservationSourceKeys.Count > 0)
+            {
+                var byReservationSource = await _context.BorrowingRecords
+                    .AsNoTracking()
+                    .Include(br => br.Book)
+                    .Where(br => reservationSourceKeys.Contains(br.Source))
+                    .OrderByDescending(br => br.BorrowDate)
+                    .ThenByDescending(br => br.Id)
+                    .ToListAsync();
+
+                borrowingRecords.AddRange(byReservationSource);
+            }
+
+            var normalizedRecords = borrowingRecords
+                .GroupBy(br => br.Id)
+                .Select(g => g.First())
+                .OrderByDescending(br => br.BorrowDate)
+                .ThenByDescending(br => br.Id)
+                .ToList();
+
+            const decimal finePerLateDay = 1.00m;
+            var nowUtc = DateTime.UtcNow;
+
+            var items = normalizedRecords
+                .Select(br =>
+                {
+                    var status = ComputeHistoryStatus(br, nowUtc);
+                    var statusLabel = status switch
+                    {
+                        "returned" => "Returned",
+                        "overdue" => "Overdue",
+                        _ => "Borrowing"
+                    };
+                    var fineDate = br.ReturnDate ?? nowUtc;
+                    var lateDays = status == "borrowing" ? 0 : CalculateLateDaysForHistory(br.DueDate, fineDate);
+                    var fineAmount = lateDays * finePerLateDay;
+
+                    return new HistoryItemViewModel
+                    {
+                        BorrowingId = br.Id,
+                        BookId = br.BookId,
+                        Title = br.Book?.Title ?? "(Missing book)",
+                        Author = br.Book?.Author ?? "Unknown",
+                        Year = br.Book?.Year ?? 0,
+                        BookCode = string.IsNullOrWhiteSpace(br.Book?.BookCode) ? $"A{br.BookId:0000}" : br.Book!.BookCode,
+                        Rating = Math.Clamp(br.Book?.Rating ?? 0, 0, 5),
+                        ImageUrl = string.IsNullOrWhiteSpace(br.Book?.ImageUrl) ? "/images/User/Book/book2.png" : br.Book!.ImageUrl,
+                        Status = status,
+                        StatusLabel = statusLabel,
+                        BorrowDate = br.BorrowDate,
+                        DueDate = br.DueDate,
+                        ReturnDate = br.ReturnDate,
+                        LateDays = lateDays,
+                        FineAmount = fineAmount
+                    };
+                })
+                .ToList();
+
+            var onHoldCount = items.Count(x => x.Status != "returned");
+            var returnedCount = items.Count(x => x.Status == "returned");
+            var estimatedFine = items.Sum(x => x.FineAmount);
+
+            var model = new HistoryViewModel
+            {
+                Items = items,
+                TotalCount = items.Count,
+                OnHoldCount = onHoldCount,
+                ReturnedCount = returnedCount,
+                EstimatedFine = estimatedFine
+            };
+
+            return View("~/Views/User/History/History.cshtml", model);
         }
 
         [HttpGet("cart")]
@@ -250,11 +372,100 @@ namespace Library_Management_system.Controllers
             ViewBag.Title = "Profile";
             return View("~/Views/User/Profile/Profile.cshtml");
         }
+
         [HttpGet("bookmark")]
-        public IActionResult Bookmark()
+        public async Task<IActionResult> Bookmark(int page = 1)
         {
-            ViewBag.Title = "Profile";
-            return View("~/Views/User/Bookmark/Bookmark.cshtml");
+            ViewBag.Title = "Bookmark";
+            const int pageSize = 8;
+
+            var ownerKey = ResolveCartOwnerKey();
+            var favoritesQuery = _context.FavoriteBooks
+                .AsNoTracking()
+                .Include(x => x.Book)
+                .Where(x => x.OwnerKey == ownerKey && x.Book != null)
+                .OrderByDescending(x => x.CreatedDate);
+
+            var totalItems = await favoritesQuery.CountAsync();
+            var totalPages = Math.Max(1, (int)Math.Ceiling(totalItems / (double)pageSize));
+            var currentPage = Math.Clamp(page, 1, totalPages);
+
+            var favorites = await favoritesQuery
+                .Skip((currentPage - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var model = new BookmarkViewModel
+            {
+                CurrentPage = currentPage,
+                TotalPages = totalPages,
+                TotalItems = totalItems,
+                Items = favorites.Select(x =>
+                {
+                    var book = x.Book!;
+                    return new BookmarkItemViewModel
+                    {
+                        BookId = x.BookId,
+                        CategoryName = string.IsNullOrWhiteSpace(book.CategoryName) ? "Professional and Technical" : book.CategoryName,
+                        Title = book.Title,
+                        Author = book.Author,
+                        BookCode = string.IsNullOrWhiteSpace(book.BookCode) ? $"A{book.Id:0000}" : book.BookCode,
+                        Rating = Math.Clamp(book.Rating, 0, 5),
+                        ImageUrl = string.IsNullOrWhiteSpace(book.ImageUrl) ? "/images/User/Book/book2.png" : book.ImageUrl,
+                        AddedAt = x.CreatedDate
+                    };
+                }).ToList()
+            };
+
+            return View("~/Views/User/Bookmark/Bookmark.cshtml", model);
+        }
+
+        [HttpPost("bookmark/add/{bookId:int}")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddFavorite(int bookId, [FromForm] string? returnUrl = null)
+        {
+            var bookExists = await _context.Books
+                .AsNoTracking()
+                .AnyAsync(b => b.Id == bookId);
+
+            if (!bookExists)
+            {
+                return NotFound();
+            }
+
+            var ownerKey = ResolveCartOwnerKey();
+            var existing = await _context.FavoriteBooks
+                .FirstOrDefaultAsync(x => x.OwnerKey == ownerKey && x.BookId == bookId);
+
+            if (existing == null)
+            {
+                _context.FavoriteBooks.Add(new FavoriteBook
+                {
+                    OwnerKey = ownerKey,
+                    BookId = bookId,
+                    CreatedDate = DateTime.UtcNow
+                });
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToLocalOrBookDetail(returnUrl, bookId);
+        }
+
+        [HttpPost("bookmark/remove/{bookId:int}")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RemoveFavorite(int bookId, [FromForm] string? returnUrl = null)
+        {
+            var ownerKey = ResolveCartOwnerKey();
+            var existing = await _context.FavoriteBooks
+                .FirstOrDefaultAsync(x => x.OwnerKey == ownerKey && x.BookId == bookId);
+
+            if (existing != null)
+            {
+                _context.FavoriteBooks.Remove(existing);
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToLocalOrBookDetail(returnUrl, bookId);
         }
 
         [HttpGet("cookie")]
@@ -274,6 +485,12 @@ namespace Library_Management_system.Controllers
         //    ViewBag.CurrentPage = page;
         //    return View("~/Views/User/Category/Category.cshtml");
         //}
+
+        [HttpGet("book")]
+        public Task<IActionResult> BookIndex(string? category, int page = 1)
+        {
+            return Category(category, page);
+        }
 
         public async Task<IActionResult> Category(string? category, int page = 1)
         {
@@ -327,6 +544,11 @@ namespace Library_Management_system.Controllers
                 return NotFound();
             }
 
+            var ownerKey = ResolveCartOwnerKey();
+            var isFavorite = await _context.FavoriteBooks
+                .AsNoTracking()
+                .AnyAsync(x => x.OwnerKey == ownerKey && x.BookId == id);
+
             var relatedBooks = await _context.Books
                 .AsNoTracking()
                 .Where(b => b.Id != id && b.CategoryName == book.CategoryName)
@@ -363,7 +585,8 @@ namespace Library_Management_system.Controllers
             var model = new BookDetailViewModel
             {
                 Book = book,
-                RelatedBooks = relatedBooks
+                RelatedBooks = relatedBooks,
+                IsFavorite = isFavorite
             };
 
             return View("~/Views/User/Books/BookDetail.cshtml", model);
@@ -378,6 +601,37 @@ namespace Library_Management_system.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        private static string ComputeHistoryStatus(BorrowingRecord borrowing, DateTime nowUtc)
+        {
+            if (borrowing.ReturnDate.HasValue ||
+                string.Equals(borrowing.Status, "returned", StringComparison.OrdinalIgnoreCase))
+            {
+                return "returned";
+            }
+
+            return borrowing.DueDate.Date < nowUtc.Date ? "overdue" : "borrowing";
+        }
+
+        private static int CalculateLateDaysForHistory(DateTime dueDate, DateTime compareDate)
+        {
+            if (compareDate.Date <= dueDate.Date)
+            {
+                return 0;
+            }
+
+            return (compareDate.Date - dueDate.Date).Days;
+        }
+
+        private IActionResult RedirectToLocalOrBookDetail(string? returnUrl, int bookId)
+        {
+            if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
+
+            return RedirectToAction(nameof(BookDetail), new { id = bookId });
         }
 
         private string ResolveCartOwnerKey()

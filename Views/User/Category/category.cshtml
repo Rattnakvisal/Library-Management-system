@@ -10,18 +10,16 @@
     var categories = ViewBag.Categories as IEnumerable<string> ?? Enumerable.Empty<string>();
 }
 
-<div class="container py-5">
+<div class="container">
     <h2 class="text-center fw-bold mb-4 text-navy">Categories</h2>
     <div class="filter-scroll-container mb-5">
         <div class="d-flex flex-nowrap px-4">
-            <a asp-action="Category"
-               asp-route-category=""
+            <a asp-action="Category"               asp-route-category=""
                class="btn btn-filter @(string.IsNullOrEmpty(currentCategory) ? "active" : "")">All</a>
 
             @foreach (var categoryName in categories)
             {
-                <a asp-action="Category"
-                   asp-route-category="@categoryName"
+                <a asp-action="Category" asp-route-category="@categoryName"
                    class="btn btn-filter @(currentCategory == categoryName ? "active" : "")">@categoryName</a>
             }
         </div>
@@ -40,7 +38,8 @@
                 <div class="col-6 col-md-4 col-lg-3">
                     <div class="card book-card border-0 shadow-sm h-100 position-relative">
                         <div class="p-2 position-relative">
-                            <img src="@imagePath" class="card-img-top rounded-3" alt="Book Cover" style="height: 200px; object-fit: cover;">
+                            <img src="@imagePath" class="card-img-top rounded-3" alt="Book Cover"
+                                 style="height: 200px; object-fit: cover;">
                         </div>
                         <div class="card-body pt-0 px-3 pb-3">
                             <span class="category-text-tiny fw-bold text-muted">@book.CategoryName</span>
@@ -60,10 +59,7 @@
                                 }
                             </div>
                         </div>
-                        <a asp-controller="Home"
-                           asp-action="BookDetail"
-                           asp-route-id="@book.Id"
-                           class="stretched-link"
+                        <a asp-controller="Home"          asp-action="BookDetail"               asp-route-id="@book.Id"                    class="stretched-link"
                            aria-label="View details for @book.Title"></a>
                     </div>
                 </div>
@@ -83,27 +79,21 @@
             {
                 @if (currentPage > 1)
                 {
-                    <a asp-action="Category"
-                       asp-route-category="@currentCategory"
-                       asp-route-page="@(currentPage - 1)"
+                    <a asp-action="Category"       asp-route-category="@currentCategory"        asp-route-page="@(currentPage - 1)"
                        class="page-node px-3">Prev</a>
                 }
 
                 @for (var i = 1; i <= totalPages; i++)
                 {
-                    <a asp-action="Category"
-                       asp-route-page="@i"
-                       asp-route-category="@currentCategory"
-                       class="page-node @(i == currentPage ? "active" : "")">
+                    <a asp-action="Category"             asp-route-page="@i"              asp-route-category="@currentCategory"
+                           class="page-node @(i == currentPage ? "active" : "")">
                         @i
                     </a>
                 }
 
                 @if (currentPage < totalPages)
                 {
-                    <a asp-action="Category"
-                       asp-route-category="@currentCategory"
-                       asp-route-page="@(currentPage + 1)"
+                    <a asp-action="Category"            asp-route-category="@currentCategory"             asp-route-page="@(currentPage + 1)"
                        class="page-node px-3">Next</a>
                 }
             }

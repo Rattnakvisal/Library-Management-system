@@ -284,3 +284,148 @@ body {
     padding-top: 8px;
 }
 
+.related-card-img {
+    height: 200px;
+    object-fit: cover;
+}
+
+.related-book-title {
+    font-size: 0.95rem;
+    line-height: 1.35;
+    min-height: 2.6em;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+@media (max-width: 991.98px) {
+    .page-wrap {
+        max-width: 100% !important;
+        padding: 0 14px;
+    }
+
+    .cover-sm {
+        width: 100%;
+        max-width: 320px;
+        height: auto;
+        aspect-ratio: 3 / 4;
+        margin: 0 auto;
+    }
+
+    .detail-header {
+        flex-direction: column;
+        align-items: flex-start !important;
+    }
+
+    .rate-box {
+        text-align: left;
+        min-width: 0;
+    }
+
+    .desc-text {
+        max-width: none;
+        margin-top: 14px;
+    }
+
+    .btn-group-custom {
+        gap: 10px;
+    }
+
+    .btn-read,
+    .btn-cart {
+        padding: 11px 28px;
+    }
+
+    .info-item {
+        white-space: normal;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .page-wrap {
+        margin: 14px auto !important;
+        padding: 0 10px;
+    }
+
+    .book-title {
+        font-size: 1.35rem;
+        line-height: 1.25;
+    }
+
+    .author-name {
+        font-size: 14px;
+    }
+
+    .desc-text {
+        font-size: 14px;
+        line-height: 1.6;
+        margin: 14px 0 18px;
+    }
+
+    .btn-group-custom {
+        display: grid;
+        grid-template-columns: 1fr 1fr auto auto;
+        gap: 10px;
+        align-items: stretch;
+    }
+
+    .btn-group-custom > form.d-inline {
+        display: block !important;
+    }
+
+    .btn-read,
+    .btn-cart {
+        width: 100%;
+        padding: 10px 14px;
+        text-align: center;
+    }
+
+    .btn-fav-circle,
+    .btn-share-circle {
+        width: 42px;
+        height: 42px;
+    }
+
+    .info-bar {
+        display: block;
+        padding: 0;
+        overflow: visible;
+    }
+
+    .info-item {
+        text-align: left;
+        font-size: 13px;
+        padding: 12px 14px;
+        border-left: none !important;
+    }
+
+    .info-item + .info-item {
+        border-top: 1px solid var(--line);
+    }
+
+    .related-card-img {
+        height: 170px;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .cover-sm {
+        max-width: 260px;
+    }
+
+    .btn-group-custom {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .btn-fav-circle,
+    .btn-share-circle {
+        width: 100%;
+        border-radius: 999px;
+    }
+
+    .related-card-img {
+        height: 150px;
+    }
+}
+

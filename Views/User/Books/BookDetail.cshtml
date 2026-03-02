@@ -17,27 +17,17 @@
     var description = string.IsNullOrWhiteSpace(book.Description)
         ? "No summary is available for this book yet."
         : book.Description;
+    var returnUrl = $"{Context.Request.Path}{Context.Request.QueryString}";
 }
 
 <div class="page-wrap">
-    <div class="breadcrumb-wrap">
-        <img src="/images/Login/logoac.png" alt="Logo" class="breadcrumb-icon">
-        <div class="breadcrumb-line">
-            <i class="fa-solid fa-angle-right"></i>
-            <a asp-controller="Home" asp-action="Category" class="breadcrumb-link">Category</a>
-            <i class="fa-solid fa-angle-right"></i>
-            <a asp-controller="Home" asp-action="Category" asp-route-category="@book.CategoryName"
-               class="breadcrumb-link">@book.CategoryName</a>
-        </div>
-    </div>
-
     <div class="row g-5 align-items-start">
         <div class="col-12 col-md-4">
             <img src="@imagePath" class="main-img cover-sm" alt="@book.Title">
         </div>
 
         <div class="col-12 col-md-8">
-            <div class="d-flex justify-content-between align-items-start gap-3">
+            <div class="detail-header d-flex justify-content-between align-items-start gap-3">
                 <div>
                     <h1 class="book-title">@book.Title</h1>
                     <p class="author-name">Author: @book.Author</p>
@@ -45,7 +35,7 @@
 
                 <div class="rate-box">
                     <div class="text-end star-rating text-warning small">
-                        @for (var i = 0; i < 4; i++)
+                        @for (var i = 0; i < 5; i++)
                         {
                             if (i < rating)
                             {
@@ -74,7 +64,28 @@
                         <i class="bi bi-cart2 me-2"></i> Add to cart
                     </button>
                 </form>
-                <button type="button" class="btn-fav-circle" aria-label="favorite"><i class="bi bi-heart"></i></button>
+                @if (Model.IsFavorite)
+                {
+                    <form method="post" asp-controller="Home" asp-action="RemoveFavorite" asp-route-bookId="@book.Id"
+                          class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="returnUrl" value="@returnUrl" />
+                        <button type="submit" class="btn-fav-circle" aria-label="remove favorite" title="Remove favorite">
+                            <i class="bi bi-heart-fill text-danger"></i>
+                        </button>
+                    </form>
+                }
+                else
+                {
+                    <form method="post" asp-controller="Home" asp-action="AddFavorite" asp-route-bookId="@book.Id"
+                          class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="returnUrl" value="@returnUrl" />
+                        <button type="submit" class="btn-fav-circle" aria-label="add favorite" title="Add favorite">
+                            <i class="bi bi-heart"></i>
+                        </button>
+                    </form>
+                }
                 <button type="button" class="btn-share-circle" aria-label="share"><i class="bi bi-share"></i></button>
             </div>
 
@@ -104,8 +115,7 @@
                     <div class="col">
                         <div class="card book-card border-0 shadow-sm h-100 position-relative">
                             <div class="card-img-wrapper p-2">
-                                <img src="@relatedImagePath" class="card-img-top rounded" alt="@relatedBook.Title"
-                                     style="height: 200px; object-fit: cover;">
+                                <img src="@relatedImagePath" class="card-img-top rounded related-card-img" alt="@relatedBook.Title">
                             </div>
                             <div class="card-body p-3">
                                 <div class="d-flex justify-content-between align-items-center mb-1">
@@ -114,10 +124,10 @@
                                         <i class="fa-solid fa-heart"></i>
                                     </button>
                                 </div>
-                                <h6 class="book-title mb-1 small fw-bold">@relatedBook.Title</h6>
+                                <h6 class="related-book-title mb-1 small fw-bold">@relatedBook.Title</h6>
                                 <p class="author-text mb-3 small italic">@relatedBook.Author</p>
                                 <div class="text-end star-rating text-warning small">
-                                    @for (var i = 0; i < 4; i++)
+                                    @for (var i = 0; i < 5; i++)
                                     {
                                         if (i < relatedRating)
                                         {
