@@ -1,7 +1,4 @@
-@using Library_Management_system.Models
-@using Microsoft.AspNetCore.Identity
-@inject UserManager<ApplicationUser> UserManager
-@inject SignInManager<ApplicationUser> SignInManager
+@model Library_Management_system.Models.ProfileViewModel
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -10,57 +7,173 @@
 
 <link rel="stylesheet" href="~/css/users/Profile.css" asp-append-version="true" />
 
-<div class="fb-container">
-    <div class="fb-profile-width">
-
-        <!-- Cover -->
-        <div class="cover-container">
-            <img src="https://i.pinimg.com/736x/61/0d/c5/610dc55e2fb7a1ab8728a718be63e1d4.jpg" alt="Cover Photo"
-                 class="cover-image">
-        </div>
-
-        @{
-            var user = await UserManager.GetUserAsync(User);
-            var fullName = user?.FullName ?? user?.UserName ?? "User";
-            var email = user?.Email ?? "";
-        }
-
-        <!-- Profile Header -->
-        <div class="profile-header-section">
-
-            <!-- Profile Picture -->
-            <div class="profile-pic-container">
-                <img src="https://i.pinimg.com/736x/c0/d1/9f/c0d19f67852cb44fe9bdbed793141790.jpg" alt="Profile Picture"
-                     class="profile-picture">
-            </div>
-
-            <!-- Profile Info -->
-            <div class="profile-info">
-                <h1 class="profile-name">@fullName</h1>
-
-                <div class="profile-stats">
-                    <span class="profile-email">@email</span>
-                    <span>Member</span>
+<div class="profile-page" id="profilePage">
+    <div class="fb-container">
+        <div class="fb-profile-width">
+            <section class="profile-hero">
+                <div class="cover-container">
+                    <img src="@Model.CoverImageUrl" alt="Cover Photo"
+                         class="cover-image">
+                    <div class="cover-overlay"></div>
+                    <form method="post" asp-controller="Home" asp-action="UploadCoverImage"
+                          enctype="multipart/form-data" class="image-upload-form image-upload-form-cover">
+                        @Html.AntiForgeryToken()
+                        <input type="file"
+                               name="imageFile"
+                               class="image-upload-input"
+                               id="coverImageInput"
+                               accept=".jpg,.jpeg,.png,.webp,image/*" />
+                        <button type="button" class="image-upload-trigger" data-target-input="coverImageInput">
+                            <i class="bi bi-image"></i>
+                            Change Cover
+                        </button>
+                    </form>
                 </div>
-            </div>
+            </section>
 
-            <!-- Actions -->
-            <div class="profile-actions">
+            <section class="profile-header-card profile-reveal">
+                <div class="profile-header-section">
+                    <div class="profile-pic-container">
+                        <img src="@Model.ProfileImageUrl" alt="Profile Picture"
+                             class="profile-picture">
+                        <form method="post" asp-controller="Home" asp-action="UploadProfileImage"
+                              enctype="multipart/form-data" class="image-upload-form image-upload-form-avatar">
+                            @Html.AntiForgeryToken()
+                            <input type="file"
+                                   name="imageFile"
+                                   class="image-upload-input"
+                                   id="profileImageInput"
+                                   accept=".jpg,.jpeg,.png,.webp,image/*" />
+                            <button type="button" class="image-upload-trigger image-upload-trigger-avatar"
+                                    data-target-input="profileImageInput" aria-label="Change profile image">
+                                <i class="bi bi-camera-fill"></i>
+                            </button>
+                        </form>
+                    </div>
 
-                <!-- Reset Password -->
-                <a asp-area="Identity" asp-page="/Account/ForgotPassword" class="btn btn-primary">
-                    Reset Password
-                </a>
+                    <div class="profile-info">
+                        <h1 class="profile-name">@Model.FullName</h1>
 
-                <!-- Logout (POST required) -->
-                <form asp-area="Identity" asp-page="/Account/Logout" method="post" style="display:inline;">
-                    <button type="submit" class="btn btn-secondary">
-                        Logout
-                    </button>
-                </form>
+                        <div class="profile-stats">
+                            <span class="profile-email">@Model.Email</span>
+                        </div>
 
-            </div>
+                        <div class="profile-pill-row">
+                            <span class="profile-pill">
+                                <i class="bi bi-person-badge"></i>
+                                @Model.MembershipLabel
+                            </span>
+                            <span class="profile-pill profile-pill-muted">
+                                <i class="bi bi-bookmark-heart-fill"></i>
+                                @Model.Interests.Count interest(s)
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="profile-actions">
+                        <a asp-area="Identity" asp-page="/Account/ForgotPassword" class="btn btn-primary">
+                            Reset Password
+                        </a>
+
+                        <form asp-area="Identity" asp-page="/Account/Logout" method="post">
+                            <button type="submit" class="btn btn-secondary">
+                                Logout
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            <section class="interest-section profile-reveal">
+                <div class="interest-title-row">
+                    <h2 class="interest-title">My Interest</h2>
+                    <span class="interest-count-badge">@Model.Interests.Count books</span>
+                </div>
+
+                @if (Model.Interests.Count == 0)
+                {
+                    <article class="interest-empty">
+                        No interests yet. Add books from
+                        <a asp-controller="Home" asp-action="Bookmark">Bookmark</a>.
+                    </article>
+                }
+                else
+                {
+                    <div class="interest-grid">
+                        @foreach (var item in Model.Interests)
+                        {
+                            <article class="interest-card">
+                                <a asp-controller="Home" asp-action="BookDetail" asp-route-id="@item.BookId" class="interest-image-link">
+                                    <img src="@Url.Content(item.ImageUrl)" alt="@item.Title" class="interest-image" />
+                                </a>
+
+                                <div class="interest-body">
+                                    <div class="interest-category">@item.CategoryName</div>
+                                    <h3 class="interest-book-title">@item.Title</h3>
+                                    <p class="interest-author">@item.Author</p>
+
+                                    <div class="interest-stars" aria-label="Book rating">
+                                        @for (var i = 0; i < 5; i++)
+                                        {
+                                            if (i < item.Rating)
+                                            {
+                                                <i class="bi bi-star-fill"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="bi bi-star"></i>
+                                            }
+                                        }
+                                    </div>
+                                </div>
+                            </article>
+                        }
+                    </div>
+                }
+            </section>
         </div>
-
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        (function () {
+            document.querySelectorAll('.image-upload-trigger').forEach(function (button) {
+                button.addEventListener('click', function () {
+                    var inputId = button.getAttribute('data-target-input');
+                    var input = inputId ? document.getElementById(inputId) : null;
+                    if (!input) return;
+                    input.click();
+                });
+            });
+
+            document.querySelectorAll('.image-upload-input').forEach(function (input) {
+                input.addEventListener('change', function () {
+                    if (!input.files || input.files.length === 0) return;
+                    var form = input.closest('form');
+                    if (!form) return;
+                    form.submit();
+                });
+            });
+
+            var success = '@(TempData["ProfileSuccess"]?.ToString() ?? string.Empty)'.trim();
+            var error = '@(TempData["ProfileError"]?.ToString() ?? string.Empty)'.trim();
+
+            if (success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Updated',
+                    text: success,
+                    confirmButtonColor: '#1d4ed8'
+                });
+            } else if (error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Upload Failed',
+                    text: error,
+                    confirmButtonColor: '#1d4ed8'
+                });
+            }
+        })();
+    </script>
+}

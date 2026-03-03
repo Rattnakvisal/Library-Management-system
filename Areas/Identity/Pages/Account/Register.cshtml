@@ -18,9 +18,16 @@
 
     <!-- Reuse the login css to keep the same style -->
     <link rel="stylesheet" href="~/css/Login/login.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/page-loader.css" asp-append-version="true" />
 </head>
 
 <body>
+    <div id="pageLoader" class="page-loader" aria-hidden="false">
+        <div class="page-loader__dots" aria-hidden="true">
+            <span></span><span></span><span></span><span></span><span></span><span></span>
+        </div>
+    </div>
+
     <div class="container">
         <div class="card">
 
@@ -100,7 +107,8 @@
                     <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
 
                     <button id="register-submit" type="submit" class="btn-signin">
-                        Sign up
+                        <span class="btn-text">Sign up</span>
+                        <span class="btn-loader" aria-hidden="true"></span>
                     </button>
                 </form>
 
@@ -140,6 +148,7 @@
         </div>
     </div>
 
+    <script src="~/js/page-loader.js" asp-append-version="true"></script>
     <script src="~/js/admin/login.js"></script>
 
     <!-- Because Layout = null, include validation scripts directly -->

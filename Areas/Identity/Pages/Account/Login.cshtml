@@ -18,9 +18,16 @@
 
     <!-- Your custom css -->
     <link rel="stylesheet" href="~/css/Login/login.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/page-loader.css" asp-append-version="true" />
 </head>
 
 <body>
+    <div id="pageLoader" class="page-loader" aria-hidden="false">
+        <div class="page-loader__dots" aria-hidden="true">
+            <span></span><span></span><span></span><span></span><span></span><span></span>
+        </div>
+    </div>
+
     <div class="container">
         <div class="card">
 
@@ -81,6 +88,7 @@
 
                     <button id="login-submit" type="submit" class="btn-signin">
                         <span class="btn-text">Sign in</span>
+                        <span class="btn-loader" aria-hidden="true"></span>
                     </button>
                 </form>
 
@@ -125,6 +133,7 @@
         </div>
     </div>
 
+    <script src="~/js/page-loader.js" asp-append-version="true"></script>
     <script src="~/js/admin/login.js"></script>
     <partial name="_ValidationScriptsPartial" />
 </body>

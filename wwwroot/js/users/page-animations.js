@@ -142,6 +142,25 @@
         revealElements(reveals, 30, 80, 620);
     }
 
+    function setupProfilePage() {
+        const root = document.getElementById("profilePage");
+        if (!root) {
+            return;
+        }
+
+        root.classList.add("motion-enabled");
+        const hero = root.querySelector(".profile-hero");
+        if (hero) {
+            requestAnimationFrame(() => root.classList.add("is-ready"));
+        }
+
+        const sectionReveals = Array.from(root.querySelectorAll(".profile-reveal"));
+        revealElements(sectionReveals, 20, 90, 520);
+
+        const interestCards = Array.from(root.querySelectorAll(".interest-card"));
+        revealElements(interestCards, 90, 60, 760);
+    }
+
     document.addEventListener("DOMContentLoaded", () => {
         setupEventPage();
         setupContactPage();
@@ -150,5 +169,6 @@
         setupBookDetailPage();
         setupBookmarkPage();
         setupHistoryPage();
+        setupProfilePage();
     });
 })();

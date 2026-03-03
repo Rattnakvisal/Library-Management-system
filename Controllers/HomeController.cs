@@ -1,5 +1,6 @@
 using Library_Management_system.Data;
 using Library_Management_system.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
@@ -9,13 +10,36 @@ namespace Library_Management_system.Controllers
 {
     public class HomeController : Controller
     {
+        private const string ProfileImageClaimType = "ProfileImageUrl";
+        private const string CoverImageClaimType = "CoverImageUrl";
+        private const string DefaultProfileImageUrl =
+            "https://i.pinimg.com/736x/c0/d1/9f/c0d19f67852cb44fe9bdbed793141790.jpg";
+        private const string DefaultCoverImageUrl =
+            "https://i.pinimg.com/736x/61/0d/c5/610dc55e2fb7a1ab8728a718be63e1d4.jpg";
+
+        private static readonly HashSet<string> AllowedImageExtensions = new(StringComparer.OrdinalIgnoreCase)
+        {
+            ".jpg",
+            ".jpeg",
+            ".png",
+            ".webp"
+        };
+
+        private readonly IWebHostEnvironment _environment;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<HomeController> _logger;
         private readonly ApplicationDbContext _context;
 
-        public HomeController(ILogger<HomeController> logger, ApplicationDbContext context)
+        public HomeController(
+            ILogger<HomeController> logger,
+            ApplicationDbContext context,
+            IWebHostEnvironment environment,
+            UserManager<ApplicationUser> userManager)
         {
             _logger = logger;
             _context = context;
+            _environment = environment;
+            _userManager = userManager;
         }
         public IActionResult Index()
         {
@@ -376,10 +400,106 @@ namespace Library_Management_system.Controllers
         }
 
         [HttpGet("profile")]
-        public IActionResult Profile()
+        public async Task<IActionResult> Profile()
         {
             ViewBag.Title = "Profile";
-            return View("~/Views/User/Profile/Profile.cshtml");
+
+            var fullName = "User";
+            var email = string.Empty;
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (!string.IsNullOrWhiteSpace(userId))
+            {
+                var currentUser = await _context.Users
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(x => x.Id == userId);
+
+                if (currentUser != null)
+                {
+                    fullName = string.IsNullOrWhiteSpace(currentUser.FullName)
+                        ? currentUser.UserName ?? "User"
+                        : currentUser.FullName;
+                    email = currentUser.Email ?? string.Empty;
+                }
+            }
+
+            var profileImageUrl = DefaultProfileImageUrl;
+            var coverImageUrl = DefaultCoverImageUrl;
+            if (!string.IsNullOrWhiteSpace(userId))
+            {
+                var imageClaims = await _context.UserClaims
+                    .AsNoTracking()
+                    .Where(x => x.UserId == userId &&
+                                (x.ClaimType == ProfileImageClaimType || x.ClaimType == CoverImageClaimType))
+                    .ToListAsync();
+
+                var profileClaim = imageClaims
+                    .LastOrDefault(x => x.ClaimType == ProfileImageClaimType)?.ClaimValue;
+                var coverClaim = imageClaims
+                    .LastOrDefault(x => x.ClaimType == CoverImageClaimType)?.ClaimValue;
+
+                if (!string.IsNullOrWhiteSpace(profileClaim))
+                {
+                    profileImageUrl = profileClaim;
+                }
+
+                if (!string.IsNullOrWhiteSpace(coverClaim))
+                {
+                    coverImageUrl = coverClaim;
+                }
+            }
+
+            var ownerKey = ResolveCartOwnerKey();
+            var favoriteBooks = await _context.FavoriteBooks
+                .AsNoTracking()
+                .Include(x => x.Book)
+                .Where(x => x.OwnerKey == ownerKey && x.Book != null)
+                .OrderByDescending(x => x.CreatedDate)
+                .Take(8)
+                .ToListAsync();
+
+            var model = new ProfileViewModel
+            {
+                FullName = fullName,
+                Email = email,
+                ProfileImageUrl = profileImageUrl,
+                CoverImageUrl = coverImageUrl,
+                Interests = favoriteBooks.Select(x =>
+                {
+                    var book = x.Book!;
+                    var rating = book.Rating < 0 ? 0 : (book.Rating > 5 ? 5 : book.Rating);
+
+                    return new ProfileInterestItemViewModel
+                    {
+                        BookId = book.Id,
+                        CategoryName = string.IsNullOrWhiteSpace(book.CategoryName)
+                            ? "Professional and Technical"
+                            : book.CategoryName,
+                        Title = book.Title,
+                        Author = book.Author,
+                        ImageUrl = string.IsNullOrWhiteSpace(book.ImageUrl)
+                            ? "/images/User/Book/book2.png"
+                            : book.ImageUrl,
+                        Rating = rating
+                    };
+                }).ToList()
+            };
+
+            return View("~/Views/User/Profile/Profile.cshtml", model);
+        }
+
+        [HttpPost("profile/upload-profile-image")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UploadProfileImage(IFormFile? imageFile)
+        {
+            return await SaveProfileImageAsync(imageFile, ProfileImageClaimType, "Profile image updated successfully.");
+        }
+
+        [HttpPost("profile/upload-cover-image")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UploadCoverImage(IFormFile? imageFile)
+        {
+            return await SaveProfileImageAsync(imageFile, CoverImageClaimType, "Cover image updated successfully.");
         }
 
         [HttpGet("bookmark")]
@@ -655,6 +775,127 @@ namespace Library_Management_system.Controllers
             }
 
             return (compareDate.Date - dueDate.Date).Days;
+        }
+
+        private async Task<IActionResult> SaveProfileImageAsync(
+            IFormFile? imageFile,
+            string claimType,
+            string successMessage)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return RedirectToPage("/Account/Login", new { area = "Identity" });
+            }
+
+            var validationError = ValidateImageFile(imageFile);
+            if (!string.IsNullOrWhiteSpace(validationError))
+            {
+                TempData["ProfileError"] = validationError;
+                return RedirectToAction(nameof(Profile));
+            }
+
+            var imageUrl = await SaveProfileImageFileAsync(imageFile!);
+            var existingClaimValue = await GetUserImageClaimValueAsync(user.Id, claimType);
+
+            if (!string.IsNullOrWhiteSpace(existingClaimValue))
+            {
+                DeleteOwnedProfileImage(existingClaimValue);
+            }
+
+            await UpsertUserImageClaimAsync(user, claimType, imageUrl);
+
+            TempData["ProfileSuccess"] = successMessage;
+            return RedirectToAction(nameof(Profile));
+        }
+
+        private static string? ValidateImageFile(IFormFile? imageFile)
+        {
+            if (imageFile is null || imageFile.Length == 0)
+            {
+                return "Please choose an image file.";
+            }
+
+            const long maxSizeBytes = 5 * 1024 * 1024;
+            if (imageFile.Length > maxSizeBytes)
+            {
+                return "Image size must be 5 MB or smaller.";
+            }
+
+            var extension = Path.GetExtension(imageFile.FileName);
+            if (string.IsNullOrWhiteSpace(extension) || !AllowedImageExtensions.Contains(extension))
+            {
+                return "Only JPG, JPEG, PNG, and WEBP files are allowed.";
+            }
+
+            if (string.IsNullOrWhiteSpace(imageFile.ContentType) ||
+                !imageFile.ContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
+            {
+                return "Invalid image file.";
+            }
+
+            return null;
+        }
+
+        private async Task<string> SaveProfileImageFileAsync(IFormFile imageFile)
+        {
+            var uploadsDirectory = Path.Combine(_environment.WebRootPath, "images", "User", "Profile", "uploads");
+            Directory.CreateDirectory(uploadsDirectory);
+
+            var extension = Path.GetExtension(imageFile.FileName).ToLowerInvariant();
+            var fileName = $"{Guid.NewGuid():N}{extension}";
+            var filePath = Path.Combine(uploadsDirectory, fileName);
+
+            await using var stream = new FileStream(filePath, FileMode.Create);
+            await imageFile.CopyToAsync(stream);
+
+            return $"/images/User/Profile/uploads/{fileName}";
+        }
+
+        private async Task<string?> GetUserImageClaimValueAsync(string userId, string claimType)
+        {
+            return await _context.UserClaims
+                .AsNoTracking()
+                .Where(x => x.UserId == userId && x.ClaimType == claimType)
+                .Select(x => x.ClaimValue)
+                .FirstOrDefaultAsync();
+        }
+
+        private async Task UpsertUserImageClaimAsync(ApplicationUser user, string claimType, string claimValue)
+        {
+            var existingClaims = await _userManager.GetClaimsAsync(user);
+            var existingClaim = existingClaims.FirstOrDefault(c => c.Type == claimType);
+            var newClaim = new Claim(claimType, claimValue);
+
+            if (existingClaim == null)
+            {
+                await _userManager.AddClaimAsync(user, newClaim);
+                return;
+            }
+
+            if (existingClaim.Value == claimValue)
+            {
+                return;
+            }
+
+            await _userManager.ReplaceClaimAsync(user, existingClaim, newClaim);
+        }
+
+        private void DeleteOwnedProfileImage(string? imageUrl)
+        {
+            if (string.IsNullOrWhiteSpace(imageUrl) ||
+                !imageUrl.StartsWith("/images/User/Profile/uploads/", StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+
+            var relativePath = imageUrl.TrimStart('/').Replace('/', Path.DirectorySeparatorChar);
+            var absolutePath = Path.Combine(_environment.WebRootPath, relativePath);
+
+            if (System.IO.File.Exists(absolutePath))
+            {
+                System.IO.File.Delete(absolutePath);
+            }
         }
 
         private IActionResult RedirectToLocalOrBookDetail(string? returnUrl, int bookId)
