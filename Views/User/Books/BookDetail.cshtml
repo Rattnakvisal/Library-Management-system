@@ -55,8 +55,31 @@
                 @description
             </p>
 
+            @if (TempData["BookReviewSuccess"] is string reviewSuccess && !string.IsNullOrWhiteSpace(reviewSuccess))
+            {
+                <div class="alert alert-success py-2 px-3 mb-3" role="alert">@reviewSuccess</div>
+            }
+            @if (TempData["BookReviewError"] is string reviewError && !string.IsNullOrWhiteSpace(reviewError))
+            {
+                <div class="alert alert-danger py-2 px-3 mb-3" role="alert">@reviewError</div>
+            }
+
             <div class="btn-group-custom">
-                <button type="button" class="btn-read">Read</button>
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <button type="button" class="btn-read" data-bs-toggle="modal" data-bs-target="#bookFeedbackModal">
+                        Feedback
+                    </button>
+                }
+                else
+                {
+                    <a class="btn-read text-decoration-none d-inline-flex align-items-center justify-content-center"
+                       asp-area="Identity"
+                       asp-page="/Account/Login"
+                       asp-route-returnUrl="@returnUrl">
+                        Feedback
+                    </a>
+                }
                 <form method="post" asp-controller="Home" asp-action="AddToCart" asp-route-bookId="@book.Id"
                       class="d-inline">
                     @Html.AntiForgeryToken()
@@ -155,3 +178,72 @@
         </div>
     </section>
 </div>
+
+@if (User.Identity?.IsAuthenticated == true)
+{
+    <div class="modal fade" id="bookFeedbackModal" tabindex="-1" aria-labelledby="bookFeedbackModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content review-modal">
+                <div class="modal-body p-4 p-md-5">
+                    <h2 class="review-title" id="bookFeedbackModalLabel">Your Feedback</h2>
+                    <p class="review-subtitle">Please rate the quality of the book you received.</p>
+
+                    <form method="post" asp-controller="Home" asp-action="SubmitBookReview">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="bookId" value="@book.Id" />
+                        <input type="hidden" name="returnUrl" value="@returnUrl" />
+                        <input type="hidden" name="rating" id="selectedRatingInput" value="5" />
+
+                        <div class="review-stars" id="feedbackStars" role="group" aria-label="Book rating">
+                            @for (var i = 1; i <= 5; i++)
+                            {
+                                <button type="button" class="star-btn active" data-rating="@i" aria-label="Rate @i star(s)">
+                                    <i class="bi bi-star-fill"></i>
+                                </button>
+                            }
+                        </div>
+
+                        <div class="review-bottom">
+                            <div class="review-user">
+                                <span class="review-avatar">
+                                    <i class="bi bi-person-fill"></i>
+                                </span>
+                                <span>@(User.Identity?.Name ?? "User")</span>
+                            </div>
+                            <button type="submit" class="btn-submit-review">Submit</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        (function () {
+            const starsWrap = document.getElementById('feedbackStars');
+            const ratingInput = document.getElementById('selectedRatingInput');
+            if (!starsWrap || !ratingInput) return;
+
+            const starButtons = Array.from(starsWrap.querySelectorAll('.star-btn'));
+
+            const paintStars = (rating) => {
+                starButtons.forEach((btn) => {
+                    const value = Number(btn.dataset.rating || 0);
+                    btn.classList.toggle('active', value <= rating);
+                });
+            };
+
+            starButtons.forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    const rating = Number(btn.dataset.rating || 5);
+                    ratingInput.value = String(rating);
+                    paintStars(rating);
+                });
+            });
+
+            paintStars(Number(ratingInput.value || 5));
+        })();
+    </script>
+}

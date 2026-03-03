@@ -18,9 +18,10 @@ public class ManageFeedbackController : Controller
     }
 
     [HttpGet("admin/managefeedback")]
-    public async Task<IActionResult> Index(string? q = null, int page = 1)
+    public async Task<IActionResult> Index(string? q = null, string? rq = null, int page = 1)
     {
         var search = (q ?? string.Empty).Trim();
+        var reviewSearch = (rq ?? string.Empty).Trim();
         var pageIndex = Math.Max(1, page);
 
         var query = _context.ContactMessages.AsNoTracking().AsQueryable();
@@ -52,15 +53,47 @@ public class ManageFeedbackController : Controller
             .AsNoTracking()
             .CountAsync(x => !x.IsRead);
 
+        var reviewQuery = _context.BookReviews
+            .AsNoTracking()
+            .Include(x => x.Book)
+            .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(reviewSearch))
+        {
+            reviewQuery = reviewQuery.Where(x =>
+                x.Username.Contains(reviewSearch) ||
+                x.Email.Contains(reviewSearch) ||
+                (x.Book != null && x.Book.Title.Contains(reviewSearch)));
+        }
+
+        var reviews = await reviewQuery
+            .OrderByDescending(x => x.CreatedDate)
+            .Select(x => new ManageFeedbackBookReviewItemViewModel
+            {
+                Id = x.Id,
+                BookId = x.BookId,
+                CoverImageUrl = x.Book != null && !string.IsNullOrWhiteSpace(x.Book.ImageUrl)
+                    ? x.Book.ImageUrl
+                    : "/images/User/Book/book2.png",
+                Title = x.Book != null ? x.Book.Title : "(Deleted book)",
+                Username = x.Username,
+                Email = x.Email,
+                Rating = x.Rating,
+                CreatedDate = x.CreatedDate
+            })
+            .ToListAsync();
+
         var model = new ManageFeedbackPageViewModel
         {
             Search = search,
+            ReviewSearch = reviewSearch,
             CurrentPage = pageIndex,
             TotalPages = totalPages,
             PageSize = DefaultPageSize,
             TotalMessages = totalMessages,
             UnreadMessages = unreadMessages,
-            Messages = messages
+            Messages = messages,
+            BookReviews = reviews
         };
 
         return View("~/Views/Admin/ManageFeedback/Index.cshtml", model);
@@ -68,7 +101,7 @@ public class ManageFeedbackController : Controller
 
     [HttpPost("admin/managefeedback/read/{id:int}")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> MarkAsRead(int id, string? q = null, int page = 1)
+    public async Task<IActionResult> MarkAsRead(int id, string? q = null, string? rq = null, int page = 1)
     {
         var message = await _context.ContactMessages.FirstOrDefaultAsync(x => x.Id == id);
         if (message != null && !message.IsRead)
@@ -77,12 +110,12 @@ public class ManageFeedbackController : Controller
             await _context.SaveChangesAsync();
         }
 
-        return RedirectToAction(nameof(Index), new { q, page });
+        return RedirectToAction(nameof(Index), new { q, rq, page });
     }
 
     [HttpPost("admin/managefeedback/mark-all-read")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> MarkAllAsRead(string? q = null, int page = 1)
+    public async Task<IActionResult> MarkAllAsRead(string? q = null, string? rq = null, int page = 1)
     {
         var unreadMessages = await _context.ContactMessages
             .Where(x => !x.IsRead)
@@ -98,12 +131,12 @@ public class ManageFeedbackController : Controller
             await _context.SaveChangesAsync();
         }
 
-        return RedirectToAction(nameof(Index), new { q, page });
+        return RedirectToAction(nameof(Index), new { q, rq, page });
     }
 
     [HttpPost("admin/managefeedback/delete/{id:int}")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Delete(int id, string? q = null, int page = 1)
+    public async Task<IActionResult> Delete(int id, string? q = null, string? rq = null, int page = 1)
     {
         var message = await _context.ContactMessages.FirstOrDefaultAsync(x => x.Id == id);
         if (message != null)
@@ -112,6 +145,6 @@ public class ManageFeedbackController : Controller
             await _context.SaveChangesAsync();
         }
 
-        return RedirectToAction(nameof(Index), new { q, page });
+        return RedirectToAction(nameof(Index), new { q, rq, page });
     }
 }

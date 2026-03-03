@@ -21,5 +21,6 @@ namespace Library_Management_system.Models
         public int Rating { get; set; }
         public string? CreatedBy { get; set; }
         public DateTime? CreatedDate { get; set; }
+        public ICollection<BookReview> Reviews { get; set; } = new List<BookReview>();
     }
 }

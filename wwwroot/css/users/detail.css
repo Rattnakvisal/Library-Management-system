@@ -132,6 +132,11 @@ body {
     color: var(--navy);
 }
 
+.btn-read:hover {
+    background: #f6f8fb;
+    color: var(--navy);
+}
+
 .btn-cart {
     background: var(--navy);
     color: #fff;
@@ -427,6 +432,23 @@ body {
     .related-card-img {
         height: 150px;
     }
+
+    .review-title {
+        font-size: 1.55rem;
+    }
+
+    .star-btn {
+        font-size: 1.7rem;
+    }
+
+    .review-bottom {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .btn-submit-review {
+        width: 100%;
+    }
 }
 
 .book-detail-page.motion-enabled .detail-cover {
@@ -483,6 +505,85 @@ body {
 
 .book-detail-page .detail-related-card:hover .related-card-img {
     transform: scale(1.03);
+}
+
+.review-modal {
+    border: 2px solid #3ba4f5;
+    border-radius: 14px;
+}
+
+.review-title {
+    text-align: center;
+    font-weight: 800;
+    font-size: 2rem;
+    margin-bottom: 2px;
+    color: #1e293b;
+}
+
+.review-subtitle {
+    text-align: center;
+    color: #5b6676;
+    margin-bottom: 18px;
+}
+
+.review-stars {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 4px 0 22px;
+}
+
+.star-btn {
+    border: none;
+    background: transparent;
+    color: #d6dee8;
+    font-size: 2rem;
+    line-height: 1;
+    padding: 2px;
+    cursor: pointer;
+}
+
+.star-btn.active {
+    color: #f1b400;
+}
+
+.review-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.review-user {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    color: #475569;
+    font-weight: 600;
+}
+
+.review-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 999px;
+    background: #e2e8f0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #64748b;
+}
+
+.btn-submit-review {
+    border: none;
+    background: #0a4fb3;
+    color: #fff;
+    border-radius: 11px;
+    padding: 9px 22px;
+    font-weight: 700;
+}
+
+.btn-submit-review:hover {
+    background: #094191;
 }
 
 @keyframes detailCoverReveal {

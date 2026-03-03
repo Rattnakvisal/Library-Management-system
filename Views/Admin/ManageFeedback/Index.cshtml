@@ -24,6 +24,7 @@
             <form method="post" asp-controller="ManageFeedback" asp-action="MarkAllAsRead">
                 @Html.AntiForgeryToken()
                 <input type="hidden" name="q" value="@Model.Search" />
+                <input type="hidden" name="rq" value="@Model.ReviewSearch" />
                 <input type="hidden" name="page" value="@Model.CurrentPage" />
                 <button type="submit" class="mark-all-btn" @(Model.UnreadMessages == 0 ? "disabled" : null)>
                     Mark all as read
@@ -86,6 +87,7 @@
                                                       asp-route-id="@item.Id" class="mark-read-form">
                                                     @Html.AntiForgeryToken()
                                                     <input type="hidden" name="q" value="@Model.Search" />
+                                                    <input type="hidden" name="rq" value="@Model.ReviewSearch" />
                                                     <input type="hidden" name="page" value="@Model.CurrentPage" />
                                                     <button type="submit" class="mark-read-btn">Mark read</button>
                                                 </form>
@@ -103,6 +105,7 @@
                                                   data-feedback-email="@item.Email">
                                                 @Html.AntiForgeryToken()
                                                 <input type="hidden" name="q" value="@Model.Search" />
+                                                <input type="hidden" name="rq" value="@Model.ReviewSearch" />
                                                 <input type="hidden" name="page" value="@Model.CurrentPage" />
                                                 <button type="submit" class="delete-feedback-btn">
                                                     <i class="bi bi-trash"></i>
@@ -124,20 +127,20 @@
                         <ul class="pagination justify-content-end">
                             <li class="page-item @(Model.HasPreviousPage ? null : "disabled")">
                                 <a class="page-link"                                  asp-controller="ManageFeedback" asp-action="Index"
-                                   asp-route-q="@Model.Search"     asp-route-page="@(Model.CurrentPage - 1)">Previous</a>
+                                   asp-route-q="@Model.Search" asp-route-rq="@Model.ReviewSearch" asp-route-page="@(Model.CurrentPage - 1)">Previous</a>
                             </li>
 
                             @for (var pageNumber = startPage; pageNumber <= endPage; pageNumber++)
                             {
                                 <li class="page-item @(pageNumber == Model.CurrentPage ? "active" : null)">
                                     <a class="page-link"                                       asp-controller="ManageFeedback"          asp-action="Index"
-                                       asp-route-q="@Model.Search"                      asp-route-page="@pageNumber">@pageNumber</a>
+                                       asp-route-q="@Model.Search" asp-route-rq="@Model.ReviewSearch" asp-route-page="@pageNumber">@pageNumber</a>
                                 </li>
                             }
 
                             <li class="page-item @(Model.HasNextPage ? null : "disabled")">
                                 <a class="page-link"         asp-controller="ManageFeedback"           asp-action="Index"
-                                   asp-route-q="@Model.Search"               asp-route-page="@(Model.CurrentPage + 1)">Next</a>
+                                   asp-route-q="@Model.Search" asp-route-rq="@Model.ReviewSearch" asp-route-page="@(Model.CurrentPage + 1)">Next</a>
                             </li>
                         </ul>
                     </nav>
@@ -151,9 +154,15 @@
             <h2 class="section-title">Book Review</h2>
         </div>
 
-        <form action="" class="search-form" id="book-review-search">
+        <form method="get" asp-controller="ManageFeedback" asp-action="Index" class="search-form" id="book-review-search">
             <i class="bi bi-search search-icon" id="book-review-icon"></i>
-            <input type="text" placeholder="Search book review..." class="search-input" id="book-review-input" />
+            <input type="hidden" name="q" value="@Model.Search" />
+            <input type="text"
+                   name="rq"
+                   value="@Model.ReviewSearch"
+                   placeholder="Search book review..."
+                   class="search-input"
+                   id="book-review-input" />
         </form>
 
         <div class="table-container">
@@ -171,9 +180,34 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td colspan="7" class="text-center py-4">No book reviews available yet.</td>
-                        </tr>
+                        @if (Model.BookReviews.Count == 0)
+                        {
+                            <tr>
+                                <td colspan="7" class="text-center py-4">No book reviews available yet.</td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @for (var i = 0; i < Model.BookReviews.Count; i++)
+                            {
+                                var review = Model.BookReviews[i];
+                                <tr>
+                                    <td>@(i + 1)</td>
+                                    <td>
+                                        <img src="@Url.Content(review.CoverImageUrl)" alt="@review.Title cover" class="book-cover" />
+                                    </td>
+                                    <td>@review.Title</td>
+                                    <td>@review.Username</td>
+                                    <td>@review.Email</td>
+                                    <td>
+                                        <span class="rating-pill">
+                                            @review.Rating / 5
+                                        </span>
+                                    </td>
+                                    <td>@review.CreatedDate.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
+                                </tr>
+                            }
+                        }
                     </tbody>
                 </table>
             </div>

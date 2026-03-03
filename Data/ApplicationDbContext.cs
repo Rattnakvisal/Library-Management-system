@@ -18,6 +18,7 @@ namespace Library_Management_system.Data
         public DbSet<BorrowingRecord> BorrowingRecords { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<ContactMessage> ContactMessages { get; set; }
+        public DbSet<BookReview> BookReviews { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -27,6 +28,19 @@ namespace Library_Management_system.Data
             {
                 entity.HasIndex(x => new { x.OwnerKey, x.BookId }).IsUnique();
                 entity.Property(x => x.OwnerKey).HasMaxLength(200);
+            });
+
+            builder.Entity<BookReview>(entity =>
+            {
+                entity.HasIndex(x => new { x.BookId, x.UserId }).IsUnique();
+                entity.Property(x => x.UserId).HasMaxLength(450);
+                entity.Property(x => x.Username).HasMaxLength(150);
+                entity.Property(x => x.Email).HasMaxLength(256);
+
+                entity.HasOne(x => x.Book)
+                    .WithMany(x => x.Reviews)
+                    .HasForeignKey(x => x.BookId)
+                    .OnDelete(DeleteBehavior.Cascade);
             });
         }
     }

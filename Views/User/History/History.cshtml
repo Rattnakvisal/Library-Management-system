@@ -33,111 +33,109 @@
 
                     <div class="summary-row mb-4">
                         <span class="small">Late return fee ($1/day):</span>
-                        <span class="fw-bold">$@Model.EstimatedFine.ToString("0.00",
-                                                        CultureInfo.InvariantCulture)</span>
-                        </div>
+                        <span class="fw-bold">$@Model.EstimatedFine.ToString("0.00", CultureInfo.InvariantCulture)</span>
+                    </div>
 
-                        <button type="button" class="btn btn-light w-100 fw-bold mb-2 py-2" style="color: #1e293b;">
-                            Read Term and Condition
-                        </button>
+                    <button type="button" class="btn btn-light w-100 fw-bold mb-2 py-2 summary-terms-btn">
+                        Read Term and Condition
+                    </button>
 
-                        <div class="text-center">
-                            <small class="gold-text">*Term and Condition Applied</small>
-                        </div>
+                    <div class="text-center">
+                        <small class="gold-text">*Term and Condition Applied</small>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <div class="history-list">
-                @if (Model.Items.Any())
+        <div class="history-list">
+            @if (Model.Items.Any())
+            {
+                @foreach (var item in Model.Items)
                 {
-                    @foreach (var item in Model.Items)
-                    {
-                        var yearText = item.Year > 0 ? item.Year.ToString(CultureInfo.InvariantCulture) : "N/A";
-                        var borrowDateText = item.BorrowDate.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture);
-                        var dueDateText = item.DueDate.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture);
-                        var returnDateText = item.ReturnDate.HasValue
-                            ? item.ReturnDate.Value.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture)
-                            : "-";
+                    var yearText = item.Year > 0 ? item.Year.ToString(CultureInfo.InvariantCulture) : "N/A";
+                    var borrowDateText = item.BorrowDate.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture);
+                    var dueDateText = item.DueDate.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture);
+                    var returnDateText = item.ReturnDate.HasValue
+                        ? item.ReturnDate.Value.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture)
+                        : "-";
 
-                        <article class="history-card shadow-sm">
-                            <div class="row g-0 align-items-center">
-                                <div class="col-auto">
-                                    <div class="thumb">
-                                        <img src="@Url.Content(item.ImageUrl)" alt="@item.Title cover" />
-                                    </div>
+                    <article class="history-card shadow-sm">
+                        <div class="row g-0 align-items-center">
+                            <div class="col-auto history-thumb-col">
+                                <div class="thumb">
+                                    <img src="@Url.Content(item.ImageUrl)" alt="@item.Title cover" />
                                 </div>
+                            </div>
 
-                                <div class="col">
-                                    <div class="px-3 py-3">
-                                        <h5 class="book-name mb-1">@item.Title</h5>
-                                        <div class="small text-muted2">Author: @item.Author</div>
-                                        <div class="small text-muted2">Publish Year: @yearText</div>
-                                        <div class="small text-muted2">Book Code: @item.BookCode</div>
+                            <div class="col history-book-col">
+                                <div class="px-3 py-3">
+                                    <h5 class="book-name mb-1">@item.Title</h5>
+                                    <div class="small text-muted2">Author: @item.Author</div>
+                                    <div class="small text-muted2">Publish Year: @yearText</div>
+                                    <div class="small text-muted2">Book Code: @item.BookCode</div>
 
-                                        <div class="stars mt-2" aria-label="Book rating">
-                                            @for (var i = 0; i < 5; i++)
-                                            {
-                                                if (i < item.Rating)
-                                                {
-                                                    <i class="bi bi-star-fill"></i>
-                                                }
-                                                else
-                                                {
-                                                    <i class="bi bi-star"></i>
-                                                }
-                                            }
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-4">
-                                    <div class="status-box px-3 py-3">
-                                        <div class="small">
-                                            <span class="label">Status:</span>
-                                            <span class="status @item.Status">@item.StatusLabel</span>
-                                        </div>
-                                        <div class="small text-muted2 mt-1">Borrow Date: @borrowDateText</div>
-                                        <div class="small text-muted2">Due Date: @dueDateText</div>
-                                        <div class="small text-muted2">Return Date: @returnDateText</div>
-                                        @if (item.LateDays > 0)
+                                    <div class="stars mt-2" aria-label="Book rating">
+                                        @for (var i = 0; i < 5; i++)
                                         {
-                                            <div class="small text-danger mt-1">
-                                                Late @item.LateDays day(s) | Fine: $@item.FineAmount.ToString("0.00",
-                                                                                CultureInfo.InvariantCulture)
-                                            </div>
+                                            if (i < item.Rating)
+                                            {
+                                                <i class="bi bi-star-fill"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="bi bi-star"></i>
+                                            }
                                         }
                                     </div>
                                 </div>
                             </div>
-                        </article>
-                    }
-                }
-                else
-                {
-                    <article class="history-card shadow-sm">
-                        <div class="empty-state">
-                            No borrowing history found yet.
+
+                            <div class="col-lg-4 history-status-col">
+                                <div class="status-box px-3 py-3">
+                                    <div class="small">
+                                        <span class="label">Status:</span>
+                                        <span class="status @item.Status">@item.StatusLabel</span>
+                                    </div>
+                                    <div class="small text-muted2 mt-1">Borrow Date: @borrowDateText</div>
+                                    <div class="small text-muted2">Due Date: @dueDateText</div>
+                                    <div class="small text-muted2">Return Date: @returnDateText</div>
+                                    @if (item.LateDays > 0)
+                                    {
+                                        <div class="small text-danger mt-1">
+                                            Late @item.LateDays day(s) | Fine: $@item.FineAmount.ToString("0.00", CultureInfo.InvariantCulture)
+                                        </div>
+                                    }
+                                </div>
+                            </div>
                         </div>
                     </article>
                 }
-            </div>
+            }
+            else
+            {
+                <article class="history-card shadow-sm">
+                    <div class="empty-state">
+                        No borrowing history found yet.
+                    </div>
+                </article>
+            }
         </div>
-    </section>
+    </div>
+</section>
 
-    @section Scripts {
-        <script>
-                $(function () {
-                    $("#toggleSummary").on("click", function (e) {
-                        e.stopPropagation();
-                        $("#summaryDetails").fadeToggle(180);
-                    });
+@section Scripts {
+    <script>
+        $(function () {
+            $("#toggleSummary").on("click", function (e) {
+                e.stopPropagation();
+                $("#summaryDetails").fadeToggle(180);
+            });
 
-                    $(document).on("click", function (e) {
-                        if (!$(e.target).closest(".summary-dropdown").length) {
-                            $("#summaryDetails").fadeOut(180);
-                        }
-                    });
-                });
-        </script>
-    }
+            $(document).on("click", function (e) {
+                if (!$(e.target).closest(".summary-dropdown").length) {
+                    $("#summaryDetails").fadeOut(180);
+                }
+            });
+        });
+    </script>
+}

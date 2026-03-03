@@ -745,6 +745,70 @@ namespace Library_Management_system.Controllers
             return View("~/Views/User/Books/BookDetail.cshtml", model);
         }
 
+        [HttpPost("book/review")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SubmitBookReview(int bookId, int rating, string? returnUrl = null)
+        {
+            if (rating < 1 || rating > 5)
+            {
+                TempData["BookReviewError"] = "Please select a rating between 1 and 5 stars.";
+                return RedirectToLocalOrBookDetail(returnUrl, bookId);
+            }
+
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                var safeReturnUrl = string.IsNullOrWhiteSpace(returnUrl)
+                    ? Url.Action(nameof(BookDetail), new { id = bookId }) ?? "/"
+                    : returnUrl;
+
+                return RedirectToPage("/Account/Login", new { area = "Identity", returnUrl = safeReturnUrl });
+            }
+
+            var book = await _context.Books.FirstOrDefaultAsync(x => x.Id == bookId);
+            if (book == null)
+            {
+                TempData["BookReviewError"] = "Book not found.";
+                return RedirectToLocalOrBookDetail(returnUrl, bookId);
+            }
+
+            var existingReview = await _context.BookReviews
+                .FirstOrDefaultAsync(x => x.BookId == bookId && x.UserId == user.Id);
+
+            if (existingReview == null)
+            {
+                _context.BookReviews.Add(new BookReview
+                {
+                    BookId = bookId,
+                    UserId = user.Id,
+                    Username = string.IsNullOrWhiteSpace(user.FullName) ? (user.UserName ?? "User") : user.FullName,
+                    Email = user.Email ?? string.Empty,
+                    Rating = rating,
+                    CreatedDate = DateTime.UtcNow
+                });
+            }
+            else
+            {
+                existingReview.Rating = rating;
+                existingReview.Username = string.IsNullOrWhiteSpace(user.FullName) ? (user.UserName ?? "User") : user.FullName;
+                existingReview.Email = user.Email ?? string.Empty;
+                existingReview.CreatedDate = DateTime.UtcNow;
+            }
+
+            await _context.SaveChangesAsync();
+
+            var averageRating = await _context.BookReviews
+                .AsNoTracking()
+                .Where(x => x.BookId == bookId)
+                .AverageAsync(x => (double)x.Rating);
+
+            book.Rating = (int)Math.Round(averageRating, MidpointRounding.AwayFromZero);
+            await _context.SaveChangesAsync();
+
+            TempData["BookReviewSuccess"] = "Thank you! Your feedback was submitted.";
+            return RedirectToLocalOrBookDetail(returnUrl, bookId);
+        }
+
         public IActionResult Privacy()
         {
             return View();
