@@ -303,7 +303,13 @@
 
     <section class="restricted-section" style="margin-top:18px;">
         <div class="quick-panel">
-            <h4 class="panel-title">Restricted Members</h4>
+            <div class="panel-head">
+                <h4 class="panel-title">Restricted Members</h4>
+                <span class="pill danger">
+                    <i class="bi bi-shield-exclamation"></i>
+                    @Model.RestrictedMembersCount restricted
+                </span>
+            </div>
 
             <div class="table-wrap">
                 <table class="dash-table">
@@ -311,19 +317,37 @@
                         <tr>
                             <th style="width:160px;">MEMBER ID</th>
                             <th>NAME</th>
+                            <th>EMAIL</th>
+                            <th style="width:190px;">RESTRICTED UNTIL</th>
                             <th style="width:120px;" class="text-center">ACTION</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>0007331</td>
-                            <td>Chun Rattnakvisal</td>
-                            <td class="text-center">
-                                <button type="button" class="pg" aria-label="View restriction">
-                                    <i class="bi bi-exclamation-circle"></i>
-                                </button>
-                            </td>
-                        </tr>
+                        @if (Model.RestrictedMembers.Any())
+                        {
+                            foreach (var member in Model.RestrictedMembers)
+                            {
+                                <tr>
+                                    <td>@member.MemberId</td>
+                                    <td>@member.FullName</td>
+                                    <td>@(string.IsNullOrWhiteSpace(member.Email) ? "-" : member.Email)</td>
+                                    <td>@member.RestrictedUntilUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
+                                    <td class="text-center">
+                                        <a class="ico-btn"
+                                           aria-label="Open user management"
+                                           href="@Url.Action("Index", "ManageUser", new { search = member.FullName })">
+                                            <i class="bi bi-box-arrow-up-right"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-4">No restricted members.</td>
+                            </tr>
+                        }
                     </tbody>
                 </table>
             </div>

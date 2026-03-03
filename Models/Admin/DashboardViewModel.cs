@@ -6,6 +6,7 @@ namespace Library_Management_system.Models.Admin
         public int BorrowedBooks { get; set; }
         public int TotalUsers { get; set; }
         public decimal TotalFines { get; set; }
+        public int RestrictedMembersCount { get; set; }
         public IReadOnlyList<DashboardOverdueBorrowingItemViewModel> OverdueBorrowings { get; set; } =
             Array.Empty<DashboardOverdueBorrowingItemViewModel>();
         public IReadOnlyList<DashboardRecentBorrowingItemViewModel> RecentBorrowings { get; set; } =
@@ -18,6 +19,8 @@ namespace Library_Management_system.Models.Admin
             Array.Empty<DashboardNewMemberItemViewModel>();
         public IReadOnlyList<DashboardNewBookItemViewModel> NewBooks { get; set; } =
             Array.Empty<DashboardNewBookItemViewModel>();
+        public IReadOnlyList<DashboardRestrictedMemberItemViewModel> RestrictedMembers { get; set; } =
+            Array.Empty<DashboardRestrictedMemberItemViewModel>();
     }
 
     public sealed class DashboardCategoryChartItemViewModel
@@ -42,6 +45,14 @@ namespace Library_Management_system.Models.Admin
         public string CategoryName { get; set; } = string.Empty;
         public string ImageUrl { get; set; } = string.Empty;
         public DateTime? CreatedDate { get; set; }
+    }
+
+    public sealed class DashboardRestrictedMemberItemViewModel
+    {
+        public string MemberId { get; set; } = string.Empty;
+        public string FullName { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public DateTimeOffset RestrictedUntilUtc { get; set; }
     }
 
     public sealed class DashboardOverdueBorrowingItemViewModel

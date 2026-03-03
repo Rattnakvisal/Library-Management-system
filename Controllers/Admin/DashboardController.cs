@@ -12,6 +12,8 @@ namespace Library_Management_system.Controllers.Admin
     {
         private const int QuickActionsLimit = 5;
         private const decimal FinePerLateDay = 1.00m;
+        private const string GenderClaimType = "Gender";
+        private const string UserCodeClaimType = "UserCode";
         private readonly ApplicationDbContext _context;
 
         public DashboardController(ApplicationDbContext context)
@@ -24,6 +26,7 @@ namespace Library_Management_system.Controllers.Admin
             var totalBooks = await _context.Books.CountAsync();
             var totalUsers = await _context.Users.CountAsync();
             var utcToday = DateTime.UtcNow.Date;
+            var utcNowOffset = DateTimeOffset.UtcNow;
 
             var latestUsers = await _context.Users
                 .AsNoTracking()
@@ -35,7 +38,7 @@ namespace Library_Management_system.Controllers.Admin
             var userIds = latestUsers.Select(u => u.Id).ToList();
             var genderClaims = await _context.UserClaims
                 .AsNoTracking()
-                .Where(c => userIds.Contains(c.UserId) && c.ClaimType == "Gender")
+                .Where(c => userIds.Contains(c.UserId) && c.ClaimType == GenderClaimType)
                 .ToListAsync();
 
             var genderByUser = genderClaims
@@ -50,6 +53,39 @@ namespace Library_Management_system.Controllers.Admin
                     PhoneNumber = u.PhoneNumber ?? string.Empty,
                     Email = u.Email ?? string.Empty,
                     CreatedDate = u.CreatedDate
+                })
+                .ToList();
+
+            var restrictedMembersCount = await _context.Users
+                .AsNoTracking()
+                .CountAsync(u => u.LockoutEnabled && u.LockoutEnd.HasValue && u.LockoutEnd > utcNowOffset);
+
+            var restrictedUsers = await _context.Users
+                .AsNoTracking()
+                .Where(u => u.LockoutEnabled && u.LockoutEnd.HasValue && u.LockoutEnd > utcNowOffset)
+                .OrderByDescending(u => u.LockoutEnd)
+                .ThenBy(u => u.FullName)
+                .ThenBy(u => u.Id)
+                .Take(QuickActionsLimit)
+                .ToListAsync();
+
+            var restrictedUserIds = restrictedUsers.Select(u => u.Id).ToList();
+            var memberIdClaims = await _context.UserClaims
+                .AsNoTracking()
+                .Where(c => restrictedUserIds.Contains(c.UserId) && c.ClaimType == UserCodeClaimType)
+                .ToListAsync();
+
+            var memberIdByUser = memberIdClaims
+                .GroupBy(c => c.UserId)
+                .ToDictionary(g => g.Key, g => g.Last().ClaimValue ?? string.Empty);
+
+            var restrictedMembers = restrictedUsers
+                .Select(u => new DashboardRestrictedMemberItemViewModel
+                {
+                    MemberId = NormalizeMemberId(memberIdByUser.TryGetValue(u.Id, out var code) ? code : string.Empty, u.Id),
+                    FullName = string.IsNullOrWhiteSpace(u.FullName) ? u.UserName ?? "Unknown" : u.FullName,
+                    Email = u.Email ?? string.Empty,
+                    RestrictedUntilUtc = u.LockoutEnd ?? DateTimeOffset.UtcNow
                 })
                 .ToList();
 
@@ -163,12 +199,14 @@ namespace Library_Management_system.Controllers.Admin
                 TotalUsers = totalUsers,
                 BorrowedBooks = borrowedBooks,
                 TotalFines = totalFines,
+                RestrictedMembersCount = restrictedMembersCount,
                 OverdueBorrowings = overdueBorrowings,
                 RecentBorrowings = recentBorrowings,
                 BorrowingTrends = borrowingTrends,
                 CategoryDistribution = categoryDistribution,
                 NewMembers = newMembers,
-                NewBooks = newBooks
+                NewBooks = newBooks,
+                RestrictedMembers = restrictedMembers
             };
 
             return View("~/Views/Admin/Dashboard/Index.cshtml", model);
@@ -210,6 +248,38 @@ namespace Library_Management_system.Controllers.Admin
             }
 
             return "Unspecified";
+        }
+
+        private static string NormalizeMemberId(string? rawCode, string userId)
+        {
+            var digits = new string((rawCode ?? string.Empty).Where(char.IsDigit).ToArray());
+            if (digits.Length == 7)
+            {
+                return digits;
+            }
+
+            if (digits.Length > 7)
+            {
+                return digits[^7..];
+            }
+
+            if (digits.Length > 0)
+            {
+                return digits.PadLeft(7, '0');
+            }
+
+            var hash = 0;
+            foreach (var ch in userId)
+            {
+                hash = ((hash * 31) + ch) % 10000000;
+            }
+
+            if (hash < 0)
+            {
+                hash *= -1;
+            }
+
+            return hash.ToString("D7");
         }
     }
 }
