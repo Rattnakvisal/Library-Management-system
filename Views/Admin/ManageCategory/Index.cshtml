@@ -37,10 +37,7 @@
     <section class="controls-section">
         <form method="get" class="search-form">
             <i class="bi bi-search search-icon"></i>
-            <input type="text"
-                   name="q"
-                   class="search-input"
-                   placeholder="Search category..."
+            <input type="text" name="q" class="search-input" placeholder="Search category..."
                    value="@Context.Request.Query["q"]" />
         </form>
         <div class="action-controls">
@@ -58,55 +55,51 @@
     <section class="table-container">
         <div class="table-responsive">
             <table class="table book-table align-middle category-table">
-            <thead>
-                <tr>
-                    <th>Category</th>
-                    <th style="width:130px;">Books</th>
-                    <th style="width:170px;">Created By</th>
-                    <th style="width:180px;">Created Date</th>
-                    <th style="width:140px; text-align:center;">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (Model != null && Model.Any())
-                {
-                    @foreach (var category in Model)
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th style="width:130px;">Books</th>
+                        <th style="width:170px;">Created By</th>
+                        <th style="width:180px;">Created Date</th>
+                        <th style="width:140px; text-align:center;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
                     {
-                        <tr data-category-name="@category.Name">
-                            <td>
-                                <span class="category-name">@category.Name</span>
-                            </td>
-                            <td>
-                                <span class="book-count-pill">@category.BookCount</span>
-                            </td>
-                            <td>@(string.IsNullOrWhiteSpace(category.CreatedBy) ? "-" : category.CreatedBy)</td>
-                            <td>@(category.CreatedDate?.ToLocalTime().ToString("yyyy-MM-dd HH:mm") ?? "-")</td>
-                            <td>
-                                <div class="action-container">
-                                    <button type="button"
-                                            class="edit-book-btn rename-category-btn"
-                                            data-category-name="@category.Name"
-                                            title="Rename @category.Name">
-                                        <i class="bi bi-pencil-square"></i>
-                                    </button>
-                                    <button type="button"
-                                            class="delete-book-btn delete-category-btn"
-                                            data-category-name="@category.Name"
-                                            title="Delete @category.Name">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </div>
-                            </td>
+                        @foreach (var category in Model)
+                        {
+                            <tr data-category-name="@category.Name">
+                                <td>
+                                    <span class="category-name">@category.Name</span>
+                                </td>
+                                <td>
+                                    <span class="book-count-pill">@category.BookCount</span>
+                                </td>
+                                <td>@(string.IsNullOrWhiteSpace(category.CreatedBy) ? "-" : category.CreatedBy)</td>
+                                <td>@(category.CreatedDate?.ToLocalTime().ToString("yyyy-MM-dd HH:mm") ?? "-")</td>
+                                <td>
+                                    <div class="action-container">
+                                        <button type="button" class="edit-book-btn rename-category-btn"
+                                                data-category-name="@category.Name" title="Rename @category.Name">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </button>
+                                        <button type="button" class="delete-book-btn delete-category-btn"
+                                                data-category-name="@category.Name" title="Delete @category.Name">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="5" class="text-center text-muted py-4">No categories found.</td>
                         </tr>
                     }
-                }
-                else
-                {
-                    <tr>
-                        <td colspan="5" class="text-center text-muted py-4">No categories found.</td>
-                    </tr>
-                }
-            </tbody>
+                </tbody>
             </table>
         </div>
     </section>

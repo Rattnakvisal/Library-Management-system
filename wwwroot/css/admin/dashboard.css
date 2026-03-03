@@ -1,612 +1,612 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 
 :root {
-  --navy: #1f4a73;
-  --navy-dark: #163a5a;
+    --navy: #1f4a73;
+    --navy-dark: #163a5a;
 
-  --bg: #f4f6f8;
-  --panel: #ffffff;
+    --bg: #f4f6f8;
+    --panel: #ffffff;
 
-  --text: #0f2138;
-  --muted: #64748b;
+    --text: #0f2138;
+    --muted: #64748b;
 
-  --line: #dfe6ee;
+    --line: #dfe6ee;
 
-  --shadow-sm: 0 4px 10px rgba(15, 33, 56, 0.08);
-  --shadow: 0 10px 22px rgba(15, 33, 56, 0.12);
-  --shadow-lg: 0 18px 44px rgba(15, 33, 56, 0.18);
+    --shadow-sm: 0 4px 10px rgba(15, 33, 56, 0.08);
+    --shadow: 0 10px 22px rgba(15, 33, 56, 0.12);
+    --shadow-lg: 0 18px 44px rgba(15, 33, 56, 0.18);
 
-  --radius: 14px;
-  --radius-sm: 12px;
+    --radius: 14px;
+    --radius-sm: 12px;
 
-  --focus: 0 0 0 0.2rem rgba(31, 74, 115, 0.18);
+    --focus: 0 0 0 0.2rem rgba(31, 74, 115, 0.18);
 }
 
 *,
 *::before,
 *::after {
-  box-sizing: border-box;
+    box-sizing: border-box;
 }
 
 /* =========================================================
    PAGE BASE
 ========================================================= */
 body {
-  background:
-    radial-gradient(1200px 600px at 15% 0%,
-      rgba(31, 74, 115, 0.1),
-      transparent 60%),
-    radial-gradient(900px 520px at 90% 10%,
-      rgba(58, 139, 209, 0.12),
-      transparent 55%),
-    var(--bg);
+    background:
+        radial-gradient(1200px 600px at 15% 0%,
+            rgba(31, 74, 115, 0.1),
+            transparent 60%),
+        radial-gradient(900px 520px at 90% 10%,
+            rgba(58, 139, 209, 0.12),
+            transparent 55%),
+        var(--bg);
 }
 
 .dashboard-page {
-  max-width: 1280px;
-  font-family: "Inter", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  color: var(--text);
-  padding-top: 6px;
+    max-width: 1200px;
+    font-family: "Inter", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--text);
+    padding-top: 6px;
 }
 
 /* =========================================================
    HEADER
 ========================================================= */
 .dash-header {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 12px 12px 0;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 12px 0;
 }
 
 .dash-header .welcome {
-  font-size: 28px;
-  font-weight: 800;
-  margin: 0;
-  letter-spacing: -0.02em;
-  line-height: 1.1;
+    font-size: 28px;
+    font-weight: 800;
+    margin: 0;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
 }
 
 .dash-header .date-line {
-  margin-top: 6px;
-  color: var(--navy);
-  font-weight: 600;
-  font-size: 13px;
-  display: inline-flex;
-  gap: 8px;
-  align-items: center;
+    margin-top: 6px;
+    color: var(--navy);
+    font-weight: 600;
+    font-size: 13px;
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
 }
 
 .divider {
-  height: 1px;
-  background: rgba(15, 33, 56, 0.12);
-  opacity: 0.7;
-  margin: 14px 0 18px;
+    height: 1px;
+    background: rgba(15, 33, 56, 0.12);
+    opacity: 0.7;
+    margin: 14px 0 18px;
 }
 
 /* =========================================================
    SUMMARY CARDS
 ========================================================= */
 .summary-row {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 18px;
-  margin-bottom: 18px;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 18px;
+    margin-bottom: 18px;
 }
 
 .sum-card {
-  background: linear-gradient(180deg, #fff, #fbfdff);
-  border: 1px solid rgba(15, 33, 56, 0.1);
-  border-radius: 16px;
-  box-shadow: 0 14px 28px rgba(15, 33, 56, 0.1);
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 14px;
-  min-height: 104px;
-  position: relative;
-  overflow: hidden;
-  transition:
-    transform 0.15s ease,
-    box-shadow 0.15s ease,
-    border-color 0.15s ease;
+    background: linear-gradient(180deg, #fff, #fbfdff);
+    border: 1px solid rgba(15, 33, 56, 0.1);
+    border-radius: 16px;
+    box-shadow: 0 14px 28px rgba(15, 33, 56, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px;
+    min-height: 104px;
+    position: relative;
+    overflow: hidden;
+    transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease,
+        border-color 0.15s ease;
 }
 
 .sum-card::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(500px 120px at 0% 0%,
-      rgba(31, 74, 115, 0.08),
-      transparent 60%);
-  pointer-events: none;
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(500px 120px at 0% 0%,
+            rgba(31, 74, 115, 0.08),
+            transparent 60%);
+    pointer-events: none;
 }
 
 .sum-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 22px 52px rgba(15, 33, 56, 0.16);
-  border-color: rgba(31, 74, 115, 0.24);
+    transform: translateY(-3px);
+    box-shadow: 0 22px 52px rgba(15, 33, 56, 0.16);
+    border-color: rgba(31, 74, 115, 0.24);
 }
 
 .sum-icon {
-  width: 62px;
-  height: 62px;
-  border-radius: 16px;
-  background: linear-gradient(135deg,
-      rgba(191, 225, 251, 0.9),
-      rgba(231, 243, 255, 0.95));
-  border: 1px solid rgba(31, 74, 115, 0.12);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 16px 24px rgba(31, 74, 115, 0.14);
-  flex: 0 0 auto;
+    width: 62px;
+    height: 62px;
+    border-radius: 16px;
+    background: linear-gradient(135deg,
+            rgba(191, 225, 251, 0.9),
+            rgba(231, 243, 255, 0.95));
+    border: 1px solid rgba(31, 74, 115, 0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 16px 24px rgba(31, 74, 115, 0.14);
+    flex: 0 0 auto;
 }
 
 .sum-icon i {
-  font-size: 26px;
-  color: #0f172a;
-  font-weight: 400;
+    font-size: 26px;
+    color: #0f172a;
+    font-weight: 400;
 }
 
 .sum-info {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 }
 
 .sum-title {
-  font-weight: 900;
-  font-size: 12px;
-  letter-spacing: 0.08em;
-  color: var(--muted);
-  text-transform: uppercase;
+    font-weight: 900;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    text-transform: uppercase;
 }
 
 .sum-value {
-  font-weight: 900;
-  font-size: 22px;
-  color: var(--text);
-  line-height: 1.1;
+    font-weight: 900;
+    font-size: 22px;
+    color: var(--text);
+    line-height: 1.1;
 }
 
 /* =========================================================
    QUICK PANELS + TABS (Premium)
 ========================================================= */
 .quick-title {
-  font-size: 18px;
-  font-weight: 800;
-  margin: 10px 0 8px;
+    font-size: 18px;
+    font-weight: 800;
+    margin: 10px 0 8px;
 }
 
 .quick-tabs {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 12px;
-  flex-wrap: wrap;
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
 
-  border: 1px solid rgba(15, 33, 56, 0.1);
-  border-radius: 16px;
-  padding: 6px;
-  background: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(15, 33, 56, 0.1);
+    border-radius: 16px;
+    padding: 6px;
+    background: rgba(255, 255, 255, 0.7);
 }
 
 .qtab {
-  background: transparent;
-  border: none;
-  padding: 9px 14px;
-  font-weight: 900;
-  font-size: 13px;
-  color: #111827;
-  cursor: pointer;
-  border-radius: 14px;
-  transition:
-    background 0.15s ease,
-    color 0.15s ease;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
+    background: transparent;
+    border: none;
+    padding: 9px 14px;
+    font-weight: 900;
+    font-size: 13px;
+    color: #111827;
+    cursor: pointer;
+    border-radius: 14px;
+    transition:
+        background 0.15s ease,
+        color 0.15s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .qtab:hover {
-  background: rgba(31, 74, 115, 0.06);
-  color: var(--navy);
+    background: rgba(31, 74, 115, 0.06);
+    color: var(--navy);
 }
 
 .qtab.active {
-  background: rgba(31, 74, 115, 0.12);
-  color: var(--navy);
+    background: rgba(31, 74, 115, 0.12);
+    color: var(--navy);
 }
 
 .qtab.active::after {
-  display: none;
+    display: none;
 }
 
 .qtab-badge {
-  min-width: 20px;
-  height: 20px;
-  padding: 0 6px;
-  border-radius: 999px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 11px;
-  font-weight: 800;
-  background: rgba(31, 74, 115, 0.14);
-  color: var(--navy);
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 800;
+    background: rgba(31, 74, 115, 0.14);
+    color: var(--navy);
 }
 
 .quick-panel {
-  background: rgba(255, 255, 255, 0.92);
-  border: 1px solid rgba(15, 33, 56, 0.1);
-  border-radius: 18px;
-  box-shadow: 0 14px 32px rgba(15, 33, 56, 0.1);
-  padding: 14px;
-  position: relative;
-  overflow: hidden;
-  backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(15, 33, 56, 0.1);
+    border-radius: 18px;
+    box-shadow: 0 14px 32px rgba(15, 33, 56, 0.1);
+    padding: 14px;
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
 }
 
 .panel-title {
-  font-weight: 900;
-  font-size: 16px;
-  margin: 6px 0 14px;
+    font-weight: 900;
+    font-size: 16px;
+    margin: 6px 0 14px;
 }
 
 .panel-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
 }
 
 .panel-head .panel-title {
-  margin: 0;
+    margin: 0;
 }
 
 .quick-add-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  text-decoration: none;
-  font-size: 13px;
-  font-weight: 800;
-  color: #fff;
-  background: var(--navy);
-  border: 1px solid var(--navy);
-  border-radius: 12px;
-  padding: 8px 12px;
-  box-shadow: 0 10px 18px rgba(31, 74, 115, 0.16);
-  transition:
-    transform 0.15s ease,
-    box-shadow 0.15s ease,
-    background 0.15s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 800;
+    color: #fff;
+    background: var(--navy);
+    border: 1px solid var(--navy);
+    border-radius: 12px;
+    padding: 8px 12px;
+    box-shadow: 0 10px 18px rgba(31, 74, 115, 0.16);
+    transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease,
+        background 0.15s ease;
 }
 
 .quick-add-btn:hover {
-  color: #fff;
-  background: var(--navy-dark);
-  border-color: var(--navy-dark);
-  transform: translateY(-1px);
-  box-shadow: 0 14px 22px rgba(31, 74, 115, 0.22);
+    color: #fff;
+    background: var(--navy-dark);
+    border-color: var(--navy-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 14px 22px rgba(31, 74, 115, 0.22);
 }
 
 .qtab-content {
-  display: none;
+    display: none;
 }
 
 .qtab-content.show {
-  display: block;
+    display: block;
 }
 
 /* =========================================================
    TABLES
 ========================================================= */
 .table-wrap {
-  border-radius: 14px;
-  overflow: hidden;
-  border: 1px solid rgba(15, 33, 56, 0.1);
-  box-shadow: 0 10px 22px rgba(15, 33, 56, 0.08);
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid rgba(15, 33, 56, 0.1);
+    box-shadow: 0 10px 22px rgba(15, 33, 56, 0.08);
 }
 
 .dash-table {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-  background: #fff;
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: #fff;
 }
 
 .dash-table thead th {
-  background: #f3f6fa;
-  font-size: 12.5px;
-  font-weight: 900;
-  letter-spacing: 0.02em;
-  padding: 12px;
-  border-bottom: 1px solid #dbe3ec;
-  color: #1f2937;
-  white-space: nowrap;
+    background: #f3f6fa;
+    font-size: 12.5px;
+    font-weight: 900;
+    letter-spacing: 0.02em;
+    padding: 12px;
+    border-bottom: 1px solid #dbe3ec;
+    color: #1f2937;
+    white-space: nowrap;
 }
 
 .dash-table tbody td {
-  padding: 12px;
-  font-size: 13px;
-  border-bottom: 1px solid rgba(15, 33, 56, 0.08);
-  color: #0f172a;
-  vertical-align: middle;
+    padding: 12px;
+    font-size: 13px;
+    border-bottom: 1px solid rgba(15, 33, 56, 0.08);
+    color: #0f172a;
+    vertical-align: middle;
 }
 
 .dash-table tbody tr:hover {
-  background: rgba(31, 74, 115, 0.04);
+    background: rgba(31, 74, 115, 0.04);
 }
 
 .dash-table tbody tr:last-child td {
-  border-bottom: none;
+    border-bottom: none;
 }
 
 .book-img {
-  width: 28px;
-  height: 36px;
-  border-radius: 10px;
-  border: 1px solid #d8e0e8;
-  box-shadow: 0 14px 26px rgba(15, 33, 56, 0.14);
+    width: 28px;
+    height: 36px;
+    border-radius: 10px;
+    border: 1px solid #d8e0e8;
+    box-shadow: 0 14px 26px rgba(15, 33, 56, 0.14);
 }
 
 /* Status text */
 .status {
-  font-weight: 900;
-  font-size: 12px;
+    font-weight: 900;
+    font-size: 12px;
 }
 
 .status.pending {
-  color: #b45309;
+    color: #b45309;
 }
 
 .status.borrowing {
-  color: #1e40af;
+    color: #1e40af;
 }
 
 .status.active {
-  color: #166534;
+    color: #166534;
 }
 
 .status.overdue {
-  color: #b91c1c;
+    color: #b91c1c;
 }
 
 .status.returned {
-  color: #334155;
+    color: #334155;
 }
 
 /* icon buttons */
 .ico-btn {
-  width: 36px;
-  height: 36px;
-  border-radius: 12px;
-  border: 1px solid rgba(15, 33, 56, 0.12);
-  background: #fff;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 4px;
-  cursor: pointer;
-  box-shadow: 0 10px 20px rgba(15, 33, 56, 0.1);
-  transition:
-    transform 0.12s ease,
-    box-shadow 0.12s ease,
-    border-color 0.12s ease;
+    width: 36px;
+    height: 36px;
+    border-radius: 12px;
+    border: 1px solid rgba(15, 33, 56, 0.12);
+    background: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 4px;
+    cursor: pointer;
+    box-shadow: 0 10px 20px rgba(15, 33, 56, 0.1);
+    transition:
+        transform 0.12s ease,
+        box-shadow 0.12s ease,
+        border-color 0.12s ease;
 }
 
 .ico-btn:hover {
-  transform: translateY(-1px);
-  border-color: rgba(31, 74, 115, 0.5);
-  box-shadow: 0 16px 30px rgba(15, 33, 56, 0.14);
+    transform: translateY(-1px);
+    border-color: rgba(31, 74, 115, 0.5);
+    box-shadow: 0 16px 30px rgba(15, 33, 56, 0.14);
 }
 
 .ico-btn i {
-  font-size: 18px;
-  color: #111827;
+    font-size: 18px;
+    color: #111827;
 }
 
 /* =========================================================
    PILLS
 ========================================================= */
 .pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  border-radius: 999px;
-  padding: 6px 12px;
-  font-size: 11px;
-  font-weight: 900;
-  border: 1px solid transparent;
-  white-space: nowrap;
-  box-shadow: 0 10px 18px rgba(15, 33, 56, 0.08);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-size: 11px;
+    font-weight: 900;
+    border: 1px solid transparent;
+    white-space: nowrap;
+    box-shadow: 0 10px 18px rgba(15, 33, 56, 0.08);
 }
 
 .pill i {
-  font-size: 12px;
-  font-weight: 400;
+    font-size: 12px;
+    font-weight: 400;
 }
 
 .pill.danger {
-  background: #fee2e2;
-  color: #991b1b;
-  border-color: #fca5a5;
+    background: #fee2e2;
+    color: #991b1b;
+    border-color: #fca5a5;
 }
 
 .pill.warn {
-  background: #fff7ed;
-  color: #9a3412;
-  border-color: #fdba74;
+    background: #fff7ed;
+    color: #9a3412;
+    border-color: #fdba74;
 }
 
 /* =========================
    PAGINATION
 ========================= */
 .pagination-wrapper {
-  padding: 12px;
+    padding: 12px;
 }
 
 .pagination {
-  margin: 0;
+    margin: 0;
 }
 
 .page-link {
-  border: 1px solid #3a3a3a;
-  color: #2b2b2b;
-  font-size: 12px;
-  padding: 6px 12px;
-  border-radius: 0 !important;
+    border: 1px solid #3a3a3a;
+    color: #2b2b2b;
+    font-size: 12px;
+    padding: 6px 12px;
+    border-radius: 0 !important;
 }
 
 .page-item.active .page-link {
-  background: var(--navy);
-  border-color: #3a3a3a;
-  color: #fff;
+    background: var(--navy);
+    border-color: #3a3a3a;
+    color: #fff;
 }
 
 .page-item .page-link:hover {
-  background: #f4f6f8;
+    background: #f4f6f8;
 }
 
 /* =========================================================
    CHARTS GRID
 ========================================================= */
 .charts-row {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
-  margin: 18px 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    margin: 18px 0;
 }
 
 .chart-col {
-  min-width: 0;
+    min-width: 0;
 }
 
 .charts-row .quick-panel {
-  min-height: 340px;
-  display: flex;
-  flex-direction: column;
+    min-height: 340px;
+    display: flex;
+    flex-direction: column;
 }
 
 .charts-row .panel-body {
-  flex: 1 1 auto;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding-top: 6px;
-  min-width: 0;
+    flex: 1 1 auto;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding-top: 6px;
+    min-width: 0;
 }
 
 .charts-row .chart-area {
-  flex: 0 0 420px;
-  max-width: 420px;
-  min-width: 0;
+    flex: 0 0 420px;
+    max-width: 420px;
+    min-width: 0;
 }
 
 .charts-row .chart-area.full {
-  flex: 1 1 auto;
-  max-width: 100%;
+    flex: 1 1 auto;
+    max-width: 100%;
 }
 
 .charts-row canvas {
-  width: 100% !important;
-  height: 220px !important;
-  display: block;
+    width: 100% !important;
+    height: 220px !important;
+    display: block;
 }
 
 .legend-area {
-  flex: 1 1 auto;
-  min-width: 0;
+    flex: 1 1 auto;
+    min-width: 0;
 }
 
 .legend {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 0 8px;
+    list-style: none;
+    padding: 0;
+    margin: 0 0 0 8px;
 }
 
 .legend li {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin: 8px 0;
-  font-size: 13px;
-  font-weight: 800;
-  color: #0f172a;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 8px 0;
+    font-size: 13px;
+    font-weight: 800;
+    color: #0f172a;
 }
 
 .legend .legend-empty {
-  color: #64748b;
-  font-weight: 700;
+    color: #64748b;
+    font-weight: 700;
 }
 
 .dot {
-  width: 14px;
-  height: 14px;
-  border-radius: 4px;
-  display: inline-block;
+    width: 14px;
+    height: 14px;
+    border-radius: 4px;
+    display: inline-block;
 }
 
 .dot.edu {
-  background: #8b5e53;
+    background: #8b5e53;
 }
 
 .dot.art {
-  background: #1534ff;
+    background: #1534ff;
 }
 
 .dot.rel {
-  background: #1dd13a;
+    background: #1dd13a;
 }
 
 .dot.other {
-  background: #ff2b2b;
+    background: #ff2b2b;
 }
 
 /* =========================================================
    RESPONSIVE
 ========================================================= */
 @media (max-width: 992px) {
-  .summary-row {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+    .summary-row {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
 
-  .charts-row {
-    grid-template-columns: 1fr;
-  }
+    .charts-row {
+        grid-template-columns: 1fr;
+    }
 
-  .charts-row .panel-body {
-    flex-direction: column;
-    align-items: stretch;
-  }
+    .charts-row .panel-body {
+        flex-direction: column;
+        align-items: stretch;
+    }
 
-  .charts-row .chart-area {
-    flex: 1 1 auto;
-    max-width: 100%;
-  }
+    .charts-row .chart-area {
+        flex: 1 1 auto;
+        max-width: 100%;
+    }
 
-  .legend {
-    margin-left: 0;
-  }
+    .legend {
+        margin-left: 0;
+    }
 }
 
 @media (max-width: 576px) {
-  .summary-row {
-    grid-template-columns: 1fr;
-  }
+    .summary-row {
+        grid-template-columns: 1fr;
+    }
 
-  .dash-header {
-    padding: 8px 6px 0;
-  }
+    .dash-header {
+        padding: 8px 6px 0;
+    }
 
-  .dash-header .welcome {
-    font-size: 22px;
-  }
+    .dash-header .welcome {
+        font-size: 22px;
+    }
 
-  .sum-card {
-    border-radius: 14px;
-  }
+    .sum-card {
+        border-radius: 14px;
+    }
 }
