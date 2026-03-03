@@ -54,6 +54,8 @@ img {
     background: rgba(255, 255, 255, 0.98);
     backdrop-filter: blur(8px);
     box-shadow: 0 20px 40px rgba(6, 24, 44, 0.22);
+    overflow: hidden;
+    isolation: isolate;
     z-index: 1200;
     display: grid;
     grid-template-columns: auto 1fr;
@@ -69,6 +71,24 @@ img {
     transition: opacity 0.35s ease, transform 0.35s ease, filter 0.35s ease;
 }
 
+.cookie-consent::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(110deg,
+            rgba(255, 255, 255, 0) 0%,
+            rgba(198, 155, 50, 0.16) 45%,
+            rgba(255, 255, 255, 0) 70%);
+    transform: translateX(-130%);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.cookie-consent>* {
+    position: relative;
+    z-index: 1;
+}
+
 .cookie-consent.show {
     opacity: 1;
     transform: translate(-50%, 0);
@@ -77,8 +97,18 @@ img {
     animation: cookieConsentIn 0.46s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
+.cookie-consent.show::before {
+    opacity: 1;
+    animation: cookieSurfaceSweep 1.35s cubic-bezier(0.22, 0.61, 0.36, 1) 0.1s both;
+}
+
 .cookie-consent.is-hiding {
     animation: cookieConsentOut 0.22s ease forwards;
+}
+
+.cookie-consent.is-hiding::before {
+    opacity: 0;
+    animation: none;
 }
 
 .cookie-consent__dismiss {
@@ -124,7 +154,6 @@ img {
     padding-right: 34px;
     opacity: 0;
     transform: translateY(10px);
-    transition: opacity 0.35s ease 0.1s, transform 0.35s ease 0.1s;
 }
 
 .cookie-consent__eyebrow {
@@ -171,13 +200,19 @@ img {
     flex-wrap: wrap;
     opacity: 0;
     transform: translateY(10px);
-    transition: opacity 0.35s ease 0.18s, transform 0.35s ease 0.18s;
 }
 
-.cookie-consent.show .cookie-consent__content,
+.cookie-consent.show .cookie-consent__content {
+    animation: cookieContentRise 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.06s both;
+}
+
 .cookie-consent.show .cookie-consent__actions {
-    opacity: 1;
-    transform: translateY(0);
+    animation: cookieActionsRise 0.48s cubic-bezier(0.16, 1, 0.3, 1) 0.14s both;
+}
+
+.cookie-consent.is-hiding .cookie-consent__content,
+.cookie-consent.is-hiding .cookie-consent__actions {
+    animation: cookieContentOut 0.18s ease both;
 }
 
 .cookie-consent__btn {
@@ -193,6 +228,20 @@ img {
     align-items: center;
     gap: 6px;
     transition: all 0.2s ease, transform 0.22s ease;
+}
+
+.cookie-consent.show .cookie-consent__btn {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+    animation: cookieButtonPop 0.38s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.cookie-consent.show .cookie-consent__btn:nth-child(1) {
+    animation-delay: 0.2s;
+}
+
+.cookie-consent.show .cookie-consent__btn:nth-child(2) {
+    animation-delay: 0.26s;
 }
 
 .cookie-consent__btn--primary {
@@ -252,6 +301,75 @@ img {
     }
 }
 
+@keyframes cookieSurfaceSweep {
+    0% {
+        transform: translateX(-130%);
+        opacity: 0;
+    }
+
+    15% {
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateX(130%);
+        opacity: 0;
+    }
+}
+
+@keyframes cookieContentRise {
+    0% {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes cookieActionsRise {
+    0% {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes cookieContentOut {
+    0% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+}
+
+@keyframes cookieButtonPop {
+    0% {
+        opacity: 0;
+        transform: translateY(8px) scale(0.98);
+    }
+
+    75% {
+        opacity: 1;
+        transform: translateY(-1px) scale(1.01);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
 @keyframes cookieIconPulse {
     0%,
     100% {
@@ -308,6 +426,7 @@ img {
 
 @media (prefers-reduced-motion: reduce) {
     .cookie-consent,
+    .cookie-consent::before,
     .cookie-consent__content,
     .cookie-consent__actions,
     .cookie-consent__btn {

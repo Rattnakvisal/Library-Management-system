@@ -20,13 +20,13 @@
     var returnUrl = $"{Context.Request.Path}{Context.Request.QueryString}";
 }
 
-<div class="page-wrap">
-    <div class="row g-5 align-items-start">
+<div id="bookDetailPage" class="page-wrap book-detail-page">
+    <div class="row g-5 align-items-start detail-top">
         <div class="col-12 col-md-4">
-            <img src="@imagePath" class="main-img cover-sm" alt="@book.Title">
+            <img src="@imagePath" class="main-img cover-sm detail-cover" alt="@book.Title">
         </div>
 
-        <div class="col-12 col-md-8">
+        <div class="col-12 col-md-8 detail-content">
             <div class="detail-header d-flex justify-content-between align-items-start gap-3">
                 <div>
                     <h1 class="book-title">@book.Title</h1>
@@ -89,7 +89,7 @@
                 <button type="button" class="btn-share-circle" aria-label="share"><i class="bi bi-share"></i></button>
             </div>
 
-            <div class="info-bar">
+            <div class="info-bar detail-info-bar">
                 <div class="info-item">Total page: @totalPages</div>
                 <div class="info-item">Publish year: @publishYear</div>
                 <div class="info-item">Book code: @bookCode</div>
@@ -97,7 +97,7 @@
         </div>
     </div>
 
-    <section class="mt-5">
+    <section class="mt-5 detail-related">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h3 class="fw-bold text-navy mb-0">You might also like:</h3>
         </div>
@@ -113,7 +113,7 @@
                     var relatedRating = Math.Clamp(relatedBook.Rating, 0, 5);
 
                     <div class="col">
-                        <div class="card book-card border-0 shadow-sm h-100 position-relative">
+                        <div class="card book-card detail-related-card border-0 shadow-sm h-100 position-relative">
                             <div class="card-img-wrapper p-2">
                                 <img src="@relatedImagePath" class="card-img-top rounded related-card-img" alt="@relatedBook.Title">
                             </div>

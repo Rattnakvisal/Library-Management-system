@@ -4,19 +4,19 @@
 }
 
 <!-- CONTACT PAGE WRAPPER (960px) -->
-<div class="contact-wrapper">
+<div id="contactPage" class="contact-wrapper contact-page">
     <input type="hidden" id="contact-success-message" value="@TempData["ContactSuccess"]" />
     <input type="hidden" id="contact-error-message" value="@TempData["ContactError"]" />
 
     <!-- MAP -->
-    <div class="contact-map">
+    <div class="contact-map contact-reveal">
         <iframe src="https://www.google.com/maps?q=ACLEDA%20University%20of%20Business&output=embed"
                 loading="lazy">
         </iframe>
     </div>
 
     <!-- CONTACT INFO -->
-    <div class="contact-info">
+    <div class="contact-info contact-reveal">
 
         <h4>Ms. Tang Siveng - Head of AUB Career Center</h4>
         <p><i class="bi bi-telephone"></i> 0886006130</p>
@@ -42,7 +42,7 @@
     </div>
 
     <!-- FEEDBACK FORM -->
-    <div class="contact-form">
+    <div class="contact-form contact-reveal">
 
         <h4>Feedback Form</h4>
 
@@ -69,7 +69,7 @@
     </div>
 
     <!-- SOCIAL MEDIA -->
-    <div class="contact-social">
+    <div class="contact-social contact-reveal">
         <p>CONNECT WITH US ON</p>
 
         <a href="https://www.facebook.com/ACLEDAUniversity" target="_blank">

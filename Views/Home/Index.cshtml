@@ -3,8 +3,8 @@
 }
 
 <!-- Slide Show -->
-<div class="container px-0">
-    <div id="heroCarousel" class="carousel slide mx-2" data-bs-ride="carousel">
+<div id="homePage" class="container px-0 home-page">
+    <div id="heroCarousel" class="carousel slide mx-2 home-hero" data-bs-ride="carousel">
 
         <div class="carousel-indicators custom-indicators">
             <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active"
@@ -32,7 +32,7 @@
     </div>
 <!-- slide show end -->
 <!-- categories -->
-<section class="container-fluid mt-4">
+<section class="container-fluid mt-4 home-section">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h3 class="fw-bold text-navy">Book Categories</h3>
             <a asp-controller="Home" asp-action="BookIndex" class="btn btn-outline-secondary btn-sm">
@@ -69,7 +69,7 @@
 <!-- categories end -->
 
 <!-- Top Trending Books -->
-<section class="container-fluid mt-4">
+<section class="container-fluid mt-4 home-section">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h3 class="fw-bold text-navy">Top Trending</h3>
     </div>
@@ -212,7 +212,7 @@
 <!-- Top Trending Books End -->
 
 <!-- author by genre section -->
-    <section class="container-fluid mt-4">
+    <section class="container-fluid mt-4 home-section">
     <h3 class="fw-bold mb-4 text-navy">Author by Geners</h3>
 
     <div class="d-flex flex-nowrap overflow-auto gap-3 pb-3 custom-scrollbar">
@@ -266,7 +266,7 @@
 <!-- author by genre section end -->
 
 <!-- New arrival section -->
-<section class="container-fluid mt-4">
+<section class="container-fluid mt-4 home-section">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h3 class="fw-bold text-navy">New Arrival</h3>
         <button class="btn btn-outline-secondary btn-sm">Explore more</button>
@@ -411,71 +411,7 @@
 </section>
 </div>
 
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-
-        const buttons = document.querySelectorAll('.wishlist-btn');
-
-        buttons.forEach(button => {
-
-            const bookId = button.getAttribute('data-id');
-
-            let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
-
-            if (favorites.includes(bookId)) {
-                button.classList.add('active');
-                button.querySelector('i').classList.add('text-danger');
-            }
-
-            button.addEventListener('click', function () {
-
-                let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
-
-                if (favorites.includes(bookId)) {
-                    favorites = favorites.filter(id => id !== bookId);
-                    this.classList.remove('active');
-                    this.querySelector('i').classList.remove('text-danger');
-                } else {
-                    favorites.push(bookId);
-                    this.classList.add('active');
-                    this.querySelector('i').classList.add('text-danger');
-                }
-
-                localStorage.setItem('favorites', JSON.stringify(favorites));
-            });
-        });
-
-    });
-</script>
-
-
-@* <script>
-        document.querySelectorAll('.wishlist-btn').forEach(button => {
-        button.addEventListener('click', function() {
-            this.classList.toggle('active');
-            const productId = this.getAttribute('data-id');
-
-            if (this.classList.contains('active')) {
-                addToFavorites(productId);
-            } else {
-                removeFromFavorites(productId);
-            }
-        });
-    });
-
-    function addToFavorites(id) {
-        let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
-        if (!favorites.includes(id)) {
-            favorites.push(id);
-            localStorage.setItem('favorites', JSON.stringify(favorites));
-        }
-    }
-
-    function removeFromFavorites(id) {
-        let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
-        favorites = favorites.filter(favId => favId !== id);
-        localStorage.setItem('favorites', JSON.stringify(favorites));
-    }
-
-</script> *@
+@section Scripts {
+    <script src="~/js/users/Home.js" asp-append-version="true"></script>
+}
 

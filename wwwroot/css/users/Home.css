@@ -1,5 +1,4 @@
-﻿
-:root {
+﻿:root {
     --primary-dark: #1a2b3c;
     --accent-gold: #c5a059;
 }
@@ -24,7 +23,7 @@ body {
 }
 
 .main-slider-img {
-    width : 960px !important;
+    width: 100% !important;
     height: 400px !important;
     border-radius: 0 !important;
 }
@@ -57,7 +56,7 @@ body {
 }
 
 .book-card:hover {
-        transform: translateY(-5px);
+    transform: translateY(-5px);
 }
 
 .badge-new {
@@ -72,6 +71,7 @@ body {
     width: calc(25% - 1rem);
     min-width: 200px;
 }
+
 .custom-card-img {
     width: 100%;
     height: 150px;
@@ -80,8 +80,8 @@ body {
 }
 
 .custom-scrollbar {
-    -ms-overflow-style: none; 
-    scrollbar-width: none; 
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 }
 
 .book-title {
@@ -132,19 +132,19 @@ body {
 .card-img-wrapper img {
     width: 100%;
     aspect-ratio: 2/3;
-    height: 220px; 
+    height: 220px;
     object-fit: cover;
     object-position: top;
 }
 
 .wishlist-btn:focus {
     outline: none;
-    box-shadow: none; 
+    box-shadow: none;
 }
 
 .wishlist-btn.active i {
-    color: #ff0000; 
-    opacity: 1 !important; 
+    color: #ff0000;
+    opacity: 1 !important;
 }
 
 @media (max-width: 576px) {
@@ -154,11 +154,131 @@ body {
 
     .book-title {
         font-size: 0.1rem;
-        line-clamp: 2; 
+        line-clamp: 2;
     }
 
     .badge {
         font-size: 0.7rem;
         padding: 4px 8px !important;
+    }
+}
+
+.home-page .home-hero {
+    opacity: 0;
+    transform: translateY(28px) scale(0.985);
+    filter: saturate(0.94);
+    will-change: transform, opacity, filter;
+}
+
+.home-page .home-hero.is-visible {
+    animation: homeHeroReveal 1s cubic-bezier(0.18, 0.9, 0.2, 1) both;
+}
+
+.home-page .home-section {
+    opacity: 0;
+    transform: translateY(38px);
+    will-change: transform, opacity;
+}
+
+.home-page .home-section.is-visible {
+    animation: homeSectionReveal 0.78s cubic-bezier(0.2, 0.84, 0.26, 1) both;
+}
+
+.home-page .home-section .reveal-card {
+    opacity: 0;
+    transform: translateY(22px) scale(0.985);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.home-page .home-section.is-visible .reveal-card {
+    animation: homeCardReveal 0.62s cubic-bezier(0.22, 0.9, 0.25, 1) both;
+    animation-delay: var(--stagger-delay, 0ms);
+}
+
+.home-page .book-card,
+.home-page .genre-card {
+    transform-origin: center;
+    backface-visibility: hidden;
+}
+
+.home-page .book-card:hover,
+.home-page .genre-card:hover {
+    transform: translateY(-6px) scale(1.01);
+    box-shadow: 0 14px 28px rgba(12, 42, 74, 0.16) !important;
+}
+
+.home-page .book-card .card-img-wrapper img,
+.home-page .genre-card .card-img {
+    transition: transform 0.45s ease;
+}
+
+.home-page .book-card:hover .card-img-wrapper img,
+.home-page .genre-card:hover .card-img {
+    transform: scale(1.04);
+}
+
+@keyframes homeHeroReveal {
+    0% {
+        opacity: 0;
+        transform: translateY(34px) scale(0.98);
+        filter: saturate(0.86);
+    }
+
+    65% {
+        opacity: 1;
+        transform: translateY(-2px) scale(1.002);
+        filter: saturate(1);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: saturate(1);
+    }
+}
+
+@keyframes homeSectionReveal {
+    0% {
+        opacity: 0;
+        transform: translateY(34px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes homeCardReveal {
+    0% {
+        opacity: 0;
+        transform: translateY(20px) scale(0.985);
+    }
+
+    70% {
+        opacity: 1;
+        transform: translateY(-2px) scale(1.006);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .home-page .home-hero,
+    .home-page .home-section,
+    .home-page .home-section .reveal-card,
+    .home-page .book-card,
+    .home-page .genre-card,
+    .home-page .book-card .card-img-wrapper img,
+    .home-page .genre-card .card-img {
+        animation: none !important;
+        transition: none !important;
+        transform: none !important;
+        opacity: 1 !important;
+        filter: none !important;
     }
 }

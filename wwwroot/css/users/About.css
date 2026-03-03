@@ -51,3 +51,89 @@ h5 {
     border-radius: 3px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
+
+.about-page.motion-enabled .about-hero {
+    opacity: 0;
+    transform: translateY(28px) scale(0.985);
+    filter: saturate(0.9);
+}
+
+.about-page.is-ready .about-hero {
+    animation: aboutHeroReveal 0.95s cubic-bezier(0.2, 0.85, 0.25, 1) both;
+}
+
+.about-page.motion-enabled .about-content>h2,
+.about-page.motion-enabled .about-content>p,
+.about-page.motion-enabled .about-content>ul,
+.about-page.motion-enabled .about-feature {
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.about-page .is-visible {
+    animation: aboutBlockReveal 0.62s cubic-bezier(0.2, 0.84, 0.26, 1) both;
+    animation-delay: var(--reveal-delay, 0ms);
+}
+
+.about-page .about-feature {
+    border-radius: 10px;
+    transition: transform 0.28s ease, box-shadow 0.28s ease;
+}
+
+.about-page .about-feature:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(12, 42, 74, 0.12);
+}
+
+.about-page .about-feature img {
+    transition: transform 0.35s ease;
+}
+
+.about-page .about-feature:hover img {
+    transform: scale(1.03);
+}
+
+@keyframes aboutHeroReveal {
+    0% {
+        opacity: 0;
+        transform: translateY(34px) scale(0.98);
+        filter: saturate(0.84);
+    }
+
+    70% {
+        opacity: 1;
+        transform: translateY(-2px) scale(1.003);
+        filter: saturate(1);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: saturate(1);
+    }
+}
+
+@keyframes aboutBlockReveal {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .about-page.motion-enabled .about-hero,
+    .about-page.motion-enabled .about-content>h2,
+    .about-page.motion-enabled .about-content>p,
+    .about-page.motion-enabled .about-content>ul,
+    .about-page.motion-enabled .about-feature {
+        opacity: 1 !important;
+        transform: none !important;
+        filter: none !important;
+        animation: none !important;
+    }
+}
