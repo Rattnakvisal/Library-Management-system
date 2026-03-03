@@ -1,75 +1,116 @@
 (function ($) {
-  var sampleData = {
-    borrowing: [
-      {
-        id: "009",
-        title: "Cambridge English for Engineering Students Book (SAE) with CDS(2)",
-        borrowDate: "11/14/25",
-        dueDate: "11/19/25",
-        status: "Borrowed",
-      },
-      {
-        id: "010",
-        title: "Learning ASP.NET Core",
-        borrowDate: "11/10/25",
-        dueDate: "11/17/25",
-        status: "Returned",
-      },
-      {
-        id: "011",
-        title: "C# in Depth",
-        borrowDate: "11/05/25",
-        dueDate: "11/12/25",
-        status: "Overdue",
-      },
-    ],
-    returns: [
-      {
-        id: "R-001",
-        title: "Cambridge English for Engineering Students Book (SAE) with CDS(2)",
-        user: "John Doe",
-        returnDate: "12/12/25",
-      },
-      {
-        id: "R-002",
-        title: "Learning ASP.NET Core",
-        user: "Jane Smith",
-        returnDate: "11/20/25",
-      },
-    ],
-    "most-borrowed": [
-      {
-        rank: 1,
-        title: "Cambridge English for Engineering Students Book (SAE) with CDS(2)",
-        category: "Education",
-        total: 90,
-      },
-      {
-        rank: 2,
-        title: "C# in Depth",
-        category: "Programming",
-        total: 64,
-      },
-    ],
-    "fine-collection": [
-      {
-        id: "F-001",
-        title: "Cambridge English for Engineering Students Book (SAE) with CDS(2)",
-        user: "John Doe",
-        amount: "$1.00",
-        paid: "Yes",
-        paidDate: "12/12/25",
-      },
-      {
-        id: "F-002",
-        title: "C# in Depth",
-        user: "Jane Smith",
-        amount: "$2.50",
-        paid: "No",
-        paidDate: "",
-      },
-    ],
+  var state = {
+    reportType: "borrowing",
+    fromDate: "",
+    toDate: "",
+    page: 1,
+    pageSize: 10,
+    totalRows: 0,
+    rows: [],
+    requestId: 0,
   };
+
+  var reportConfigs = {
+    borrowing: {
+      title: "Borrowing Report",
+      headers: [
+        { key: "id", label: "Borrow ID" },
+        { key: "title", label: "Book Title" },
+        { key: "borrowDate", label: "Borrow Date" },
+        { key: "dueDate", label: "Due Date" },
+        { key: "status", label: "Status", align: "text-end" },
+      ],
+      rowHtml: function (row) {
+        return (
+          "<tr>" +
+          "<td>" + escapeHtml(row.id) + "</td>" +
+          '<td><div class="book-title">' + escapeHtml(row.title) + "</div></td>" +
+          "<td>" + escapeHtml(row.borrowDate) + "</td>" +
+          "<td>" + escapeHtml(row.dueDate) + "</td>" +
+          '<td class="text-end">' + getStatusPill(row.status) + "</td>" +
+          "</tr>"
+        );
+      },
+      csvValues: function (row) {
+        return [row.id, row.title, row.borrowDate, row.dueDate, row.status];
+      },
+    },
+    returns: {
+      title: "Return Books Report",
+      headers: [
+        { key: "id", label: "Return ID" },
+        { key: "title", label: "Book Title" },
+        { key: "user", label: "User" },
+        { key: "returnDate", label: "Return Date" },
+        { key: "status", label: "Status", align: "text-end" },
+      ],
+      rowHtml: function (row) {
+        return (
+          "<tr>" +
+          "<td>" + escapeHtml(row.id) + "</td>" +
+          '<td><div class="book-title">' + escapeHtml(row.title) + "</div></td>" +
+          "<td>" + escapeHtml(row.user) + "</td>" +
+          "<td>" + escapeHtml(row.returnDate) + "</td>" +
+          '<td class="text-end">' + getStatusPill(row.status) + "</td>" +
+          "</tr>"
+        );
+      },
+      csvValues: function (row) {
+        return [row.id, row.title, row.user, row.returnDate, row.status];
+      },
+    },
+    "most-borrowed": {
+      title: "Most Borrowed Books Report",
+      headers: [
+        { key: "rank", label: "Rank" },
+        { key: "title", label: "Book Title" },
+        { key: "category", label: "Category" },
+        { key: "total", label: "Total Borrowed" },
+        { key: "status", label: "Status", align: "text-end" },
+      ],
+      rowHtml: function (row) {
+        return (
+          "<tr>" +
+          "<td>#" + escapeHtml(row.rank) + "</td>" +
+          '<td><div class="book-title">' + escapeHtml(row.title) + "</div></td>" +
+          "<td>" + escapeHtml(row.category) + "</td>" +
+          "<td>" + escapeHtml(row.total) + "</td>" +
+          '<td class="text-end">' + getStatusPill(row.status) + "</td>" +
+          "</tr>"
+        );
+      },
+      csvValues: function (row) {
+        return [row.rank, row.title, row.category, row.total, row.status];
+      },
+    },
+    "fine-collection": {
+      title: "Fine Collection Report",
+      headers: [
+        { key: "id", label: "Fine ID" },
+        { key: "title", label: "Book Title" },
+        { key: "user", label: "User" },
+        { key: "amount", label: "Amount" },
+        { key: "paid", label: "Paid", align: "text-end" },
+      ],
+      rowHtml: function (row) {
+        return (
+          "<tr>" +
+          "<td>" + escapeHtml(row.id) + "</td>" +
+          '<td><div class="book-title">' + escapeHtml(row.title) + "</div></td>" +
+          "<td>" + escapeHtml(row.user) + "</td>" +
+          "<td>" + formatCurrency(row.amount) + "</td>" +
+          '<td class="text-end">' + getStatusPill(row.paid) + "</td>" +
+          "</tr>"
+        );
+      },
+      csvValues: function (row) {
+        return [row.id, row.title, row.user, formatCurrency(row.amount), row.paid, row.paidDate || ""];
+      },
+    },
+  };
+
+  var $page = $(".dashboard-page[data-report-url]");
+  var reportUrl = $page.data("report-url") || "/admin/managereport/data";
 
   function escapeHtml(value) {
     return String(value || "")
@@ -80,120 +121,36 @@
       .replace(/'/g, "&#039;");
   }
 
+  function escapeCsv(value) {
+    var text = String(value == null ? "" : value);
+    return '"' + text.replace(/"/g, '""') + '"';
+  }
+
+  function formatCurrency(amount) {
+    var number = Number(amount || 0);
+    return "$" + number.toFixed(2);
+  }
+
   function getStatusPill(status) {
-    var normalized = String(status || "").toLowerCase();
+    var label = String(status || "");
+    var normalized = label.toLowerCase();
     var cssClass = "borrowed";
 
-    if (normalized === "returned" || normalized === "yes" || normalized === "paid") {
+    if (normalized === "returned" || normalized === "paid") {
       cssClass = "returned";
-    } else if (normalized === "overdue" || normalized === "no" || normalized === "unpaid") {
+    } else if (normalized === "overdue" || normalized === "unpaid") {
       cssClass = "overdue";
     }
 
-    return '<span class="status-pill ' + cssClass + '">' + escapeHtml(status) + "</span>";
+    return '<span class="status-pill ' + cssClass + '">' + escapeHtml(label) + "</span>";
   }
 
-  function setTableRows(type) {
-    var $thead = $(".report-table thead");
-    var $tbody = $(".report-table tbody");
-    var rows = sampleData[type] || [];
-    var headerHtml = "";
-    var bodyHtml = "";
-
-    if (type === "returns") {
-      headerHtml =
-        "<tr>" +
-        "<th>Return ID</th>" +
-        "<th>Book Title</th>" +
-        "<th>User</th>" +
-        "<th>Return Date</th>" +
-        '<th class="text-end">Status</th>' +
-        "</tr>";
-
-      for (var i = 0; i < rows.length; i += 1) {
-        bodyHtml +=
-          "<tr>" +
-          "<td>" + escapeHtml(rows[i].id) + "</td>" +
-          '<td><div class="book-title">' + escapeHtml(rows[i].title) + "</div></td>" +
-          "<td>" + escapeHtml(rows[i].user) + "</td>" +
-          "<td>" + escapeHtml(rows[i].returnDate) + "</td>" +
-          '<td class="text-end">' + getStatusPill("Returned") + "</td>" +
-          "</tr>";
-      }
-    } else if (type === "most-borrowed") {
-      headerHtml =
-        "<tr>" +
-        "<th>Rank</th>" +
-        "<th>Book Title</th>" +
-        "<th>Category</th>" +
-        "<th>Total Borrowed</th>" +
-        '<th class="text-end">Status</th>' +
-        "</tr>";
-
-      for (var j = 0; j < rows.length; j += 1) {
-        bodyHtml +=
-          "<tr>" +
-          "<td>#" + escapeHtml(rows[j].rank) + "</td>" +
-          '<td><div class="book-title">' + escapeHtml(rows[j].title) + "</div></td>" +
-          "<td>" + escapeHtml(rows[j].category) + "</td>" +
-          "<td>" + escapeHtml(rows[j].total) + "</td>" +
-          '<td class="text-end">' + getStatusPill("Borrowed") + "</td>" +
-          "</tr>";
-      }
-    } else if (type === "fine-collection") {
-      headerHtml =
-        "<tr>" +
-        "<th>Fine ID</th>" +
-        "<th>Book Title</th>" +
-        "<th>User</th>" +
-        "<th>Amount</th>" +
-        '<th class="text-end">Paid</th>' +
-        "</tr>";
-
-      for (var k = 0; k < rows.length; k += 1) {
-        var paidText = String(rows[k].paid || "").toLowerCase() === "yes" ? "Paid" : "Unpaid";
-
-        bodyHtml +=
-          "<tr>" +
-          "<td>" + escapeHtml(rows[k].id) + "</td>" +
-          '<td><div class="book-title">' + escapeHtml(rows[k].title) + "</div></td>" +
-          "<td>" + escapeHtml(rows[k].user) + "</td>" +
-          "<td>" + escapeHtml(rows[k].amount) + "</td>" +
-          '<td class="text-end">' + getStatusPill(paidText) + "</td>" +
-          "</tr>";
-      }
-    } else {
-      headerHtml =
-        "<tr>" +
-        "<th>Borrow ID</th>" +
-        "<th>Book Title</th>" +
-        "<th>Borrow Date</th>" +
-        "<th>Due Date</th>" +
-        '<th class="text-end">Status</th>' +
-        "</tr>";
-
-      for (var l = 0; l < rows.length; l += 1) {
-        bodyHtml +=
-          "<tr>" +
-          "<td>" + escapeHtml(rows[l].id) + "</td>" +
-          '<td><div class="book-title">' + escapeHtml(rows[l].title) + "</div></td>" +
-          "<td>" + escapeHtml(rows[l].borrowDate) + "</td>" +
-          "<td>" + escapeHtml(rows[l].dueDate) + "</td>" +
-          '<td class="text-end">' + getStatusPill(rows[l].status) + "</td>" +
-          "</tr>";
-      }
-    }
-
-    if (!rows.length) {
-      bodyHtml = '<tr><td colspan="5" class="text-center py-4">No report data found.</td></tr>';
-    }
-
-    $thead.html(headerHtml);
-    $tbody.html(bodyHtml);
+  function getReportConfig(type) {
+    return reportConfigs[type] || reportConfigs.borrowing;
   }
 
-  function renderReport(type) {
-    setTableRows(type || "borrowing");
+  function setSelectButtonText($button, text) {
+    $button.html('<span>' + escapeHtml(text) + '</span><i class="bi bi-chevron-down caret"></i>');
   }
 
   function closeAllSelects(exceptId) {
@@ -208,50 +165,376 @@
     });
   }
 
-  function initSelect(containerId, btnId) {
+  function toggleSelect(containerId) {
     var $container = $("#" + containerId);
-    var $btn = $("#" + btnId);
-    var $opts = $container.find(".options");
+    var isOpen = $container.hasClass("open");
 
-    $btn.on("click", function (e) {
-      e.preventDefault();
-      e.stopPropagation();
+    closeAllSelects(containerId);
 
-      var isOpen = $container.hasClass("open");
-      closeAllSelects(containerId);
+    if (!isOpen) {
+      $container.addClass("open");
+      $container.find(".options").show();
+    } else {
+      $container.removeClass("open");
+      $container.find(".options").hide();
+    }
+  }
 
-      if (!isOpen) {
-        $container.addClass("open");
-        $opts.show();
-      } else {
-        $container.removeClass("open");
-        $opts.hide();
+  function setLoadingState() {
+    var config = getReportConfig(state.reportType);
+    var columnCount = config.headers.length;
+
+    $(".report-table thead").html(renderTableHeader(config));
+    $(".report-table tbody").html(
+      '<tr><td colspan="' +
+        columnCount +
+        '" class="text-center py-4 text-muted">Loading report data...</td></tr>'
+    );
+    $("#reportMeta").text("Loading...");
+    $("#reportPagination").empty();
+  }
+
+  function renderTableHeader(config) {
+    var html = "<tr>";
+    for (var i = 0; i < config.headers.length; i += 1) {
+      var header = config.headers[i];
+      var alignClass = header.align ? " " + header.align : "";
+      html += '<th class="' + alignClass.trim() + '">' + escapeHtml(header.label) + "</th>";
+    }
+    html += "</tr>";
+    return html;
+  }
+
+  function renderTable(type, rows) {
+    var config = getReportConfig(type);
+    var $thead = $(".report-table thead");
+    var $tbody = $(".report-table tbody");
+
+    $thead.html(renderTableHeader(config));
+
+    if (!rows.length) {
+      $tbody.html(
+        '<tr><td colspan="' +
+          config.headers.length +
+          '" class="text-center py-4 text-muted">No report data found.</td></tr>'
+      );
+      return;
+    }
+
+    var bodyHtml = "";
+    for (var i = 0; i < rows.length; i += 1) {
+      bodyHtml += config.rowHtml(rows[i]);
+    }
+
+    $tbody.html(bodyHtml);
+  }
+
+  function renderError(message) {
+    var config = getReportConfig(state.reportType);
+    $(".report-table thead").html(renderTableHeader(config));
+    $(".report-table tbody").html(
+      '<tr><td colspan="' +
+        config.headers.length +
+        '" class="text-center py-4 text-danger">' +
+        escapeHtml(message) +
+        "</td></tr>"
+    );
+    $("#reportMeta").text("Unable to load report data.");
+    $("#reportPagination").empty();
+  }
+
+  function getVisiblePages(currentPage, totalPages) {
+    var pages = [];
+
+    if (totalPages <= 7) {
+      for (var p = 1; p <= totalPages; p += 1) {
+        pages.push(p);
       }
+      return pages;
+    }
+
+    pages.push(1);
+
+    if (currentPage > 3) {
+      pages.push("...");
+    }
+
+    var start = Math.max(2, currentPage - 1);
+    var end = Math.min(totalPages - 1, currentPage + 1);
+
+    for (var i = start; i <= end; i += 1) {
+      pages.push(i);
+    }
+
+    if (currentPage < totalPages - 2) {
+      pages.push("...");
+    }
+
+    pages.push(totalPages);
+    return pages;
+  }
+
+  function renderPagination(currentPage, totalPages, totalRows) {
+    var $pagination = $("#reportPagination");
+    $pagination.empty();
+
+    var safeTotalPages = Math.max(1, Number(totalPages || 1));
+    var safeCurrentPage = Math.min(Math.max(1, Number(currentPage || 1)), safeTotalPages);
+    var safeTotalRows = Math.max(0, Number(totalRows || 0));
+
+    var startIndex = safeTotalRows === 0 ? 0 : (safeCurrentPage - 1) * state.pageSize + 1;
+    var endIndex = safeTotalRows === 0 ? 0 : Math.min(safeCurrentPage * state.pageSize, safeTotalRows);
+    $("#reportMeta").text("Showing " + startIndex + "-" + endIndex + " of " + safeTotalRows + " records");
+
+    var prevDisabled = safeCurrentPage <= 1 ? " disabled" : "";
+    $pagination.append(
+      '<li class="page-item' + prevDisabled + '"><a class="page-link" href="#" data-page="' +
+        (safeCurrentPage - 1) +
+        '">Previous</a></li>'
+    );
+
+    var visiblePages = getVisiblePages(safeCurrentPage, safeTotalPages);
+    for (var i = 0; i < visiblePages.length; i += 1) {
+      var page = visiblePages[i];
+      if (page === "...") {
+        $pagination.append('<li class="page-item disabled"><span class="page-link">...</span></li>');
+        continue;
+      }
+
+      var activeClass = page === safeCurrentPage ? " active" : "";
+      $pagination.append(
+        '<li class="page-item' + activeClass + '"><a class="page-link" href="#" data-page="' + page + '">' + page + "</a></li>"
+      );
+    }
+
+    var nextDisabled = safeCurrentPage >= safeTotalPages ? " disabled" : "";
+    $pagination.append(
+      '<li class="page-item' + nextDisabled + '"><a class="page-link" href="#" data-page="' +
+        (safeCurrentPage + 1) +
+        '">Next</a></li>'
+    );
+  }
+
+  function showWarning(message) {
+    if (window.Swal && typeof window.Swal.fire === "function") {
+      window.Swal.fire({ icon: "warning", text: message });
+      return;
+    }
+
+    window.alert(message);
+  }
+
+  function validateDateRange(showAlert) {
+    if (!state.fromDate || !state.toDate) {
+      return true;
+    }
+
+    if (state.fromDate <= state.toDate) {
+      return true;
+    }
+
+    if (showAlert) {
+      showWarning("From Date cannot be later than To Date.");
+    }
+
+    return false;
+  }
+
+  async function loadReport() {
+    if (!validateDateRange(true)) {
+      return;
+    }
+
+    var requestId = state.requestId + 1;
+    state.requestId = requestId;
+
+    setLoadingState();
+
+    var query = new URLSearchParams({
+      reportType: state.reportType,
+      page: String(state.page),
+      pageSize: String(state.pageSize),
     });
 
-    $opts.on("click", "li", function (e) {
+    if (state.fromDate) {
+      query.append("fromDate", state.fromDate);
+    }
+
+    if (state.toDate) {
+      query.append("toDate", state.toDate);
+    }
+
+    try {
+      var response = await fetch(reportUrl + "?" + query.toString(), {
+        method: "GET",
+        headers: { Accept: "application/json" },
+      });
+
+      var payload = await response.json().catch(function () {
+        return {};
+      });
+
+      if (requestId !== state.requestId) {
+        return;
+      }
+
+      if (!response.ok || !payload.success) {
+        throw new Error(payload.message || "Failed to load report data.");
+      }
+
+      state.page = Number(payload.page || 1);
+      state.pageSize = Number(payload.pageSize || state.pageSize || 10);
+      state.totalRows = Number(payload.totalRows || 0);
+      state.rows = Array.isArray(payload.rows) ? payload.rows : [];
+
+      renderTable(state.reportType, state.rows);
+      renderPagination(state.page, payload.totalPages, state.totalRows);
+    } catch (error) {
+      var message = (error && error.message) || "Failed to load report data.";
+      renderError(message);
+    }
+  }
+
+  function downloadCsv() {
+    var config = getReportConfig(state.reportType);
+
+    if (!state.rows.length) {
+      showWarning("There is no data to export.");
+      return;
+    }
+
+    var lines = [];
+    var headerRow = [];
+    for (var i = 0; i < config.headers.length; i += 1) {
+      headerRow.push(escapeCsv(config.headers[i].label));
+    }
+
+    if (state.reportType === "fine-collection") {
+      headerRow.push(escapeCsv("Paid Date"));
+    }
+
+    lines.push(headerRow.join(","));
+
+    for (var r = 0; r < state.rows.length; r += 1) {
+      var values = config.csvValues(state.rows[r]);
+      var escaped = [];
+      for (var c = 0; c < values.length; c += 1) {
+        escaped.push(escapeCsv(values[c]));
+      }
+      lines.push(escaped.join(","));
+    }
+
+    var csvContent = "\uFEFF" + lines.join("\r\n");
+    var blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    var downloadUrl = URL.createObjectURL(blob);
+    var link = document.createElement("a");
+    var fileDate = new Date().toISOString().slice(0, 10);
+
+    link.href = downloadUrl;
+    link.download = state.reportType + "-report-" + fileDate + ".csv";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(downloadUrl);
+  }
+
+  function handleExport(type) {
+    if (type === "excel") {
+      downloadCsv();
+      return;
+    }
+
+    if (type === "pdf") {
+      window.print();
+    }
+  }
+
+  function bindSelectHandlers() {
+    $("#reportTypeBtn").on("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      toggleSelect("reportTypeSelect");
+    });
+
+    $("#exportTypeBtn").on("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      toggleSelect("exportTypeSelect");
+    });
+
+    $("#reportTypeSelect .options").on("click", "li", function (e) {
       e.preventDefault();
       e.stopPropagation();
 
-      var $li = $(this);
-      var text = $.trim($li.text());
-      var type = $li.data("value");
+      var $option = $(this);
+      var type = String($option.data("value") || "borrowing");
+      var text = $.trim($option.text()) || "Borrowing Report";
 
-      $btn.html('<span>' + text + '</span><i class="bi bi-chevron-down caret"></i>');
-      $container.removeClass("open");
-      $opts.hide();
+      state.reportType = type;
+      state.page = 1;
+      setSelectButtonText($("#reportTypeBtn"), text);
+      closeAllSelects();
+      loadReport();
+    });
 
-      if (containerId === "reportTypeSelect") {
-        renderReport(type);
+    $("#exportTypeSelect .options").on("click", "li", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      var $option = $(this);
+      var type = String($option.data("value") || "");
+      var text = $.trim($option.text()) || "Export Type";
+
+      setSelectButtonText($("#exportTypeBtn"), text);
+      closeAllSelects();
+      handleExport(type);
+
+      window.setTimeout(function () {
+        setSelectButtonText($("#exportTypeBtn"), "Export Type");
+      }, 800);
+    });
+  }
+
+  function bindDateFilters() {
+    $("#fromDate, #toDate").on("change", function () {
+      state.fromDate = String($("#fromDate").val() || "");
+      state.toDate = String($("#toDate").val() || "");
+
+      if (!validateDateRange(true)) {
+        return;
       }
+
+      state.page = 1;
+      loadReport();
+    });
+  }
+
+  function bindPagination() {
+    $(document).on("click", "#reportPagination .page-link", function (e) {
+      e.preventDefault();
+
+      var $item = $(this).closest(".page-item");
+      if ($item.hasClass("disabled") || $item.hasClass("active")) {
+        return;
+      }
+
+      var targetPage = Number($(this).data("page") || 0);
+      if (!targetPage || targetPage < 1 || targetPage === state.page) {
+        return;
+      }
+
+      state.page = targetPage;
+      loadReport();
     });
   }
 
   $(function () {
-    initSelect("reportTypeSelect", "reportTypeBtn");
-    initSelect("exportTypeSelect", "exportTypeBtn");
+    setSelectButtonText($("#reportTypeBtn"), getReportConfig(state.reportType).title);
+    setSelectButtonText($("#exportTypeBtn"), "Export Type");
 
-    renderReport("borrowing");
+    bindSelectHandlers();
+    bindDateFilters();
+    bindPagination();
 
     $(document).on("click", function (e) {
       if (!$(e.target).closest(".custom-select, .export-select").length) {
@@ -264,5 +547,7 @@
         closeAllSelects();
       }
     });
+
+    loadReport();
   });
 })(jQuery);

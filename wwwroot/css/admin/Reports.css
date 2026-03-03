@@ -218,11 +218,32 @@
   color: #0f2f50;
 }
 
+.status-pill.returned {
+  background: #b5e1c8;
+  color: #0e5a2f;
+}
+
+.status-pill.overdue {
+  background: #f6c0c0;
+  color: #8c1d1d;
+}
+
 /* =========================
    PAGINATION
 ========================= */
 .pagination-wrapper {
   padding: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.report-meta {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 600;
 }
 
 .pagination {

@@ -1,0 +1,137 @@
+@model Library_Management_system.Models.Admin.AdminProfileUpdateInput
+@{
+    ViewBag.Title = "Profile";
+    var displayName = (ViewBag.DisplayName as string) ?? $"{Model.FirstName} {Model.LastName}".Trim();
+    var profileImageUrl = (ViewBag.ProfileImageUrl as string) ?? string.Empty;
+    var hasProfileImage = !string.IsNullOrWhiteSpace(profileImageUrl);
+
+    var nameParts = displayName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+    var initials = nameParts.Length switch
+    {
+        >= 2 => $"{char.ToUpper(nameParts[0][0])}{char.ToUpper(nameParts[^1][0])}",
+        1 => $"{char.ToUpper(nameParts[0][0])}",
+        _ => "A"
+    };
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/admin/AdminAccount.css" asp-append-version="true" />
+}
+
+<div class="setting-shell">
+    <section class="setting-card">
+        <header class="setting-title-wrap">
+            <h1 class="setting-title">Setting</h1>
+        </header>
+
+        <nav class="setting-tabs">
+            <button type="button" class="tab-item active">Edit Profile</button>
+            <a class="tab-item tab-link" asp-controller="AdminAccount" asp-action="ChangePassword">Security</a>
+        </nav>
+
+        @if (TempData["AccountImageSuccess"] is string imageSuccess && !string.IsNullOrWhiteSpace(imageSuccess))
+        {
+            <div class="alert alert-success mt-3 mb-0" role="alert">@imageSuccess</div>
+        }
+
+        @if (TempData["AccountImageError"] is string imageError && !string.IsNullOrWhiteSpace(imageError))
+        {
+            <div class="alert alert-danger mt-3 mb-0" role="alert">@imageError</div>
+        }
+
+        @if (TempData["AccountSuccess"] is string success && !string.IsNullOrWhiteSpace(success))
+        {
+            <div class="alert alert-success mt-3 mb-0" role="alert">@success</div>
+        }
+
+        <div class="setting-body">
+            <aside class="avatar-column">
+                <div class="avatar-editor">
+                    <div class="setting-avatar">
+                        @if (hasProfileImage)
+                        {
+                            <img src="@profileImageUrl" alt="Profile image" class="setting-avatar-img" />
+                        }
+                        else
+                        {
+                            <span>@initials</span>
+                        }
+                    </div>
+
+                    <form id="uploadProfileImageForm" method="post" asp-controller="AdminAccount"
+                          asp-action="UploadProfileImage" enctype="multipart/form-data">
+                        <input id="adminProfileImageInput" class="d-none" type="file" name="imageFile"
+                               accept=".jpg,.jpeg,.png,.webp" />
+                        <button id="chooseProfileImageBtn" type="button" class="avatar-camera-btn"
+                                title="Upload profile photo">
+                            <i class="bi bi-camera"></i>
+                        </button>
+                    </form>
+                </div>
+
+                <div class="avatar-note">JPG, PNG, WEBP up to 5 MB</div>
+
+                @if (hasProfileImage)
+                {
+                    <form method="post" asp-controller="AdminAccount" asp-action="RemoveProfileImage" class="mt-2">
+                        <button type="submit" class="btn-remove-avatar">Remove Photo</button>
+                    </form>
+                }
+            </aside>
+
+            <form method="post" asp-controller="AdminAccount" asp-action="Profile" novalidate class="setting-form">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 px-3 mb-3"></div>
+
+                <div class="form-grid two-col">
+                    <div class="field-wrap">
+                        <label asp-for="FirstName" class="form-label"></label>
+                        <input asp-for="FirstName" class="form-control setting-input" autocomplete="given-name" />
+                        <span asp-validation-for="FirstName" class="text-danger"></span>
+                    </div>
+
+                    <div class="field-wrap">
+                        <label asp-for="LastName" class="form-label"></label>
+                        <input asp-for="LastName" class="form-control setting-input" autocomplete="family-name" />
+                        <span asp-validation-for="LastName" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="field-wrap">
+                    <label asp-for="Email" class="form-label"></label>
+                    <input asp-for="Email" class="form-control setting-input" autocomplete="email" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+
+                <div class="field-wrap">
+                    <label asp-for="PhoneNumber" class="form-label"></label>
+                    <input asp-for="PhoneNumber" class="form-control setting-input" autocomplete="tel" />
+                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-save-profile">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </section>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+                        (function () {
+                            const pickButton = document.getElementById('chooseProfileImageBtn');
+                            const fileInput = document.getElementById('adminProfileImageInput');
+                            const uploadForm = document.getElementById('uploadProfileImageForm');
+                            if (!pickButton || !fileInput || !uploadForm) return;
+
+                            pickButton.addEventListener('click', function () {
+                                fileInput.click();
+                            });
+
+                            fileInput.addEventListener('change', function () {
+                                if (!fileInput.files || fileInput.files.length === 0) return;
+                                uploadForm.submit();
+                            });
+                        })();
+    </script>
+}

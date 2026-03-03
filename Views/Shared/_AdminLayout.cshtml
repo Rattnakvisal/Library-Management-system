@@ -57,6 +57,7 @@
     string displayName = "Admin";
     string roleText = isAdmin ? "Admin" : (isLibrarian ? "Librarian" : "Staff");
     string initials = "A";
+    string profileImageUrl = string.Empty;
     int newUsersCount = 0;
     int newBooksCount = 0;
     int unreadContactCount = 0;
@@ -74,6 +75,16 @@
             1 => $"{parts[0][0]}".ToUpper(),
             _ => "A"
         };
+
+        if (u != null)
+        {
+            profileImageUrl = await DbContext.UserClaims
+                .AsNoTracking()
+                .Where(x => x.UserId == u.Id && x.ClaimType == "ProfileImageUrl")
+                .OrderByDescending(x => x.Id)
+                .Select(x => x.ClaimValue)
+                .FirstOrDefaultAsync() ?? string.Empty;
+        }
 
         var since = DateTime.UtcNow.AddDays(-7);
         newUsersCount = await DbContext.Users
@@ -277,7 +288,16 @@
 
                 <div class="dropdown">
                     <button class="user-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <span class="avatar">@initials</span>
+                        <span class="avatar">
+                            @if (!string.IsNullOrWhiteSpace(profileImageUrl))
+                            {
+                                <img src="@profileImageUrl" alt="Profile image" class="avatar-img" />
+                            }
+                            else
+                            {
+                                @initials
+                            }
+                        </span>
                         <span class="user-meta">
                             <span class="user-name">@displayName</span>
                             <span class="user-role">@roleText</span>
@@ -292,12 +312,12 @@
                         <li><hr class="dropdown-divider" /></li>
 
                         <li>
-                            <a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index">
+                            <a class="dropdown-item" asp-controller="AdminAccount" asp-action="Profile">
                                 <i class="bi bi-person me-2"></i> Profile
                             </a>
                         </li>
                         <li>
-                            <a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/ChangePassword">
+                            <a class="dropdown-item" asp-controller="AdminAccount" asp-action="ChangePassword">
                                 <i class="bi bi-key me-2"></i> Change Password
                             </a>
                         </li>
