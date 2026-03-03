@@ -298,7 +298,8 @@ namespace Library_Management_system.Controllers
                 BookId = bookId,
                 CreatedDate = DateTime.UtcNow,
                 IsRequested = false,
-                ReservationStatus = "none"
+                ReservationStatus = "none",
+                IsReservationNotificationSeen = false
             });
 
             await _context.SaveChangesAsync();
@@ -365,6 +366,7 @@ namespace Library_Management_system.Controllers
                 item.RequestedDate = now;
                 item.ReservationStatus = "pending";
                 item.ReservationUpdatedDate = now;
+                item.IsReservationNotificationSeen = false;
             }
 
             await _context.SaveChangesAsync();
@@ -473,6 +475,30 @@ namespace Library_Management_system.Controllers
             }
 
             return RedirectToLocalOrBookDetail(returnUrl, bookId);
+        }
+
+        [HttpPost("notifications/reservations/mark-read")]
+        public async Task<IActionResult> MarkReservationNotificationsRead()
+        {
+            var ownerKey = ResolveCartOwnerKey();
+            var unreadItems = await _context.CartItems
+                .Where(ci => ci.OwnerKey == ownerKey &&
+                             (ci.ReservationStatus == "approved" || ci.ReservationStatus == "rejected") &&
+                             !ci.IsReservationNotificationSeen)
+                .ToListAsync();
+
+            if (unreadItems.Count == 0)
+            {
+                return Ok(new { success = true, updated = 0 });
+            }
+
+            foreach (var item in unreadItems)
+            {
+                item.IsReservationNotificationSeen = true;
+            }
+
+            await _context.SaveChangesAsync();
+            return Ok(new { success = true, updated = unreadItems.Count });
         }
 
         [HttpGet("cookie")]

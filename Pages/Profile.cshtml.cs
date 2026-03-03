@@ -17,18 +17,19 @@ namespace Library_Management_system.Pages
             _userManager = userManager;
         }
 
-        public ApplicationUser CurrentUser { get; set; }
+        public ApplicationUser CurrentUser { get; private set; } = null!;
 
         public async Task<IActionResult> OnGetAsync()
         {
-            CurrentUser = await _userManager.GetUserAsync(User);
+            var currentUser = await _userManager.GetUserAsync(User);
 
-            if (CurrentUser == null)
+            if (currentUser == null)
             {
                
                 return RedirectToPage("/Account/Login"); 
             }
 
+            CurrentUser = currentUser;
             return Page();
         }
     }

@@ -1,0 +1,23 @@
+.swal2-popup {
+    border-radius: 12px;
+    font-family: "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+}
+
+.swal2-title {
+    color: #132a46;
+    font-weight: 700;
+}
+
+.swal2-html-container {
+    color: #334e68;
+}
+
+.swal2-confirm {
+    background-color: #0f2b48 !important;
+    border: 1px solid #0f2b48 !important;
+}
+
+.swal2-cancel {
+    background-color: #6b7785 !important;
+    border: 1px solid #6b7785 !important;
+}

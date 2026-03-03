@@ -2,9 +2,9 @@
 @model Library_Management_system.Models.BookDetailViewModel
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
-    ViewData["Title"] = "Book detail";
-
     var book = Model.Book;
+    ViewData["Title"] = "Book detail";
+    ViewData["BreadcrumbCurrent"] = string.IsNullOrWhiteSpace(book.Title) ? "Book detail" : book.Title;
     var imagePath = string.IsNullOrWhiteSpace(book.ImageUrl)
         ? Url.Content("~/images/User/Book/book2.png")
         : Url.Content(book.ImageUrl);

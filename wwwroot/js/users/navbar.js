@@ -40,4 +40,56 @@ document.addEventListener('DOMContentLoaded', function () {
             badge.classList.remove('d-none');
         });
     });
+
+    const reservationToggle = document.getElementById('userReservationToggle');
+    const reservationBadge = document.getElementById('userReservationBadge');
+    let isMarkingReservationRead = false;
+
+    function hasUnreadReservationNotifications() {
+        if (!reservationBadge || reservationBadge.classList.contains('d-none')) {
+            return false;
+        }
+
+        return Number(reservationBadge.textContent || 0) > 0;
+    }
+
+    function clearReservationBadge() {
+        if (!reservationBadge) {
+            return;
+        }
+
+        reservationBadge.textContent = '0';
+        reservationBadge.classList.add('d-none');
+    }
+
+    function markReservationNotificationsRead() {
+        if (isMarkingReservationRead || !hasUnreadReservationNotifications()) {
+            return;
+        }
+
+        isMarkingReservationRead = true;
+        clearReservationBadge();
+
+        fetch('/notifications/reservations/mark-read', {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+            .catch(function () {
+                // Keep UI responsive even if request fails.
+            })
+            .finally(function () {
+                isMarkingReservationRead = false;
+            });
+    }
+
+    if (reservationToggle) {
+        reservationToggle.addEventListener('click', markReservationNotificationsRead);
+
+        const reservationDropdown = reservationToggle.closest('.dropdown');
+        if (reservationDropdown) {
+            reservationDropdown.addEventListener('show.bs.dropdown', markReservationNotificationsRead);
+        }
+    }
 });

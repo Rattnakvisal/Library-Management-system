@@ -2,7 +2,8 @@
 @model IEnumerable<Library_Management_system.Models.Book>
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
-    ViewBag.Title = "Category";
+    ViewData["Title"] = "Book";
+    ViewBag.Title = "Book Category";
 
     var currentCategory = ViewBag.CurrentCategory as string;
     var currentPage = ViewBag.CurrentPage is int page ? page : 1;
@@ -11,15 +12,16 @@
 }
 
 <div class="container">
-    <h2 class="text-center fw-bold mb-4 text-navy">Categories</h2>
+    <h2 class="text-center fw-bold text-navy">Book Categories</h2>
+    <p class="text-center text-muted">Explore our collection of books by category. Find your next great read!</p>
     <div class="filter-scroll-container mb-5">
         <div class="d-flex flex-nowrap px-4">
-            <a asp-action="Category"               asp-route-category=""
+            <a asp-controller="Home" asp-action="BookIndex" asp-route-category=""
                class="btn btn-filter @(string.IsNullOrEmpty(currentCategory) ? "active" : "")">All</a>
 
             @foreach (var categoryName in categories)
             {
-                <a asp-action="Category" asp-route-category="@categoryName"
+                <a asp-controller="Home" asp-action="BookIndex" asp-route-category="@categoryName"
                    class="btn btn-filter @(currentCategory == categoryName ? "active" : "")">@categoryName</a>
             }
         </div>
@@ -59,7 +61,7 @@
                                 }
                             </div>
                         </div>
-                        <a asp-controller="Home"          asp-action="BookDetail"               asp-route-id="@book.Id"                    class="stretched-link"
+                        <a asp-controller="Home" asp-action="BookDetail" asp-route-id="@book.Id" class="stretched-link"
                            aria-label="View details for @book.Title"></a>
                     </div>
                 </div>
@@ -79,13 +81,13 @@
             {
                 @if (currentPage > 1)
                 {
-                    <a asp-action="Category"       asp-route-category="@currentCategory"        asp-route-page="@(currentPage - 1)"
+                    <a asp-controller="Home" asp-action="BookIndex" asp-route-category="@currentCategory" asp-route-page="@(currentPage - 1)"
                        class="page-node px-3">Prev</a>
                 }
 
                 @for (var i = 1; i <= totalPages; i++)
                 {
-                    <a asp-action="Category"             asp-route-page="@i"              asp-route-category="@currentCategory"
+                    <a asp-controller="Home" asp-action="BookIndex" asp-route-page="@i" asp-route-category="@currentCategory"
                            class="page-node @(i == currentPage ? "active" : "")">
                         @i
                     </a>
@@ -93,7 +95,7 @@
 
                 @if (currentPage < totalPages)
                 {
-                    <a asp-action="Category"            asp-route-category="@currentCategory"             asp-route-page="@(currentPage + 1)"
+                    <a asp-controller="Home" asp-action="BookIndex" asp-route-category="@currentCategory" asp-route-page="@(currentPage + 1)"
                        class="page-node px-3">Next</a>
                 }
             }

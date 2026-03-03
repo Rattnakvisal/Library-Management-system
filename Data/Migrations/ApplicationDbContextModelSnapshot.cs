@@ -232,6 +232,9 @@ namespace Library_Management_system.Data.Migrations
                     b.Property<bool>("IsRequested")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsReservationNotificationSeen")
+                        .HasColumnType("bit");
+
                     b.Property<string>("OwnerKey")
                         .IsRequired()
                         .HasMaxLength(150)

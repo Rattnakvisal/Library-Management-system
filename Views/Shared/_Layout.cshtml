@@ -36,7 +36,13 @@
         var clean = segment.Replace("-", " ").Replace("_", " ").Trim();
         if (int.TryParse(clean, out _))
         {
-            return (ViewData["Title"]?.ToString() ?? "Detail").Trim();
+            var currentBreadcrumb = ViewData["BreadcrumbCurrent"]?.ToString();
+            if (string.IsNullOrWhiteSpace(currentBreadcrumb))
+            {
+                currentBreadcrumb = ViewData["Title"]?.ToString();
+            }
+
+            return (string.IsNullOrWhiteSpace(currentBreadcrumb) ? "Detail" : currentBreadcrumb).Trim();
         }
 
         return CultureInfo.CurrentCulture.TextInfo.ToTitleCase(clean.ToLowerInvariant());
@@ -87,7 +93,8 @@
         reservationNotificationCount = await DbContext.CartItems
             .AsNoTracking()
             .Where(ci => ci.OwnerKey == cartOwnerKey &&
-                         (ci.ReservationStatus == "approved" || ci.ReservationStatus == "rejected"))
+                         (ci.ReservationStatus == "approved" || ci.ReservationStatus == "rejected") &&
+                         !ci.IsReservationNotificationSeen)
             .CountAsync();
 
         var rawNotifications = await DbContext.CartItems
@@ -229,7 +236,7 @@
                         </a>
 
                         <div class="dropdown">
-                            <a class="icon-btn dropdown-toggle no-caret" title="Notifications" href="#" role="button"
+                            <a id="userReservationToggle" class="icon-btn dropdown-toggle no-caret" title="Notifications" href="#" role="button"
                                    data-bs-toggle="dropdown" aria-expanded="false">
                                 <svg viewBox="0 0 24 24">
                                     <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
@@ -346,6 +353,43 @@
             </div>
         </div>
     </footer>
+
+    <section id="cookieConsentAlert"
+             class="cookie-consent"
+             role="dialog"
+             aria-live="polite"
+             aria-modal="false"
+             aria-labelledby="cookieConsentTitle"
+             aria-describedby="cookieConsentDesc"
+             hidden>
+        <button id="cookieCloseBtn" type="button" class="cookie-consent__dismiss" aria-label="Dismiss cookie banner">
+            <i class="bi bi-x-lg"></i>
+        </button>
+
+        <div class="cookie-consent__icon" aria-hidden="true">
+            <i class="bi bi-shield-check"></i>
+        </div>
+
+        <div class="cookie-consent__content">
+            <p class="cookie-consent__eyebrow">Cookie Notice</p>
+            <h2 id="cookieConsentTitle" class="cookie-consent__title">We use cookies to improve your experience</h2>
+            <p id="cookieConsentDesc" class="cookie-consent__description">
+                We use cookies to remember your preferences, improve performance, and keep the library platform secure.
+                You can accept all cookies or keep only essential cookies.
+                <a href="/Cookie">Learn more</a>.
+            </p>
+        </div>
+
+        <div class="cookie-consent__actions">
+            <button id="cookieRejectBtn" type="button" class="cookie-consent__btn cookie-consent__btn--secondary">
+                Essential only
+            </button>
+            <button id="cookieAcceptBtn" type="button" class="cookie-consent__btn cookie-consent__btn--primary">
+                <i class="bi bi-check-lg"></i>
+                Accept all cookies
+            </button>
+        </div>
+    </section>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>

@@ -1,8 +1,9 @@
-﻿.container-about{
+﻿.container-about {
     padding: 6px 7px 2px 6px;
 }
 
-.container-about h2, h5 {
+.container-about h2,
+h5 {
     font-size: 24px !important;
     margin-top: 10px !important;
     margin-bottom: 10px !important;
@@ -41,8 +42,12 @@
     border-radius: 3px;
 }
 
-.description, .service-hours, .visit-us, .leadership, .support {
+.description,
+.service-hours,
+.visit-us,
+.leadership,
+.support {
     background-color: #fff;
     border-radius: 3px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }

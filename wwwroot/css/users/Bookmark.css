@@ -1,5 +1,5 @@
 .bookmark-page {
-    padding: 0 0 1.5rem 0;
+    padding: 1rem 0;
 }
 
 .bookmark-hero-wrap {
@@ -84,6 +84,7 @@
     font-weight: 600;
     color: #121a2f;
     display: -webkit-box;
+    line-clamp: 2;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
@@ -95,6 +96,7 @@
     color: #6b7280;
     margin-bottom: 0.25rem;
     display: -webkit-box;
+    line-clamp: 1;
     -webkit-line-clamp: 1;
     -webkit-box-orient: vertical;
     overflow: hidden;

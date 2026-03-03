@@ -19,5 +19,6 @@ namespace Library_Management_system.Models
         [MaxLength(30)]
         public string ReservationStatus { get; set; } = "none";
         public DateTime? ReservationUpdatedDate { get; set; }
+        public bool IsReservationNotificationSeen { get; set; }
     }
 }

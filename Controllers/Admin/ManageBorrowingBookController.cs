@@ -219,6 +219,7 @@ public class ManageBorrowingBookController : Controller
             matchedReservation.ReservationStatus = "approved";
             matchedReservation.RequestedDate ??= DateTime.UtcNow;
             matchedReservation.ReservationUpdatedDate = DateTime.UtcNow;
+            matchedReservation.IsReservationNotificationSeen = false;
         }
 
         book.Quantity -= 1;
@@ -476,6 +477,7 @@ public class ManageBorrowingBookController : Controller
         reservation.ReservationStatus = "approved";
         reservation.ReservationUpdatedDate = DateTime.UtcNow;
         reservation.RequestedDate ??= DateTime.UtcNow;
+        reservation.IsReservationNotificationSeen = false;
 
         await _context.SaveChangesAsync();
         return Ok(new { success = true, message = "Reservation approved and stored in borrowing with a 1-week due date." });
@@ -502,6 +504,7 @@ public class ManageBorrowingBookController : Controller
         reservation.ReservationStatus = "rejected";
         reservation.ReservationUpdatedDate = DateTime.UtcNow;
         reservation.RequestedDate ??= DateTime.UtcNow;
+        reservation.IsReservationNotificationSeen = false;
 
         await _context.SaveChangesAsync();
         return Ok(new { success = true, message = "Reservation rejected." });

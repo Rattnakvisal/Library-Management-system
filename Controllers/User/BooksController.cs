@@ -12,7 +12,7 @@ namespace Library_Management_system.Controllers.user
                 return RedirectToAction("BookDetail", "Home", new { id = id.Value });
             }
 
-            return RedirectToAction("Category", "Home");
+            return RedirectToAction("BookIndex", "Home");
         }
     }
 }

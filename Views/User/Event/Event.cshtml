@@ -3,63 +3,94 @@
 @{
     ViewBag.Title = "Events";
 }
-<div class="events-container">
-    <h1 class="page-title">Upcoming Events</h1>
+<!-- Slide Show -->
+<div class="container px-0 mt-0">
+    <div id="heroCarousel" class="carousel slide mx-2" data-bs-ride="carousel">
+        <div class="carousel-indicators custom-indicators">
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active"
+                    aria-current="true"></button>
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1"></button>
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2"></button>
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="3"></button>
+        </div>
 
-    @if (Model.Any())
-    {
-        foreach (var item in Model)
-        {
-            var imagePath = string.IsNullOrWhiteSpace(item.ImageUrl)
-                ? Url.Content("~/images/User/Contact/contact-3.png")
-                : Url.Content(item.ImageUrl);
-            var host = string.IsNullOrWhiteSpace(item.CreatedBy) ? "Library Team" : item.CreatedBy;
-            var eventDate = item.StartDate.Date == item.EndDate.Date
-                ? item.StartDate.ToString("dddd, dd MMM yyyy", CultureInfo.InvariantCulture)
-                : $"{item.StartDate:dd MMM yyyy} - {item.EndDate:dd MMM yyyy}";
-
-            <div class="event-card">
-                <div class="event-image">
-                    <img src="@imagePath" alt="@item.Name">
-                </div>
-
-                <div class="event-details">
-                    <h2 class="event-title">@item.Name</h2>
-
-                    <div class="event-content">
-                        <p class="event-description">@item.Description</p>
-                    </div>
-
-                    <div class="event-meta">
-                        <div class="meta-item">
-                            <strong>Host:</strong> @host
-                        </div>
-                        <div class="meta-item">
-                            <strong>Location:</strong> @item.Location
-                        </div>
-                        <div class="meta-item">
-                            <strong>Date:</strong> @eventDate
-                        </div>
-                        <div class="meta-item">
-                            <strong>Created Date:</strong> @item.CreatedDate.ToString("dd MMM yyyy", CultureInfo.InvariantCulture)
-                        </div>
-                        <div class="meta-item">
-                            <strong>Accommodation:</strong> Free
-                        </div>
-                    </div>
-                </div>
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img src="/images/User/Slideshow/img_library1.jpg" class="d-block w-100 main-slider-img" alt="slide 1">
             </div>
-        }
-    }
-    else
-    {
-        <div class="event-card">
-            <div class="event-details">
-                <h2 class="event-title">No upcoming events</h2>
-                <div class="event-content">
-                    <p class="event-description">There are no events published yet. Please check again soon.</p>
-                </div>
+            <div class="carousel-item">
+                <img src="/images/User/Slideshow/img_library2.jpg" class="d-block w-100 main-slider-img" alt="Slide 2">
             </div>
         </div>
-    }
-</div>
+
+        <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        </button>
+    </div>
+    <div class="events-container">
+        <h1 class="page-title">Upcoming Events</h1>
+        <p class="page-description">Discover our latest events and activities. Join us to explore, learn, and
+            connect
+            with fellow book lovers!</p>
+            @if (Model.Any())
+            {
+                foreach (var item in Model)
+                {
+                    var imagePath = string.IsNullOrWhiteSpace(item.ImageUrl)
+                        ? Url.Content("~/images/User/Contact/contact-3.png")
+                        : Url.Content(item.ImageUrl);
+                    var host = string.IsNullOrWhiteSpace(item.CreatedBy) ? "Library Team" : item.CreatedBy;
+                    var eventDate = item.StartDate.Date == item.EndDate.Date
+                        ? item.StartDate.ToString("dddd, dd MMM yyyy", CultureInfo.InvariantCulture)
+                        : $"{item.StartDate:dd MMM yyyy} - {item.EndDate:dd MMM yyyy}";
+
+                    <div class="event-card">
+                        <div class="event-image">
+                            <img src="@imagePath" alt="@item.Name">
+                        </div>
+
+                        <div class="event-details">
+                            <h2 class="event-title">@item.Name</h2>
+
+                            <div class="event-content">
+                                <p class="event-description">@item.Description</p>
+                            </div>
+
+                            <div class="event-meta">
+                                <div class="meta-item">
+                                    <strong>Host:</strong> @host
+                                </div>
+                                <div class="meta-item">
+                                    <strong>Location:</strong> @item.Location
+                                </div>
+                                <div class="meta-item">
+                                    <strong>Date:</strong> @eventDate
+                                </div>
+                                <div class="meta-item">
+                                    <strong>Created Date:</strong> @item.CreatedDate.ToString("dd MMM yyyy",
+                                                                                                                                                                                                                                                                                                                CultureInfo.InvariantCulture)
+                                </div>
+                                <div class="meta-item">
+                                    <strong>Accommodation:</strong> Free
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="event-card">
+                    <div class="event-details">
+                        <h2 class="event-title">No upcoming events</h2>
+                        <div class="event-content">
+                            <p class="event-description">There are no events published yet. Please check again soon.</p>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
