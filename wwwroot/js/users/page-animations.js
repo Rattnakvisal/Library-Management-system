@@ -113,11 +113,42 @@
         revealElements(relatedReveals, 40, 70, 600);
     }
 
+    function setupBookmarkPage() {
+        const root = document.getElementById("bookmarkPage");
+        if (!root) {
+            return;
+        }
+
+        root.classList.add("motion-enabled");
+        const hero = root.querySelector(".bookmark-hero-wrap");
+        if (hero) {
+            requestAnimationFrame(() => root.classList.add("is-ready"));
+        }
+
+        const reveals = Array.from(
+            root.querySelectorAll(".bookmark-title, .bookmark-card, .bookmark-pagination-wrap, .bookmark-empty")
+        );
+        revealElements(reveals, 35, 65, 680);
+    }
+
+    function setupHistoryPage() {
+        const root = document.getElementById("historyPage");
+        if (!root) {
+            return;
+        }
+
+        root.classList.add("motion-enabled");
+        const reveals = Array.from(root.querySelectorAll(".page-title, .summary-dropdown, .history-card"));
+        revealElements(reveals, 30, 80, 620);
+    }
+
     document.addEventListener("DOMContentLoaded", () => {
         setupEventPage();
         setupContactPage();
         setupAboutPage();
         setupBookCategoryPage();
         setupBookDetailPage();
+        setupBookmarkPage();
+        setupHistoryPage();
     });
 })();

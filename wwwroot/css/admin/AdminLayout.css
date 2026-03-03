@@ -451,6 +451,12 @@
   gap: 8px;
 }
 
+.notification-header-right {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .contact-item {
   padding: 12px 14px;
   border-bottom: 1px solid rgba(15, 23, 42, 0.08);
@@ -513,7 +519,8 @@
 }
 
 .mark-contact-read-btn,
-.mark-all-contact-read-btn {
+.mark-all-contact-read-btn,
+.mark-all-notification-read-btn {
   border: 1px solid rgba(37, 99, 235, 0.30);
   background: rgba(37, 99, 235, 0.08);
   color: #1d4ed8;
@@ -524,7 +531,8 @@
 }
 
 .mark-contact-read-btn:hover,
-.mark-all-contact-read-btn:hover {
+.mark-all-contact-read-btn:hover,
+.mark-all-notification-read-btn:hover {
   background: rgba(37, 99, 235, 0.14);
 }
 

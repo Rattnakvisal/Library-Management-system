@@ -1,5 +1,9 @@
+@model Library_Management_system.Models.Admin.ManageFeedbackPageViewModel
 @{
     ViewBag.Title = "Manage Feedback";
+    var startPage = Math.Max(1, Model.CurrentPage - 2);
+    var endPage = Math.Min(Model.TotalPages, startPage + 4);
+    startPage = Math.Max(1, endPage - 4);
 }
 
 @section Styles {
@@ -8,14 +12,32 @@
 
 <div class="dashboard-page container-fluid feedback-page" id="manageFeedbackPage">
     <header class="page-header">
-        <h1 class="page-title">Feedback Management</h1>
-        <p class="page-subtitle">Review user feedback and book reviews from readers.</p>
+        <div class="header-main">
+            <h1 class="page-title">Feedback Management</h1>
+            <p class="page-subtitle">Review contact messages and user feedback from readers.</p>
+        </div>
+        <div class="header-actions">
+            <div class="feedback-counts">
+                <span><strong>@Model.TotalMessages</strong> total messages</span>
+                <span><strong>@Model.UnreadMessages</strong> unread</span>
+            </div>
+            <form method="post" asp-controller="ManageFeedback" asp-action="MarkAllAsRead">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="q" value="@Model.Search" />
+                <input type="hidden" name="page" value="@Model.CurrentPage" />
+                <button type="submit" class="mark-all-btn" @(Model.UnreadMessages == 0 ? "disabled" : null)>
+                    Mark all as read
+                </button>
+            </form>
+        </div>
     </header>
 
     <section class="feedback-section user-feedback-part">
-        <form action="" class="search-form" id="user-feedback-search">
+        <form method="get" asp-controller="ManageFeedback" asp-action="Index" class="search-form"
+              id="user-feedback-search">
             <i class="bi bi-search search-icon" id="search-feedback-icon"></i>
-            <input type="text" placeholder="Search feedback..." class="search-input" id="search-feedback-input" />
+            <input type="text" name="q"     value="@Model.Search"       placeholder="Search by email or message..."
+                   class="search-input"             id="search-feedback-input" />
         </form>
 
         <div class="table-container">
@@ -24,35 +46,103 @@
                     <thead>
                         <tr>
                             <th scope="col">#</th>
-                            <th scope="col">Username</th>
                             <th scope="col">Email</th>
                             <th scope="col">Message</th>
+                            <th scope="col">Status</th>
                             <th scope="col">Created Date</th>
+                            <th scope="col">Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>Ly</td>
-                            <td>ly@gmail.com</td>
-                            <td>Lorem, ipsum dolor.</td>
-                            <td>2026/01/01</td>
-                        </tr>
+                        @if (Model.Messages.Count == 0)
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center py-4">No contact messages found.</td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @for (var i = 0; i < Model.Messages.Count; i++)
+                            {
+                                var item = Model.Messages[i];
+                                var rowNumber = ((Model.CurrentPage - 1) * Model.PageSize) + i + 1;
+                                var messagePreview = item.Message.Length > 130 ? $"{item.Message[..130]}..." : item.Message;
+
+                                <tr>
+                                    <td>@rowNumber</td>
+                                    <td>@item.Email</td>
+                                    <td class="message-cell" title="@item.Message">@messagePreview</td>
+                                    <td>
+                                        <span class="status-pill @(item.IsRead ? "read" : "unread")">
+                                            @(item.IsRead ? "Read" : "Unread")
+                                        </span>
+                                    </td>
+                                    <td>@item.CreatedDate.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
+                                    <td>
+                                        <div class="action-group">
+                                            @if (!item.IsRead)
+                                            {
+                                                <form method="post" asp-controller="ManageFeedback" asp-action="MarkAsRead"
+                                                      asp-route-id="@item.Id" class="mark-read-form">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="q" value="@Model.Search" />
+                                                    <input type="hidden" name="page" value="@Model.CurrentPage" />
+                                                    <button type="submit" class="mark-read-btn">Mark read</button>
+                                                </form>
+                                            }
+                                            else
+                                            {
+                                                <span class="read-label">Read</span>
+                                            }
+
+                                            <form method="post"
+                                                  asp-controller="ManageFeedback"
+                                                  asp-action="Delete"
+                                                  asp-route-id="@item.Id"
+                                                  class="delete-feedback-form"
+                                                  data-feedback-email="@item.Email">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="q" value="@Model.Search" />
+                                                <input type="hidden" name="page" value="@Model.CurrentPage" />
+                                                <button type="submit" class="delete-feedback-btn">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
                     </tbody>
                 </table>
             </div>
 
-            <div class="pagination-wrapper">
-                <nav aria-label="Feedback pagination">
-                    <ul class="pagination justify-content-end">
-                        <li class="page-item disabled"><a class="page-link">Previous</a></li>
-                        <li class="page-item active" aria-current="page"><a class="page-link" href="#">1</a></li>
-                        <li class="page-item"><a class="page-link" href="#">2</a></li>
-                        <li class="page-item"><a class="page-link" href="#">3</a></li>
-                        <li class="page-item"><a class="page-link" href="#">Next</a></li>
-                    </ul>
-                </nav>
-            </div>
+            @if (Model.TotalPages > 1)
+            {
+                <div class="pagination-wrapper">
+                    <nav aria-label="Feedback pagination">
+                        <ul class="pagination justify-content-end">
+                            <li class="page-item @(Model.HasPreviousPage ? null : "disabled")">
+                                <a class="page-link"                                  asp-controller="ManageFeedback" asp-action="Index"
+                                   asp-route-q="@Model.Search"     asp-route-page="@(Model.CurrentPage - 1)">Previous</a>
+                            </li>
+
+                            @for (var pageNumber = startPage; pageNumber <= endPage; pageNumber++)
+                            {
+                                <li class="page-item @(pageNumber == Model.CurrentPage ? "active" : null)">
+                                    <a class="page-link"                                       asp-controller="ManageFeedback"          asp-action="Index"
+                                       asp-route-q="@Model.Search"                      asp-route-page="@pageNumber">@pageNumber</a>
+                                </li>
+                            }
+
+                            <li class="page-item @(Model.HasNextPage ? null : "disabled")">
+                                <a class="page-link"         asp-controller="ManageFeedback"           asp-action="Index"
+                                   asp-route-q="@Model.Search"               asp-route-page="@(Model.CurrentPage + 1)">Next</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            }
         </div>
     </section>
 
@@ -82,30 +172,10 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td>1</td>
-                            <td>
-                                <img class="book-cover" src="~/images/User/Book/book2.png" alt="Book cover" />
-                            </td>
-                            <td>Lorem, ipsum dolor.</td>
-                            <td>Ly</td>
-                            <td>ly@gmail.com</td>
-                            <td><span class="rating-pill">3</span></td>
-                            <td>2026/01/01</td>
+                            <td colspan="7" class="text-center py-4">No book reviews available yet.</td>
                         </tr>
                     </tbody>
                 </table>
-            </div>
-
-            <div class="pagination-wrapper">
-                <nav aria-label="Book review pagination">
-                    <ul class="pagination justify-content-end">
-                        <li class="page-item disabled"><a class="page-link">Previous</a></li>
-                        <li class="page-item active" aria-current="page"><a class="page-link" href="#">1</a></li>
-                        <li class="page-item"><a class="page-link" href="#">2</a></li>
-                        <li class="page-item"><a class="page-link" href="#">3</a></li>
-                        <li class="page-item"><a class="page-link" href="#">Next</a></li>
-                    </ul>
-                </nav>
             </div>
         </div>
     </section>

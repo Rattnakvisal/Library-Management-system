@@ -142,8 +142,9 @@
             {
                 <div class="topbar-actions"
                      id="topbarActions"
-                     data-base-notification-count="@(newUsersCount + newBooksCount)">
-                    <div class="dropdown action-dropdown">
+                     data-base-notification-count="@(newUsersCount + newBooksCount)"
+                     data-server-base-notification-count="@(newUsersCount + newBooksCount)">
+                    <div class="dropdown action-dropdown" id="notificationDropdown">
                         <button class="action-icon-btn dropdown-toggle"
                                 type="button"
                                 data-bs-toggle="dropdown"
@@ -154,10 +155,17 @@
                             <span class="action-badge @(notificationCount > 0 ? "" : "d-none")"
                                   id="notificationBadge">@notificationCount</span>
                         </button>
-                        <div class="dropdown-menu dropdown-menu-end action-menu notification-menu shadow-sm">
+                        <div class="dropdown-menu dropdown-menu-end action-menu notification-menu shadow-sm" id="notificationMenu">
                             <div class="action-menu-header">
                                 <span>Notifications</span>
-                                <small>Last 7 days</small>
+                                <div class="notification-header-right">
+                                    <small id="notificationMenuUnreadText">@(newUsersCount + newBooksCount) unread</small>
+                                    <button type="button"
+                                            class="mark-all-notification-read-btn @((newUsersCount + newBooksCount) > 0 ? "" : "d-none")"
+                                            id="markAllNotificationsReadBtn">
+                                        Mark all
+                                    </button>
+                                </div>
                             </div>
 
                             @if (notificationCount == 0)
@@ -571,7 +579,6 @@
             if (!contactMenu) return;
 
             const topbarActions = document.getElementById('topbarActions');
-            const baseNotificationCount = Number(topbarActions?.dataset.baseNotificationCount || 0);
             const notificationBadge = document.getElementById('notificationBadge');
             const contactBadge = document.getElementById('contactBadge');
             const contactUnreadText = document.getElementById('contactMenuUnreadText');
@@ -614,6 +621,7 @@
                 }
 
                 if (notificationBadge) {
+                    const baseNotificationCount = Number(topbarActions?.dataset.baseNotificationCount || 0);
                     const totalNotification = baseNotificationCount + unreadCount;
                     notificationBadge.textContent = String(totalNotification);
                     notificationBadge.classList.toggle('d-none', totalNotification <= 0);
@@ -661,6 +669,75 @@
                     }
                 }
             });
+        })();
+
+        // Notification mark-as-read behavior for New Users/New Books alerts.
+        (function () {
+            const notificationDropdown = document.getElementById('notificationDropdown');
+            const notificationMenu = document.getElementById('notificationMenu');
+            const topbarActions = document.getElementById('topbarActions');
+            const notificationBadge = document.getElementById('notificationBadge');
+            const contactBadge = document.getElementById('contactBadge');
+            const notificationUnreadText = document.getElementById('notificationMenuUnreadText');
+            const markAllNotificationsReadBtn = document.getElementById('markAllNotificationsReadBtn');
+            if (!topbarActions || !notificationBadge) return;
+
+            const serverBaseCount = Number(
+                topbarActions.dataset.serverBaseNotificationCount
+                || topbarActions.dataset.baseNotificationCount
+                || 0
+            );
+            const seenKey = 'adminNotificationSeenBaseCount';
+
+            const getEffectiveBaseCount = () => {
+                const seenBaseCount = Math.max(0, Number(localStorage.getItem(seenKey) || 0));
+                return Math.max(0, serverBaseCount - seenBaseCount);
+            };
+
+            const syncNotificationUi = () => {
+                const effectiveBaseCount = getEffectiveBaseCount();
+                topbarActions.dataset.baseNotificationCount = String(effectiveBaseCount);
+
+                if (notificationUnreadText) {
+                    notificationUnreadText.textContent = `${effectiveBaseCount} unread`;
+                }
+
+                if (markAllNotificationsReadBtn) {
+                    markAllNotificationsReadBtn.classList.toggle('d-none', effectiveBaseCount <= 0);
+                }
+
+                const contactUnreadCount = Number(contactBadge?.textContent || 0);
+                const totalCount = Math.max(0, effectiveBaseCount + contactUnreadCount);
+                notificationBadge.textContent = String(totalCount);
+                notificationBadge.classList.toggle('d-none', totalCount <= 0);
+            };
+
+            const markNotificationsAsRead = () => {
+                localStorage.setItem(seenKey, String(serverBaseCount));
+                syncNotificationUi();
+            };
+
+            syncNotificationUi();
+
+            if (markAllNotificationsReadBtn) {
+                markAllNotificationsReadBtn.addEventListener('click', markNotificationsAsRead);
+            }
+
+            if (notificationMenu) {
+                notificationMenu.addEventListener('click', (event) => {
+                    const itemLink = event.target.closest('a.action-item');
+                    if (!itemLink) return;
+                    markNotificationsAsRead();
+                });
+            }
+
+            if (window.location.pathname.toLowerCase().includes('/admin/managefeedback')) {
+                markNotificationsAsRead();
+            }
+
+            if (notificationDropdown) {
+                notificationDropdown.addEventListener('shown.bs.dropdown', syncNotificationUi);
+            }
         })();
     </script>
 
