@@ -42,7 +42,7 @@
     <section class="container-fluid mt-4 home-section">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h3 class="fw-bold text-navy">Book Categories</h3>
-            <a asp-controller="Home" asp-action="BookIndex" class="btn btn-outline-secondary btn-sm">
+            <a asp-controller="Home" asp-action="Book" class="btn btn-outline-secondary btn-sm">
                 Explore more
             </a>
         </div>
@@ -54,7 +54,8 @@
                     : category.ImageUrl;
 
                 <div class="category-scroll-item">
-                    <a asp-controller="Home" asp-action="BookIndex" asp-route-category="@category.Name" class="text-decoration-none">
+                    <a asp-controller="Home" asp-action="Book" asp-route-category="@category.Name"
+                           class="text-decoration-none">
                         <div class="card book-card category-scroll-card shadow-sm h-100">
                             <img src="@categoryImageUrl" class="card-img-top custom-card-img" alt="@category.Name">
                             <div class="card-body py-2">
@@ -79,132 +80,140 @@
                 <div class="flex-shrink-0 custom-card-width">
                     <div class="card book-card border-0 shadow-sm h-100">
                         <div class="card-img-wrapper p-2">
-                            <a asp-controller="Home" asp-action="BookDetail" asp-route-id="@book.Id" class="text-decoration-none">
+                            <a asp-controller="Home" asp-action="BookDetail" asp-route-id="@book.Id"
+                                   class="text-decoration-none">
                                 <img src="@(string.IsNullOrWhiteSpace(book.ImageUrl) ? "/images/User/Book/book2.png" : book.ImageUrl)"
                                      class="card-img-top rounded" alt="@book.Title" height="200">
                             </a>
                         </div>
                         <div class="card-body p-3">
                             <div class="d-flex justify-content-between align-items-center mb-1">
-                                <span class="category-text small fw-bold">@(string.IsNullOrWhiteSpace(book.CategoryName) ? "Professional and Technical" : book.CategoryName)</span>
-                                <button class="btn p-0 border-0 wishlist-btn text-secondary" data-id="@book.Id">
-                                    <i class="fa-solid fa-heart"></i>
-                                </button>
-                            </div>
-                            <h6 class="book-title mb-1 small fw-bold">
-                                <a asp-controller="Home" asp-action="BookDetail" asp-route-id="@book.Id" class="text-decoration-none text-dark">
-                                    @book.Title
-                                </a>
-                            </h6>
-                            <p class="author-text mb-3 small italic">@book.Author</p>
-                            <div class="text-end star-rating text-warning small">
-                                @for (int i = 0; i < Math.Clamp(book.Rating, 0, 5); i++)
-                                {
-                                    <i class="fa-solid fa-star"></i>
-                                }
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            }
-        </div>
-    </section>
-    <!-- Top Trending Books End -->
-    <!-- author by genre section -->
-    <section class="container-fluid mt-4 home-section">
-        <h3 class="fw-bold mb-4 text-navy">Author by Genre</h3>
-
-        <div class="d-flex custom-scrollbar pb-3" style="gap: 1rem;">
-            @foreach (var genreCard in Model.Genres)
-            {
-                var genreImageUrl = string.IsNullOrWhiteSpace(genreCard.ImageUrl)
-                    ? "/images/User/Book/science-fiction.jpg"
-                    : genreCard.ImageUrl;
-
-                <div class="genre-card-wrapper flex-shrink-0">
-                    <a asp-controller="Home" asp-action="BookIndex" asp-route-category="@genreCard.GenreName" class="text-decoration-none">
-                        <div class="card border-0 rounded-4 overflow-hidden position-relative genre-card shadow-sm">
-                            <img src="@genreImageUrl" class="card-img" alt="@genreCard.GenreName">
-                            <div class="genre-overlay d-flex align-items-end p-3">
-                                <div class="genre-overlay-content">
-                                    <h5 class="text-white fw-bold mb-0 genre-author-name">@genreCard.AuthorName</h5>
-                                    <p class="genre-name-text mb-0">@genreCard.GenreName</p>
+                                <span class="category-text small fw-bold">@(string.IsNullOrWhiteSpace(book.CategoryName) ?
+                                                                                                                                                                                                                    "Professional and Technical" : book.CategoryName)</span>
+                                    <button class="btn p-0 border-0 wishlist-btn text-secondary" data-id="@book.Id">
+                                        <i class="fa-solid fa-heart"></i>
+                                    </button>
+                                </div>
+                                <h6 class="book-title mb-1 small fw-bold">
+                                    <a asp-controller="Home" asp-action="BookDetail" asp-route-id="@book.Id"
+                                           class="text-decoration-none text-dark">
+                                        @book.Title
+                                    </a>
+                                </h6>
+                                <p class="author-text mb-3 small italic">@book.Author</p>
+                                <div class="text-end star-rating text-warning small">
+                                    @for (int i = 0; i < Math.Clamp(book.Rating, 0, 5); i++)
+                                    {
+                                        <i class="fa-solid fa-star"></i>
+                                    }
                                 </div>
                             </div>
                         </div>
-                    </a>
-                </div>
-            }
-        </div>
-    </section>
-    <!-- author by genre section end -->
-    <!-- New arrival section -->
-    <section class="container-fluid mt-4 home-section">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h3 class="fw-bold text-navy">New Arrival</h3>
-            <a asp-controller="Home" asp-action="BookIndex" class="btn btn-outline-secondary btn-sm">Explore more</a>
-        </div>
-
-        <div class="row row-cols-2 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3 g-md-4">
-            @foreach (var book in Model.NewArrivalBooks)
-            {
-                <div class="col">
-                    <div class="card book-card border-0 shadow-sm h-100 position-relative">
-                        <span class="badge bg-danger position-absolute top-0 start-0 m-3 px-3 py-2">New</span>
-
-                        <div class="card-img-wrapper">
-                            <a asp-controller="Home" asp-action="BookDetail" asp-route-id="@book.Id" class="text-decoration-none">
-                                <img src="@(string.IsNullOrWhiteSpace(book.ImageUrl) ? "/images/User/Book/book2.png" : book.ImageUrl)"
-                                     class="card-img-top" alt="@book.Title">
-                            </a>
-                        </div>
-
-                        <div class="card-body p-3">
-                            <div class="d-flex justify-content-between align-items-center mb-1">
-                                <span class="category-text small fw-bold">@(string.IsNullOrWhiteSpace(book.CategoryName) ? "Professional and Technical" : book.CategoryName)</span>
-                                <button class="btn p-0 border-0 wishlist-btn text-secondary" type="button" data-id="@book.Id">
-                                    <i class="fa-solid fa-heart"></i>
-                                </button>
-                            </div>
-
-                            <h6 class="book-title mb-1 fw-bold">
-                                <a asp-controller="Home" asp-action="BookDetail" asp-route-id="@book.Id" class="text-decoration-none text-dark">
-                                    @book.Title
-                                </a>
-                            </h6>
-
-                            <p class="author-text mb-3 small fst-italic">@book.Author</p>
-
-                            <div class="text-end star-rating text-warning small">
-                                @for (int i = 0; i < Math.Clamp(book.Rating, 0, 5); i++)
-                                {
-                                    <i class="fa-solid fa-star"></i>
-                                }
-                            </div>
-                        </div>
                     </div>
-                </div>
-            }
-        </div>
-    </section>
-    <!-- New arrival section end -->
-</div>
-
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const sliders = document.querySelectorAll(".custom-scrollbar");
-
-        sliders.forEach(slider => {
-            slider.addEventListener("wheel", function (e) {
-                if (e.deltaY !== 0) {
-                    e.preventDefault();
-                    slider.scrollLeft += e.deltaY;
                 }
-            });
-        });
-    });
-</script>
+            </div>
+        </section>
+        <!-- Top Trending Books End -->
+        <!-- author by genre section -->
+        <section class="container-fluid mt-4 home-section">
+            <h3 class="fw-bold mb-4 text-navy">Author by Genre</h3>
 
-@section Scripts {
-    <script src="~/js/users/Home.js" asp-append-version="true"></script>
-}
+            <div class="d-flex custom-scrollbar pb-3" style="gap: 1rem;">
+                @foreach (var genreCard in Model.Genres)
+                {
+                    var genreImageUrl = string.IsNullOrWhiteSpace(genreCard.ImageUrl)
+                        ? "/images/User/Book/science-fiction.jpg"
+                        : genreCard.ImageUrl;
+
+                    <div class="genre-card-wrapper flex-shrink-0">
+                        <a asp-controller="Home" asp-action="Book" asp-route-category="@genreCard.GenreName"
+                               class="text-decoration-none">
+                            <div class="card border-0 rounded-4 overflow-hidden position-relative genre-card shadow-sm">
+                                <img src="@genreImageUrl" class="card-img" alt="@genreCard.GenreName">
+                                <div class="genre-overlay d-flex align-items-end p-3">
+                                    <div class="genre-overlay-content">
+                                        <h5 class="text-white fw-bold mb-0 genre-author-name">@genreCard.AuthorName</h5>
+                                        <p class="genre-name-text mb-0">@genreCard.GenreName</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                }
+            </div>
+        </section>
+        <!-- author by genre section end -->
+        <!-- New arrival section -->
+        <section class="container-fluid mt-4 home-section">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="fw-bold text-navy">New Arrival</h3>
+                <a asp-controller="Home" asp-action="Book" class="btn btn-outline-secondary btn-sm">Explore more</a>
+            </div>
+
+            <div class="row row-cols-2 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3 g-md-4">
+                @foreach (var book in Model.NewArrivalBooks)
+                {
+                    <div class="col">
+                        <div class="card book-card border-0 shadow-sm h-100 position-relative">
+                            <span class="badge bg-danger position-absolute top-0 start-0 m-3 px-3 py-2">New</span>
+
+                            <div class="card-img-wrapper">
+                                <a asp-controller="Home" asp-action="BookDetail" asp-route-id="@book.Id"
+                                       class="text-decoration-none">
+                                    <img src="@(string.IsNullOrWhiteSpace(book.ImageUrl) ? "/images/User/Book/book2.png" : book.ImageUrl)"
+                                         class="card-img-top" alt="@book.Title">
+                                </a>
+                            </div>
+
+                            <div class="card-body p-3">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <span class="category-text small fw-bold">@(string.IsNullOrWhiteSpace(book.CategoryName) ?
+                                                                                                                                                                                                                                        "Professional and Technical" : book.CategoryName)</span>
+                                        <button class="btn p-0 border-0 wishlist-btn text-secondary" type="button"
+                                                data-id="@book.Id">
+                                            <i class="fa-solid fa-heart"></i>
+                                        </button>
+                                    </div>
+
+                                    <h6 class="book-title mb-1 fw-bold">
+                                        <a asp-controller="Home" asp-action="BookDetail" asp-route-id="@book.Id"
+                                               class="text-decoration-none text-dark">
+                                            @book.Title
+                                        </a>
+                                    </h6>
+
+                                    <p class="author-text mb-3 small fst-italic">@book.Author</p>
+
+                                    <div class="text-end star-rating text-warning small">
+                                        @for (int i = 0; i < Math.Clamp(book.Rating, 0, 5); i++)
+                                        {
+                                            <i class="fa-solid fa-star"></i>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </section>
+            <!-- New arrival section end -->
+        </div>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const sliders = document.querySelectorAll(".custom-scrollbar");
+
+                sliders.forEach(slider => {
+                    slider.addEventListener("wheel", function (e) {
+                        if (e.deltaY !== 0) {
+                            e.preventDefault();
+                            slider.scrollLeft += e.deltaY;
+                        }
+                    });
+                });
+            });
+        </script>
+
+        @section Scripts {
+            <script src="~/js/users/Home.js" asp-append-version="true"></script>
+        }

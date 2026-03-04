@@ -739,7 +739,7 @@ namespace Library_Management_system.Controllers
 
         [HttpGet("book")]
         [HttpGet("[controller]/[action]")]
-        public Task<IActionResult> BookIndex(string? category, int page = 1)
+        public Task<IActionResult> Book(string? category, int page = 1)
         {
             return Category(category, page);
         }
@@ -1096,5 +1096,5 @@ namespace Library_Management_system.Controllers
             return $"guest:{guestCartId}";
         }
     }
-    
+
 }
