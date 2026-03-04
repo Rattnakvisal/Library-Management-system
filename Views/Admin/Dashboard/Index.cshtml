@@ -1,12 +1,10 @@
-@using System.Text.Json
 @model Library_Management_system.Models.Admin.DashboardViewModel
+@using System.Text.Json
 @{
     ViewBag.Title = "Dashboard";
     var now = DateTime.Now;
-    var categoryLabelsJson = JsonSerializer.Serialize(
-        Model.CategoryDistribution.Select(x => x.CategoryName).ToArray());
-    var categoryCountsJson = JsonSerializer.Serialize(
-        Model.CategoryDistribution.Select(x => x.BookCount).ToArray());
+    var categoryLabelsJson = JsonSerializer.Serialize(Model?.CategoryDistribution?.Select(x => x.CategoryName) ?? new List<string>());
+    var categoryDataJson = JsonSerializer.Serialize(Model?.CategoryDistribution?.Select(x => x.BookCount) ?? new List<int>());
     var borrowingTrendLabelsJson = JsonSerializer.Serialize(
         Model.BorrowingTrends.Select(x => x.Label).ToArray());
     var borrowingTrendCountsJson = JsonSerializer.Serialize(
@@ -360,7 +358,7 @@
     <script>
         window.dashboardCategoryChart = {
             labels: @Html.Raw(categoryLabelsJson),
-            counts: @Html.Raw(categoryCountsJson)
+            counts: @Html.Raw(categoryDataJson)
         };
         window.dashboardBorrowingTrend = {
             labels: @Html.Raw(borrowingTrendLabelsJson),

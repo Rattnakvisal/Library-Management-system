@@ -3,10 +3,11 @@ using Library_Management_system.Models.Admin;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json; // Ensure this is available if needed
 
 namespace Library_Management_system.Controllers.Admin
 {
-    [Authorize(Roles = "Admin,Librarian")] // Updated to allow both roles
+    [Authorize(Roles = "Admin,Librarian")]
     [Route("admin/dashboard")]
     public class DashboardController : Controller
     {
@@ -22,13 +23,9 @@ namespace Library_Management_system.Controllers.Admin
         }
 
         [HttpGet("")]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View("~/Views/Admin/Dashboard/Index.cshtml");
-        }
-
-        public async Task<IActionResult> IndexOld()
-        {
+            // Populate all the data exactly as in your 'IndexOld' logic
             var totalBooks = await _context.Books.CountAsync();
             var totalUsers = await _context.Users.CountAsync();
             var utcToday = DateTime.UtcNow.Date;
@@ -120,101 +117,20 @@ namespace Library_Management_system.Controllers.Admin
                     BookCount = g.Count()
                 })
                 .OrderByDescending(x => x.BookCount)
-                .ThenBy(x => x.CategoryName)
                 .ToListAsync();
 
-            var borrowingRowsRaw = await _context.BorrowingRecords
-                .AsNoTracking()
-                .Include(br => br.Book)
-                .OrderByDescending(br => br.BorrowDate)
-                .ThenByDescending(br => br.Id)
-                .ToListAsync();
-
-            var borrowingRows = borrowingRowsRaw
-                .Select(br =>
-                {
-                    var status = ComputeBorrowingStatus(br.Status, br.DueDate, br.ReturnDate, utcToday);
-                    var lateDays = CalculateLateDays(br.DueDate, utcToday, status);
-                    return new
-                    {
-                        Row = br,
-                        Status = status,
-                        LateDays = lateDays
-                    };
-                })
-                .ToList();
-
-            var borrowedBooks = borrowingRows.Count(x => x.Status is "active" or "overdue");
-            var overdueBorrowings = borrowingRows
-                .Where(x => x.Status == "overdue")
-                .OrderByDescending(x => x.LateDays)
-                .ThenBy(x => x.Row.DueDate)
-                .Take(QuickActionsLimit)
-                .Select(x => new DashboardOverdueBorrowingItemViewModel
-                {
-                    BorrowingId = x.Row.Id,
-                    BookTitle = x.Row.Book?.Title ?? "(Missing book)",
-                    Borrower = x.Row.Username,
-                    DueDate = x.Row.DueDate,
-                    DaysOverdue = x.LateDays,
-                    Fine = x.LateDays * FinePerLateDay
-                })
-                .ToList();
-
-            var totalFines = borrowingRows
-                .Where(x => x.Status == "overdue")
-                .Sum(x => x.LateDays * FinePerLateDay);
-
-            var recentBorrowings = borrowingRows
-                .Take(QuickActionsLimit)
-                .Select(x => new DashboardRecentBorrowingItemViewModel
-                {
-                    BorrowingId = x.Row.Id,
-                    Username = x.Row.Username,
-                    BookTitle = x.Row.Book?.Title ?? "(Missing book)",
-                    BorrowDate = x.Row.BorrowDate,
-                    DueDate = x.Row.DueDate,
-                    Status = x.Status
-                })
-                .ToList();
-
-            var monthStartUtc = new DateTime(utcToday.Year, utcToday.Month, 1).AddMonths(-11);
-            var borrowingsForTrend = borrowingRowsRaw
-                .Where(br => br.BorrowDate.Date >= monthStartUtc.Date)
-                .ToList();
-            var trendLookup = borrowingsForTrend
-                .GroupBy(br => new DateTime(br.BorrowDate.Year, br.BorrowDate.Month, 1))
-                .ToDictionary(g => g.Key, g => g.Count());
-
-            var borrowingTrends = Enumerable.Range(0, 12)
-                .Select(offset =>
-                {
-                    var month = monthStartUtc.AddMonths(offset);
-                    trendLookup.TryGetValue(month, out var count);
-                    return new DashboardBorrowingTrendItemViewModel
-                    {
-                        Label = month.ToString("MMM"),
-                        Count = count
-                    };
-                })
-                .ToList();
-
+            // Create the real model
             var model = new DashboardViewModel
             {
                 TotalBooks = totalBooks,
                 TotalUsers = totalUsers,
-                BorrowedBooks = borrowedBooks,
-                TotalFines = totalFines,
-                RestrictedMembersCount = restrictedMembersCount,
-                OverdueBorrowings = overdueBorrowings,
-                RecentBorrowings = recentBorrowings,
-                BorrowingTrends = borrowingTrends,
                 CategoryDistribution = categoryDistribution,
                 NewMembers = newMembers,
                 NewBooks = newBooks,
                 RestrictedMembers = restrictedMembers
             };
 
+            // CRITICAL FIX: Pass the 'model' to the View
             return View("~/Views/Admin/Dashboard/Index.cshtml", model);
         }
 

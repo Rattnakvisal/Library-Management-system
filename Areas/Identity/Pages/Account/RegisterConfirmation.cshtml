@@ -1,0 +1,39 @@
+@page
+@model Library_Management_system.Areas.Identity.Pages.Account.RegisterConfirmationModel
+@{
+    ViewData["Title"] = "Register confirmation";
+}
+
+<div class="container mt-5 text-center">
+    <div class="card shadow-sm p-5">
+        <div class="mb-4">
+            <i class="bi bi-envelope-check text-primary" style="font-size: 3rem;"></i>
+        </div>
+        <h1>Check your email</h1>
+        <p class="lead mt-3">
+            We've sent a verification link to <strong>@Model.Email</strong>.
+        </p>
+        <p>
+            Please check your inbox (and spam folder) and click the link to confirm your library account.
+        </p>
+        <hr />
+        @{
+            if (Model.DisplayConfirmAccountLink)
+            {
+                <p>
+                    This site does not currently have a real email sender registered, see <a href="https://aka.ms/aspaccountconf">these docs</a> for how to configure a real email sender.
+                    Normally this would be emailed: <a id="confirm-link" href="@Model.DisplayConfirmAccountLink">Click here to confirm your account</a>
+                </p>
+            }
+            else
+            {
+                <p class="text-muted">
+                    Once you confirm your email, you will be able to log in.
+                </p>
+            }
+        }
+        <div class="mt-4">
+            <a href="/Login" class="btn btn-primary">Back to Login</a>
+        </div>
+    </div>
+</div>
