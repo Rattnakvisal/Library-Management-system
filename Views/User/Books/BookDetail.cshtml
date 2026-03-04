@@ -22,7 +22,7 @@
 
 <div id="bookDetailPage" class="page-wrap book-detail-page">
     <div class="row g-5 align-items-start detail-top">
-        <div class="col-12 col-md-4">
+        <div class="col-12 col-md-4 detail-media">
             <img src="@imagePath" class="main-img cover-sm detail-cover" alt="@book.Title">
         </div>
 
@@ -47,6 +47,7 @@
                             }
                         }
                     </div>
+                    <div class="rate-score">@rating/5</div>
                     <div class="rate-text">Rate this book</div>
                 </div>
             </div>
@@ -81,7 +82,7 @@
                     </a>
                 }
                 <form method="post" asp-controller="Home" asp-action="AddToCart" asp-route-bookId="@book.Id"
-                      class="d-inline">
+                      class="d-inline cart-form">
                     @Html.AntiForgeryToken()
                     <button type="submit" class="btn-cart text-decoration-none border-0">
                         <i class="bi bi-cart2 me-2"></i> Add to cart
@@ -90,7 +91,7 @@
                 @if (Model.IsFavorite)
                 {
                     <form method="post" asp-controller="Home" asp-action="RemoveFavorite" asp-route-bookId="@book.Id"
-                          class="d-inline">
+                          class="d-inline fav-form">
                         @Html.AntiForgeryToken()
                         <input type="hidden" name="returnUrl" value="@returnUrl" />
                         <button type="submit" class="btn-fav-circle" aria-label="remove favorite" title="Remove favorite">
@@ -101,7 +102,7 @@
                 else
                 {
                     <form method="post" asp-controller="Home" asp-action="AddFavorite" asp-route-bookId="@book.Id"
-                          class="d-inline">
+                          class="d-inline fav-form">
                         @Html.AntiForgeryToken()
                         <input type="hidden" name="returnUrl" value="@returnUrl" />
                         <button type="submit" class="btn-fav-circle" aria-label="add favorite" title="Add favorite">

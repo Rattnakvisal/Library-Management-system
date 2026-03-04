@@ -13,92 +13,93 @@
 
 <div id="bookCategoryPage" class="container book-category-page">
     <h2 class="text-center fw-bold text-navy category-heading">Book Categories</h2>
-    <p class="text-center text-muted category-subheading">Explore our collection of books by category. Find your next great read!</p>
-    <div class="filter-scroll-container mb-5">
-        <div class="d-flex flex-nowrap px-4">
-            <a asp-controller="Home" asp-action="BookIndex" asp-route-category=""
-               class="btn btn-filter category-chip @(string.IsNullOrEmpty(currentCategory) ? "active" : "")">All</a>
+    <p class="text-center text-muted category-subheading">Explore our collection of books by category. Find your next
+        great read!</p>
+        <div class="filter-scroll-container mb-5">
+            <div class="d-flex flex-nowrap px-4">
+                <a asp-controller="Home" asp-action="Book" asp-route-category=""
+                   class="btn btn-filter category-chip @(string.IsNullOrEmpty(currentCategory) ? "active" : "")">All</a>
 
-            @foreach (var categoryName in categories)
-            {
-                <a asp-controller="Home" asp-action="BookIndex" asp-route-category="@categoryName"
-                   class="btn btn-filter category-chip @(currentCategory == categoryName ? "active" : "")">@categoryName</a>
-            }
+                @foreach (var categoryName in categories)
+                {
+                    <a asp-controller="Home" asp-action="Book" asp-route-category="@categoryName"
+                       class="btn btn-filter category-chip @(currentCategory == categoryName ? "active" : "")">@categoryName</a>
+                }
+            </div>
         </div>
-    </div>
 
-    <div class="row g-4 category-grid">
-        @if (Model != null && Model.Any())
-        {
-            @foreach (var book in Model)
+        <div class="row g-4 category-grid">
+            @if (Model != null && Model.Any())
             {
-                var imagePath = string.IsNullOrWhiteSpace(book.ImageUrl)
-                    ? Url.Content("~/images/User/Book/book2.png")
-                    : Url.Content(book.ImageUrl);
-                var rating = Math.Clamp(book.Rating, 0, 5);
+                @foreach (var book in Model)
+                {
+                    var imagePath = string.IsNullOrWhiteSpace(book.ImageUrl)
+                        ? Url.Content("~/images/User/Book/book2.png")
+                        : Url.Content(book.ImageUrl);
+                    var rating = Math.Clamp(book.Rating, 0, 5);
 
-                <div class="col-6 col-md-4 col-lg-3">
-                    <div class="card book-card category-card border-0 shadow-sm h-100 position-relative">
-                        <div class="p-2 position-relative">
-                            <img src="@imagePath" class="card-img-top rounded-3" alt="Book Cover"
-                                 style="height: 200px; object-fit: cover;">
-                        </div>
-                        <div class="card-body pt-0 px-3 pb-3">
-                            <span class="category-text-tiny fw-bold text-muted">@book.CategoryName</span>
-                            <h6 class="book-title-clamped mb-1 fw-bold">@book.Title</h6>
-                            <p class="author-text-tiny text-muted mb-2">@book.Author</p>
-                            <div class="text-end text-warning small">
-                                @for (var i = 0; i < 5; i++)
-                                {
-                                    if (i < rating)
-                                    {
-                                        <i class="fa-solid fa-star"></i>
-                                    }
-                                    else
-                                    {
-                                        <i class="fa-regular fa-star"></i>
-                                    }
-                                }
+                    <div class="col-6 col-md-4 col-lg-3">
+                        <div class="card book-card category-card border-0 shadow-sm h-100 position-relative">
+                            <div class="p-2 position-relative">
+                                <img src="@imagePath" class="card-img-top rounded-3" alt="Book Cover"
+                                     style="height: 200px; object-fit: cover;">
                             </div>
+                            <div class="card-body pt-0 px-3 pb-3">
+                                <span class="category-text-tiny fw-bold text-muted">@book.CategoryName</span>
+                                <h6 class="book-title-clamped mb-1 fw-bold">@book.Title</h6>
+                                <p class="author-text-tiny text-muted mb-2">@book.Author</p>
+                                <div class="text-end text-warning small">
+                                    @for (var i = 0; i < 5; i++)
+                                    {
+                                        if (i < rating)
+                                        {
+                                            <i class="fa-solid fa-star"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="fa-regular fa-star"></i>
+                                        }
+                                    }
+                                </div>
+                            </div>
+                            <a asp-controller="Home" asp-action="BookDetail" asp-route-id="@book.Id" class="stretched-link"
+                               aria-label="View details for @book.Title"></a>
                         </div>
-                        <a asp-controller="Home" asp-action="BookDetail" asp-route-id="@book.Id" class="stretched-link"
-                           aria-label="View details for @book.Title"></a>
                     </div>
+                }
+            }
+            else
+            {
+                <div class="col-12">
+                    <div class="text-center py-5 text-muted">No books found in this category.</div>
                 </div>
             }
-        }
-        else
-        {
-            <div class="col-12">
-                <div class="text-center py-5 text-muted">No books found in this category.</div>
-            </div>
-        }
-    </div>
-
-    <nav class="mt-5 d-flex justify-content-center">
-        <div class="pagination-wrapper d-flex border rounded overflow-hidden">
-            @if (totalPages > 1)
-            {
-                @if (currentPage > 1)
-                {
-                    <a asp-controller="Home" asp-action="BookIndex" asp-route-category="@currentCategory" asp-route-page="@(currentPage - 1)"
-                       class="page-node px-3">Prev</a>
-                }
-
-                @for (var i = 1; i <= totalPages; i++)
-                {
-                    <a asp-controller="Home" asp-action="BookIndex" asp-route-page="@i" asp-route-category="@currentCategory"
-                           class="page-node @(i == currentPage ? "active" : "")">
-                        @i
-                    </a>
-                }
-
-                @if (currentPage < totalPages)
-                {
-                    <a asp-controller="Home" asp-action="BookIndex" asp-route-category="@currentCategory" asp-route-page="@(currentPage + 1)"
-                       class="page-node px-3">Next</a>
-                }
-            }
         </div>
-    </nav>
-</div>
+
+        <nav class="mt-5 d-flex justify-content-center">
+            <div class="pagination-wrapper d-flex border rounded overflow-hidden">
+                @if (totalPages > 1)
+                {
+                    @if (currentPage > 1)
+                    {
+                        <a asp-controller="Home" asp-action="Book" asp-route-category="@currentCategory"
+                           asp-route-page="@(currentPage - 1)" class="page-node px-3">Prev</a>
+                    }
+
+                    @for (var i = 1; i <= totalPages; i++)
+                    {
+                        <a asp-controller="Home" asp-action="Book" asp-route-page="@i" asp-route-category="@currentCategory"
+                               class="page-node @(i == currentPage ? "active" : "")">
+                            @i
+                        </a>
+                    }
+
+                    @if (currentPage < totalPages)
+                    {
+                        <a asp-controller="Home" asp-action="Book" asp-route-category="@currentCategory"
+                           asp-route-page="@(currentPage + 1)" class="page-node px-3">Next</a>
+                    }
+                }
+            </div>
+        </nav>
+    </div>
