@@ -3,7 +3,7 @@ using Library_Management_system.Models.Admin;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Text.Json; // Ensure this is available if needed
+using System.Globalization;
 
 namespace Library_Management_system.Controllers.Admin
 {
@@ -25,7 +25,6 @@ namespace Library_Management_system.Controllers.Admin
         [HttpGet("")]
         public async Task<IActionResult> Index()
         {
-            // Populate all the data exactly as in your 'IndexOld' logic
             var totalBooks = await _context.Books.CountAsync();
             var totalUsers = await _context.Users.CountAsync();
             var utcToday = DateTime.UtcNow.Date;
@@ -119,18 +118,96 @@ namespace Library_Management_system.Controllers.Admin
                 .OrderByDescending(x => x.BookCount)
                 .ToListAsync();
 
-            // Create the real model
+            var borrowings = await _context.BorrowingRecords
+                .AsNoTracking()
+                .Include(br => br.Book)
+                .ToListAsync();
+
+            var borrowingSnapshots = borrowings
+                .Select(br =>
+                {
+                    var status = ComputeBorrowingStatus(br.Status, br.DueDate, br.ReturnDate, utcToday);
+                    var lateDays = CalculateLateDays(br.DueDate, utcToday, status);
+                    return new
+                    {
+                        Record = br,
+                        Status = status,
+                        LateDays = lateDays,
+                        Fine = lateDays * FinePerLateDay
+                    };
+                })
+                .ToList();
+
+            var borrowedBooks = borrowingSnapshots.Count(x => x.Status != "returned");
+            var totalFines = borrowingSnapshots.Sum(x => x.Fine);
+
+            var overdueBorrowings = borrowingSnapshots
+                .Where(x => x.Status == "overdue")
+                .OrderByDescending(x => x.LateDays)
+                .ThenBy(x => x.Record.DueDate)
+                .Take(QuickActionsLimit)
+                .Select(x => new DashboardOverdueBorrowingItemViewModel
+                {
+                    BorrowingId = x.Record.Id,
+                    BookTitle = x.Record.Book?.Title ?? "(Missing book)",
+                    Borrower = string.IsNullOrWhiteSpace(x.Record.Username) ? "Unknown" : x.Record.Username,
+                    DueDate = x.Record.DueDate,
+                    DaysOverdue = x.LateDays,
+                    Fine = x.Fine
+                })
+                .ToList();
+
+            var recentBorrowings = borrowingSnapshots
+                .OrderByDescending(x => x.Record.BorrowDate)
+                .ThenByDescending(x => x.Record.Id)
+                .Take(QuickActionsLimit)
+                .Select(x => new DashboardRecentBorrowingItemViewModel
+                {
+                    BorrowingId = x.Record.Id,
+                    Username = string.IsNullOrWhiteSpace(x.Record.Username) ? "Unknown" : x.Record.Username,
+                    BookTitle = x.Record.Book?.Title ?? "(Missing book)",
+                    BorrowDate = x.Record.BorrowDate,
+                    DueDate = x.Record.DueDate,
+                    Status = x.Status
+                })
+                .ToList();
+
+            var trendStartMonth = new DateTime(utcToday.Year, utcToday.Month, 1).AddMonths(-11);
+            var trendBuckets = borrowingSnapshots
+                .Where(x => x.Record.BorrowDate.Date >= trendStartMonth)
+                .GroupBy(x => new { x.Record.BorrowDate.Year, x.Record.BorrowDate.Month })
+                .ToDictionary(
+                    g => (g.Key.Year, g.Key.Month),
+                    g => g.Count());
+
+            var borrowingTrends = Enumerable.Range(0, 12)
+                .Select(offset =>
+                {
+                    var monthDate = trendStartMonth.AddMonths(offset);
+                    return new DashboardBorrowingTrendItemViewModel
+                    {
+                        Label = monthDate.ToString("MMM yy", CultureInfo.InvariantCulture),
+                        Count = trendBuckets.TryGetValue((monthDate.Year, monthDate.Month), out var count) ? count : 0
+                    };
+                })
+                .ToList();
+
             var model = new DashboardViewModel
             {
                 TotalBooks = totalBooks,
+                BorrowedBooks = borrowedBooks,
                 TotalUsers = totalUsers,
+                TotalFines = totalFines,
+                RestrictedMembersCount = restrictedMembersCount,
+                OverdueBorrowings = overdueBorrowings,
+                RecentBorrowings = recentBorrowings,
+                BorrowingTrends = borrowingTrends,
                 CategoryDistribution = categoryDistribution,
                 NewMembers = newMembers,
                 NewBooks = newBooks,
                 RestrictedMembers = restrictedMembers
             };
 
-            // CRITICAL FIX: Pass the 'model' to the View
             return View("~/Views/Admin/Dashboard/Index.cshtml", model);
         }
 

@@ -215,21 +215,41 @@ public class ManageUserController : Controller
 
         await UpsertUserClaimsAsync(user, input.UserCode, input.Gender);
 
-        // Send email confirmation
-        var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-        var confirmationLink = Url.Action(
-            "ConfirmEmail", 
-            "Account", 
-            new { userId = user.Id, token = token }, 
-            Request.Scheme);
+        var successMessage = "User created successfully.";
 
-        if (!string.IsNullOrEmpty(user.Email))
+        // Don't fail user creation when SMTP is misconfigured/unavailable.
+        if (!string.IsNullOrWhiteSpace(user.Email))
         {
-            await _emailSender.SendEmailAsync(user.Email, "Confirm your email", 
-                $"Please confirm your account by <a href='{confirmationLink}'>clicking here</a>.");
+            try
+            {
+                var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                var confirmationLink = Url.Action(
+                    "ConfirmEmail",
+                    "Account",
+                    new { userId = user.Id, token },
+                    Request.Scheme);
+
+                if (!string.IsNullOrWhiteSpace(confirmationLink))
+                {
+                    await _emailSender.SendEmailAsync(
+                        user.Email,
+                        "Confirm your email",
+                        $"Please confirm your account by <a href='{confirmationLink}'>clicking here</a>.");
+
+                    successMessage = "User created successfully. A verification email has been sent.";
+                }
+                else
+                {
+                    successMessage = "User created successfully, but verification email could not be generated.";
+                }
+            }
+            catch
+            {
+                successMessage = "User created successfully, but verification email could not be sent. Please check email settings.";
+            }
         }
 
-        TempData["ManageUserSuccess"] = "User created successfully. A verification email has been sent.";
+        TempData["ManageUserSuccess"] = successMessage;
         return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort));
     }
 

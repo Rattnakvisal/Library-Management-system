@@ -43,7 +43,7 @@ namespace Library_Management_system.Controllers
         }
         public async Task<IActionResult> Index()
         {
-            const int trendingBooksLimit = 4;
+            const int trendingBooksLimit = 12;
             const int newArrivalsLimit = 4;
 
             // Get categories with images

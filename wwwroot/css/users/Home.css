@@ -109,6 +109,17 @@ body {
     white-space: nowrap;
 }
 
+.home-page .top-trending-scroll {
+    scroll-snap-type: x proximity;
+    padding-bottom: 0.5rem;
+}
+
+.home-page .top-trending-item {
+    flex: 0 0 250px;
+    width: 250px;
+    scroll-snap-align: start;
+}
+
 .book-title {
     display: -webkit-box;
     line-clamp: 2;
@@ -195,6 +206,11 @@ body {
     .home-page .category-scroll-item {
         flex-basis: 78vw;
         max-width: 78vw;
+    }
+
+    .home-page .top-trending-item {
+        flex-basis: 78vw;
+        width: 78vw;
     }
 
     .card-body {
