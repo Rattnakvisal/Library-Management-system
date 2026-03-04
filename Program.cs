@@ -15,7 +15,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // Identity
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
-    options.SignIn.RequireConfirmedAccount = false;
+    // Change this from false to true
+    options.SignIn.RequireConfirmedAccount = true; 
     options.User.RequireUniqueEmail = true;
 
     // Optional: password rules (you can adjust)

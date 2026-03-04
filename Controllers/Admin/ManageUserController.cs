@@ -5,6 +5,7 @@ using Library_Management_system.Models;
 using Library_Management_system.Models.Admin;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services; // Add this namespace
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,13 +23,16 @@ public class ManageUserController : Controller
 
     private readonly ApplicationDbContext _dbContext;
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly IEmailSender _emailSender;
 
     public ManageUserController(
         ApplicationDbContext dbContext,
-        UserManager<ApplicationUser> userManager)
+        UserManager<ApplicationUser> userManager,
+        IEmailSender emailSender)
     {
         _dbContext = dbContext;
         _userManager = userManager;
+        _emailSender = emailSender;
     }
 
     [HttpGet("")]
@@ -187,7 +191,7 @@ public class ManageUserController : Controller
         {
             FullName = input.FullName.Trim(),
             Email = input.Email.Trim(),
-            EmailConfirmed = true,
+            // EmailConfirmed = true, <-- REMOVE OR COMMENT THIS LINE
             PhoneNumber = input.PhoneNumber.Trim(),
             UserName = await GenerateUniqueUsernameAsync(input.FullName, input.Email),
             CreatedBy = GetCurrentActor(),
@@ -211,7 +215,21 @@ public class ManageUserController : Controller
 
         await UpsertUserClaimsAsync(user, input.UserCode, input.Gender);
 
-        TempData["ManageUserSuccess"] = "User created successfully.";
+        // Send email confirmation
+        var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+        var confirmationLink = Url.Action(
+            "ConfirmEmail", 
+            "Account", 
+            new { userId = user.Id, token = token }, 
+            Request.Scheme);
+
+        if (!string.IsNullOrEmpty(user.Email))
+        {
+            await _emailSender.SendEmailAsync(user.Email, "Confirm your email", 
+                $"Please confirm your account by <a href='{confirmationLink}'>clicking here</a>.");
+        }
+
+        TempData["ManageUserSuccess"] = "User created successfully. A verification email has been sent.";
         return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort));
     }
 

@@ -1,0 +1,11 @@
+@{
+    ViewData["Title"] = "Confirm Email";
+}
+
+<div class="container mt-5">
+    <h2>@ViewData["Title"]</h2>
+    <div class="alert alert-info">
+        @ViewBag.Status
+    </div>
+    <a asp-controller="Login" asp-action="Index" class="btn btn-primary">Go to Login</a>
+</div>
