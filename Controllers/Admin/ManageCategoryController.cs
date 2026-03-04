@@ -1,21 +1,34 @@
 using Library_Management_system.Data;
 using Library_Management_system.Models;
 using Library_Management_system.Models.Admin;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace Library_Management_system.Controllers.Admin;
 
+[Authorize(Roles = "Admin")]
+[Route("admin/managecategory")]
 public class ManageCategoryController : Controller
 {
     private readonly ApplicationDbContext _context;
+    private readonly IWebHostEnvironment _environment;
 
-    public ManageCategoryController(ApplicationDbContext context)
+    private static readonly HashSet<string> AllowedImageExtensions = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ".jpg",
+        ".jpeg",
+        ".png",
+        ".webp"
+    };
+
+    public ManageCategoryController(ApplicationDbContext context, IWebHostEnvironment environment)
     {
         _context = context;
+        _environment = environment;
     }
 
-    [HttpGet("admin/managecategory")]
+    [HttpGet("")]
     public async Task<IActionResult> Index(string? q = null)
     {
         var categoriesQuery = _context.Categories.AsNoTracking().AsQueryable();
@@ -43,8 +56,8 @@ public class ManageCategoryController : Controller
         return View("~/Views/Admin/ManageCategory/Index.cshtml", categories);
     }
 
-    [HttpPost("admin/managecategory/create")]
-    public async Task<IActionResult> Create([FromBody] CreateCategoryRequest request)
+    [HttpPost("create")]
+    public async Task<IActionResult> Create([FromForm] CreateCategoryRequest request)
     {
         var name = request.Name?.Trim();
         if (string.IsNullOrWhiteSpace(name))
@@ -58,9 +71,13 @@ public class ManageCategoryController : Controller
             return BadRequest(new { success = false, message = "Category already exists." });
         }
 
+        var imageUrl = await SaveCategoryImageAsync(request.ImageFile);
+
         _context.Categories.Add(new Category
         {
             Name = name,
+            ImageUrl = imageUrl,
+            Description = request.Description,
             CreatedBy = GetCurrentActor(),
             CreatedDate = DateTime.UtcNow
         });
@@ -68,20 +85,15 @@ public class ManageCategoryController : Controller
         return Ok(new { success = true, message = "Category added successfully." });
     }
 
-    [HttpPost("admin/managecategory/rename")]
-    public async Task<IActionResult> Rename([FromBody] RenameCategoryRequest request)
+    [HttpPost("update")]
+    public async Task<IActionResult> Update([FromForm] UpdateCategoryRequest request)
     {
         var oldName = request.OldName?.Trim();
         var newName = request.NewName?.Trim();
 
         if (string.IsNullOrWhiteSpace(oldName) || string.IsNullOrWhiteSpace(newName))
         {
-            return BadRequest(new { success = false, message = "Old and new category names are required." });
-        }
-
-        if (string.Equals(oldName, newName, StringComparison.OrdinalIgnoreCase))
-        {
-            return BadRequest(new { success = false, message = "New category name must be different." });
+            return BadRequest(new { success = false, message = "Category names are required." });
         }
 
         var targetCategory = await _context.Categories.FirstOrDefaultAsync(c => c.Name == oldName);
@@ -90,28 +102,44 @@ public class ManageCategoryController : Controller
             return NotFound(new { success = false, message = "Category not found." });
         }
 
-        var duplicate = await _context.Categories.AnyAsync(c => c.Name == newName);
-        if (duplicate)
+        // Update name if changed
+        if (!string.Equals(oldName, newName, StringComparison.OrdinalIgnoreCase))
         {
-            return BadRequest(new { success = false, message = "Category name already exists." });
+            var duplicate = await _context.Categories.AnyAsync(c => c.Name == newName);
+            if (duplicate)
+            {
+                return BadRequest(new { success = false, message = "Category name already exists." });
+            }
+
+            var books = await _context.Books.Where(b => b.CategoryName == oldName).ToListAsync();
+            foreach (var book in books)
+            {
+                book.CategoryName = newName;
+            }
+            targetCategory.Name = newName;
         }
 
-        targetCategory.Name = newName;
-
-        var books = await _context.Books
-            .Where(b => b.CategoryName == oldName)
-            .ToListAsync();
-
-        foreach (var book in books)
+        // Update image if provided
+        if (request.ImageFile != null && request.ImageFile.Length > 0)
         {
-            book.CategoryName = newName;
+            var imageUrl = await SaveCategoryImageAsync(request.ImageFile);
+            if (!string.IsNullOrWhiteSpace(imageUrl))
+            {
+                targetCategory.ImageUrl = imageUrl;
+            }
+        }
+
+        // Update description if provided
+        if (!string.IsNullOrWhiteSpace(request.Description))
+        {
+            targetCategory.Description = request.Description;
         }
 
         await _context.SaveChangesAsync();
-        return Ok(new { success = true, message = "Category renamed successfully." });
+        return Ok(new { success = true, message = "Category updated successfully." });
     }
 
-    [HttpPost("admin/managecategory/delete")]
+    [HttpPost("delete")]
     public async Task<IActionResult> Delete([FromBody] DeleteCategoryRequest request)
     {
         var categoryName = request.Name?.Trim();
@@ -137,10 +165,7 @@ public class ManageCategoryController : Controller
             });
         }
 
-        var books = await _context.Books
-            .Where(b => b.CategoryName == categoryName)
-            .ToListAsync();
-
+        var books = await _context.Books.Where(b => b.CategoryName == categoryName).ToListAsync();
         foreach (var book in books)
         {
             book.CategoryName = uncategorizedName;
@@ -151,25 +176,57 @@ public class ManageCategoryController : Controller
         return Ok(new { success = true, message = "Category deleted. Books moved to Uncategorized." });
     }
 
-    public sealed class CreateCategoryRequest
+    private async Task<string?> SaveCategoryImageAsync(IFormFile? imageFile)
     {
-        public string Name { get; set; } = string.Empty;
-    }
+        if (imageFile == null || imageFile.Length == 0)
+            return null;
 
-    public sealed class RenameCategoryRequest
-    {
-        public string OldName { get; set; } = string.Empty;
-        public string NewName { get; set; } = string.Empty;
-    }
+        const long maxSizeBytes = 5 * 1024 * 1024;
+        if (imageFile.Length > maxSizeBytes)
+            return null;
 
-    public sealed class DeleteCategoryRequest
-    {
-        public string Name { get; set; } = string.Empty;
+        var extension = Path.GetExtension(imageFile.FileName).ToLowerInvariant();
+        if (string.IsNullOrWhiteSpace(extension) || !AllowedImageExtensions.Contains(extension))
+            return null;
+
+        if (!imageFile.ContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
+            return null;
+
+        var uploadsDirectory = Path.Combine(_environment.WebRootPath, "images", "Admin", "Categories");
+        Directory.CreateDirectory(uploadsDirectory);
+
+        var fileName = $"{Guid.NewGuid():N}{extension}";
+        var filePath = Path.Combine(uploadsDirectory, fileName);
+
+        await using var stream = new FileStream(filePath, FileMode.Create);
+        await imageFile.CopyToAsync(stream);
+
+        return $"/images/Admin/Categories/{fileName}";
     }
 
     private string GetCurrentActor()
     {
         var actor = User?.Identity?.Name?.Trim();
         return string.IsNullOrWhiteSpace(actor) ? "System Admin" : actor;
+    }
+
+    public sealed class CreateCategoryRequest
+    {
+        public string Name { get; set; } = string.Empty;
+        public IFormFile? ImageFile { get; set; }
+        public string? Description { get; set; }
+    }
+
+    public sealed class UpdateCategoryRequest
+    {
+        public string OldName { get; set; } = string.Empty;
+        public string NewName { get; set; } = string.Empty;
+        public IFormFile? ImageFile { get; set; }
+        public string? Description { get; set; }
+    }
+
+    public sealed class DeleteCategoryRequest
+    {
+        public string Name { get; set; } = string.Empty;
     }
 }

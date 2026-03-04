@@ -80,8 +80,8 @@
                                 <td>@(category.CreatedDate?.ToLocalTime().ToString("yyyy-MM-dd HH:mm") ?? "-")</td>
                                 <td>
                                     <div class="action-container">
-                                        <button type="button" class="edit-book-btn rename-category-btn"
-                                                data-category-name="@category.Name" title="Rename @category.Name">
+                                        <button type="button" class="edit-book-btn edit-category-btn"
+                                                data-category-name="@category.Name" title="Edit @category.Name">
                                             <i class="bi bi-pencil-square"></i>
                                         </button>
                                         <button type="button" class="delete-book-btn delete-category-btn"
@@ -103,6 +103,45 @@
             </table>
         </div>
     </section>
+
+    <!-- Add/Edit Category Modal -->
+    <div class="modal fade" id="categoryModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="categoryModalTitle">Add Category</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="categoryForm" enctype="multipart/form-data">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="categoryName" class="form-label">Category Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="categoryName" name="name" 
+                                   placeholder="Enter category name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="categoryImage" class="form-label">Category Image</label>
+                            <input type="file" class="form-control" id="categoryImage" name="imageFile" 
+                                   accept="image/jpeg,image/png,image/webp" />
+                            <small class="text-muted">Accepted formats: JPG, PNG, WEBP (Max 5MB)</small>
+                        </div>
+                        <div class="mb-3">
+                            <label for="categoryDescription" class="form-label">Description</label>
+                            <textarea class="form-control" id="categoryDescription" name="description" 
+                                      rows="3" placeholder="Enter category description"></textarea>
+                        </div>
+                        <div id="previewContainer" class="mb-3" style="display:none;">
+                            <img id="imagePreview" src="" alt="Preview" style="max-width: 100%; max-height: 200px;" />
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary" id="submitBtn">Add Category</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 
 @section Scripts {
