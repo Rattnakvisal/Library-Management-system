@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Library_Management_system.Controllers.Admin
 {
-    [Authorize(Roles = "Admin,Librarian")]
+    [Authorize(Roles = "Admin,Librarian")] // Updated to allow both roles
     [Route("admin/dashboard")]
     public class DashboardController : Controller
     {
@@ -21,7 +21,13 @@ namespace Library_Management_system.Controllers.Admin
             _context = context;
         }
 
-        public async Task<IActionResult> Index()
+        [HttpGet("")]
+        public IActionResult Index()
+        {
+            return View("~/Views/Admin/Dashboard/Index.cshtml");
+        }
+
+        public async Task<IActionResult> IndexOld()
         {
             var totalBooks = await _context.Books.CountAsync();
             var totalUsers = await _context.Users.CountAsync();

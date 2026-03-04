@@ -29,6 +29,19 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders();
 
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Login/Index";
+    options.AccessDeniedPath = "/"; 
+    
+    // Explicitly handle the redirect to avoid the ReturnUrl parameter
+    options.Events.OnRedirectToAccessDenied = context =>
+    {
+        context.Response.Redirect("/");
+        return Task.CompletedTask;
+    };
+});
+
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 builder.Services.AddScoped<DbHelper>();
