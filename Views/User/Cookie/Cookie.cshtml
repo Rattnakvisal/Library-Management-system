@@ -1,7 +1,44 @@
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
-    ViewBag.Title = "Cookie";
+    ViewBag.Title = "Cookie Policy";
 }
 
-<h1>Cookie Policy</h1>
-<p>Cookie policy and consent information placeholder.</p>
+<div class="container mt-4">
+    <h1>Cookie Policy</h1>
+    <p><strong>Last Updated:</strong> @DateTime.Now.ToString("MMMM dd, yyyy")</p>
+
+    <hr />
+
+    <h3>1. What Are Cookies?</h3>
+    <p>
+        Cookies are small text files that are stored on your device when you visit a website.
+        They help improve functionality, remember preferences, and enhance user experience.
+    </p>
+
+    <h3>2. How We Use Cookies</h3>
+    <p>We use cookies for the following purposes:</p>
+    <ul>
+        <li><strong>Essential Cookies:</strong> Necessary for website operation.</li>
+        <li><strong>Performance Cookies:</strong> Help us understand website usage.</li>
+        <li><strong>Functional Cookies:</strong> Store your preferences and settings.</li>
+        <li><strong>Analytics Cookies:</strong> Provide insights to improve our services.</li>
+    </ul>
+
+    <h3>3. Third-Party Cookies</h3>
+    <p>
+        Some cookies may be set by third-party services such as analytics providers.
+        These services have their own privacy and cookie policies.
+    </p>
+
+    <h3>4. Managing Cookies</h3>
+    <p>
+        You can control or delete cookies through your browser settings.
+        Disabling certain cookies may affect website functionality.
+    </p>
+
+    <h3>5. Consent</h3>
+    <p>
+        By continuing to use this website, you consent to our use of cookies
+        in accordance with this Cookie Policy.
+    </p>
+</div>

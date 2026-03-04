@@ -21,6 +21,12 @@
             <div class="carousel-item">
                 <img src="/images/User/Slideshow/img_library2.jpg" class="d-block w-100 main-slider-img" alt="Slide 2">
             </div>
+            <div class="carousel-item">
+                <img src="/images/User/Slideshow/img_library2.jpg" class="d-block w-100 main-slider-img" alt="Slide 2">
+            </div>
+            <div class="carousel-item">
+                <img src="/images/User/Slideshow/img_library2.jpg" class="d-block w-100 main-slider-img" alt="Slide 2">
+            </div>
         </div>
 
         <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
@@ -213,56 +219,47 @@
 
 <!-- author by genre section -->
     <section class="container-fluid mt-4 home-section">
-    <h3 class="fw-bold mb-4 text-navy">Author by Geners</h3>
+        <h3 class="fw-bold mb-4 text-navy">Author by Genre</h3>
 
-    <div class="d-flex flex-nowrap overflow-auto gap-3 pb-3 custom-scrollbar">
+        <div class="d-flex custom-scrollbar pb-3" style="gap: 1rem;">
 
-        <div class="flex-shrink-0 genre-card-wrapper">
-            <div class="card border-0 rounded-4 overflow-hidden position-relative genre-card shadow-sm">
-                <img src="~/images/User/Book/novel.jpg" class="card-img" alt="Novel">
-                <div class="genre-overlay d-flex align-items-end p-3">
-                    <h5 class="text-white fw-bold mb-0">Novel</h5>
+            <div class="genre-card-wrapper flex-shrink-0">
+                <div class="card border-0 rounded-4 overflow-hidden position-relative genre-card shadow-sm">
+                    <img src="~/images/User/Book/novel.jpg" class="card-img" alt="Novel">
+                    <div class="genre-overlay d-flex align-items-end p-3">
+                        <h5 class="text-white fw-bold mb-0">Novel</h5>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="flex-shrink-0 genre-card-wrapper">
-            <div class="card border-0 rounded-4 overflow-hidden position-relative genre-card shadow-sm">
-                <img src="/images/User/Book/science-fiction.jpg" class="card-img" alt="Science Fiction">
-                <div class="genre-overlay d-flex align-items-end p-3">
-                    <h5 class="text-white fw-bold mb-0">Science Fiction</h5>
+            <div class="genre-card-wrapper flex-shrink-0">
+                <div class="card border-0 rounded-4 overflow-hidden position-relative genre-card shadow-sm">
+                    <img src="~/images/User/Book/science-fiction.jpg" class="card-img" alt="Science Fiction">
+                    <div class="genre-overlay d-flex align-items-end p-3">
+                        <h5 class="text-white fw-bold mb-0">Science Fiction</h5>
+                    </div>
                 </div>
             </div>
-        </div>
-
-        <div class="flex-shrink-0 genre-card-wrapper">
-            <div class="card border-0 rounded-4 overflow-hidden position-relative genre-card shadow-sm">
-                <img src="~/images/User/Book/romance.jpg" class="card-img" alt="Romance">
-                <div class="genre-overlay d-flex align-items-end p-3">
-                    <h5 class="text-white fw-bold mb-0">Romance</h5>
+            <div class="genre-card-wrapper flex-shrink-0">
+                <div class="card border-0 rounded-4 overflow-hidden position-relative genre-card shadow-sm">
+                    <img src="~/images/User/Book/science-fiction.jpg" class="card-img" alt="Science Fiction">
+                    <div class="genre-overlay d-flex align-items-end p-3">
+                        <h5 class="text-white fw-bold mb-0">Science Fiction</h5>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="flex-shrink-0 genre-card-wrapper">
-            <div class="card border-0 rounded-4 overflow-hidden position-relative genre-card shadow-sm">
-                <img src="/images/User/Book/science-fiction.jpg" class="card-img" alt="Science Fiction">
-                <div class="genre-overlay d-flex align-items-end p-3">
-                    <h5 class="text-white fw-bold mb-0">Science Fiction</h5>
+
+            <div class="genre-card-wrapper flex-shrink-0">
+                <div class="card border-0 rounded-4 overflow-hidden position-relative genre-card shadow-sm">
+                    <img src="~/images/User/Book/romance.jpg" class="card-img" alt="Romance">
+                    <div class="genre-overlay d-flex align-items-end p-3">
+                        <h5 class="text-white fw-bold mb-0">Romance</h5>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="flex-shrink-0 genre-card-wrapper">
-            <div class="card border-0 rounded-4 overflow-hidden position-relative genre-card shadow-sm">
-                <img src="~/images/User/Book/romance.jpg" class="card-img" alt="Romance">
-                <div class="genre-overlay d-flex align-items-end p-3">
-                    <h5 class="text-white fw-bold mb-0">Romance</h5>
-                </div>
-            </div>
         </div>
-
-    </div>
-</section>
+    </section>
 <!-- author by genre section end -->
 
 <!-- New arrival section -->
@@ -410,7 +407,20 @@
     </div>
 </section>
 </div>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const sliders = document.querySelectorAll(".custom-scrollbar");
 
+        sliders.forEach(slider => {
+            slider.addEventListener("wheel", function (e) {
+                if (e.deltaY !== 0) {
+                    e.preventDefault();
+                    slider.scrollLeft += e.deltaY;
+                }
+            });
+        });
+    });
+</script>
 @section Scripts {
     <script src="~/js/users/Home.js" asp-append-version="true"></script>
 }

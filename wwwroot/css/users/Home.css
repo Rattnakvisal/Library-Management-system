@@ -80,8 +80,9 @@ body {
 }
 
 .custom-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-behavior: smooth;
 }
 
 .book-title {
@@ -281,4 +282,66 @@ body {
         opacity: 1 !important;
         filter: none !important;
     }
+}
+.genre-card-wrapper {
+    flex: 0 0 auto;
+    width: 240px;
+}
+
+.genre-card img {
+    height: 300px;
+    object-fit: cover;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+    height: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 10px;
+}
+/* HERO IMPROVEMENT */
+.hero-slide {
+    position: relative;
+}
+
+.main-slider-img {
+    height: 420px;
+    object-fit: cover;
+}
+
+.hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right, rgba(0,0,0,0.7), rgba(0,0,0,0.2));
+    display: flex;
+    align-items: center;
+    padding-left: 5%;
+}
+
+.hero-content {
+    max-width: 500px;
+}
+
+    .hero-content h1 {
+        font-size: 2.5rem;
+    }
+
+    .hero-content .btn {
+        margin-top: 10px;
+    }
+
+/* Better controls */
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+    background-color: rgba(0,0,0,0.4);
+    padding: 20px;
+    border-radius: 50%;
+}
+
+/* Rounded edges */
+#heroCarousel {
+    border-radius: 16px;
+    overflow: hidden;
 }
