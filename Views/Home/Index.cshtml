@@ -46,15 +46,19 @@
                 Explore more
             </a>
         </div>
-        <div class="row g-4">
+        <div class="category-scroll-wrap custom-scrollbar">
             @foreach (var category in Model.Categories)
             {
-                <div class="col-md-4">
-                    <a asp-controller="Home" asp-action="Category" asp-route-category="@category" class="text-decoration-none">
-                        <div class="card book-card shadow-sm h-100">
-                            <img src="/images/User/Book/general.jpg" class="card-img-top custom-card-img" alt="@category">
+                var categoryImageUrl = string.IsNullOrWhiteSpace(category.ImageUrl)
+                    ? "/images/User/Book/general.jpg"
+                    : category.ImageUrl;
+
+                <div class="category-scroll-item">
+                    <a asp-controller="Home" asp-action="BookIndex" asp-route-category="@category.Name" class="text-decoration-none">
+                        <div class="card book-card category-scroll-card shadow-sm h-100">
+                            <img src="@categoryImageUrl" class="card-img-top custom-card-img" alt="@category.Name">
                             <div class="card-body py-2">
-                                <h6 class="mb-0">@category.ToUpper()</h6>
+                                <h6 class="mb-0">@category.Name.ToUpper()</h6>
                             </div>
                         </div>
                     </a>
@@ -111,14 +115,21 @@
         <h3 class="fw-bold mb-4 text-navy">Author by Genre</h3>
 
         <div class="d-flex custom-scrollbar pb-3" style="gap: 1rem;">
-            @foreach (var genre in Model.Genres)
+            @foreach (var genreCard in Model.Genres)
             {
+                var genreImageUrl = string.IsNullOrWhiteSpace(genreCard.ImageUrl)
+                    ? "/images/User/Book/science-fiction.jpg"
+                    : genreCard.ImageUrl;
+
                 <div class="genre-card-wrapper flex-shrink-0">
-                    <a asp-controller="Home" asp-action="Category" asp-route-category="@genre" class="text-decoration-none">
+                    <a asp-controller="Home" asp-action="BookIndex" asp-route-category="@genreCard.GenreName" class="text-decoration-none">
                         <div class="card border-0 rounded-4 overflow-hidden position-relative genre-card shadow-sm">
-                            <img src="/images/User/Book/science-fiction.jpg" class="card-img" alt="@genre">
+                            <img src="@genreImageUrl" class="card-img" alt="@genreCard.GenreName">
                             <div class="genre-overlay d-flex align-items-end p-3">
-                                <h5 class="text-white fw-bold mb-0">@genre</h5>
+                                <div class="genre-overlay-content">
+                                    <h5 class="text-white fw-bold mb-0 genre-author-name">@genreCard.AuthorName</h5>
+                                    <p class="genre-name-text mb-0">@genreCard.GenreName</p>
+                                </div>
                             </div>
                         </div>
                     </a>

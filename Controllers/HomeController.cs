@@ -46,15 +46,50 @@ namespace Library_Management_system.Controllers
             const int trendingBooksLimit = 4;
             const int newArrivalsLimit = 4;
 
-            // Get all categories
-            var categories = await _context.Books
+            var categoryNames = await _context.Categories
                 .AsNoTracking()
-                .Where(b => !string.IsNullOrWhiteSpace(b.CategoryName))
-                .Select(b => b.CategoryName)
+                .Where(c => !string.IsNullOrWhiteSpace(c.Name))
+                .Select(c => c.Name.Trim())
                 .Distinct()
                 .OrderBy(name => name)
-                .Take(3)
                 .ToListAsync();
+
+            if (categoryNames.Count == 0)
+            {
+                categoryNames = await _context.Books
+                    .AsNoTracking()
+                    .Where(b => !string.IsNullOrWhiteSpace(b.CategoryName))
+                    .Select(b => b.CategoryName!.Trim())
+                    .Distinct()
+                    .OrderBy(name => name)
+                    .ToListAsync();
+            }
+
+            var categoryImageCandidates = await _context.Books
+                .AsNoTracking()
+                .Where(b => !string.IsNullOrWhiteSpace(b.CategoryName))
+                .OrderByDescending(b => b.Id)
+                .Select(b => new
+                {
+                    CategoryName = b.CategoryName!,
+                    b.ImageUrl
+                })
+                .ToListAsync();
+
+            var categoryImages = categoryImageCandidates
+                .GroupBy(x => x.CategoryName.Trim(), StringComparer.OrdinalIgnoreCase)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.Select(x => x.ImageUrl).FirstOrDefault(url => !string.IsNullOrWhiteSpace(url)),
+                    StringComparer.OrdinalIgnoreCase);
+
+            var categories = categoryNames
+                .Select(name => new HomeCategoryCardViewModel
+                {
+                    Name = name,
+                    ImageUrl = categoryImages.TryGetValue(name, out var imageUrl) ? imageUrl : null
+                })
+                .ToList();
 
             // Get trending/popular books (highest rated or most recent)
             var trendingBooks = await _context.Books
@@ -71,15 +106,32 @@ namespace Library_Management_system.Controllers
                 .Take(newArrivalsLimit)
                 .ToListAsync();
 
-            // Get genres/categories for the genre section
-            var genres = await _context.Books
+            // Build "Author by Genre" cards dynamically from latest books per genre.
+            var genreAuthorCandidates = await _context.Books
                 .AsNoTracking()
                 .Where(b => !string.IsNullOrWhiteSpace(b.CategoryName))
-                .Select(b => b.CategoryName)
-                .Distinct()
-                .OrderBy(name => name)
-                .Take(4)
+                .OrderByDescending(b => b.Id)
+                .Select(b => new
+                {
+                    GenreName = b.CategoryName!,
+                    b.Author,
+                    b.ImageUrl
+                })
                 .ToListAsync();
+
+            var genres = genreAuthorCandidates
+                .GroupBy(x => x.GenreName.Trim(), StringComparer.OrdinalIgnoreCase)
+                .Select(g => new HomeGenreAuthorCardViewModel
+                {
+                    GenreName = g.Key,
+                    AuthorName = g.Select(x => x.Author)
+                        .FirstOrDefault(name => !string.IsNullOrWhiteSpace(name))
+                        ?? "Unknown Author",
+                    ImageUrl = g.Select(x => x.ImageUrl)
+                        .FirstOrDefault(url => !string.IsNullOrWhiteSpace(url))
+                })
+                .OrderBy(x => x.GenreName)
+                .ToList();
 
             var model = new HomeViewModel
             {
@@ -686,6 +738,7 @@ namespace Library_Management_system.Controllers
         //}
 
         [HttpGet("book")]
+        [HttpGet("[controller]/[action]")]
         public Task<IActionResult> BookIndex(string? category, int page = 1)
         {
             return Category(category, page);
