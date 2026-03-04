@@ -41,9 +41,55 @@ namespace Library_Management_system.Controllers
             _environment = environment;
             _userManager = userManager;
         }
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            const int trendingBooksLimit = 4;
+            const int newArrivalsLimit = 4;
+
+            // Get all categories
+            var categories = await _context.Books
+                .AsNoTracking()
+                .Where(b => !string.IsNullOrWhiteSpace(b.CategoryName))
+                .Select(b => b.CategoryName)
+                .Distinct()
+                .OrderBy(name => name)
+                .Take(3)
+                .ToListAsync();
+
+            // Get trending/popular books (highest rated or most recent)
+            var trendingBooks = await _context.Books
+                .AsNoTracking()
+                .OrderByDescending(b => b.Rating)
+                .ThenByDescending(b => b.Id)
+                .Take(trendingBooksLimit)
+                .ToListAsync();
+
+            // Get new arrival books
+            var newArrivalBooks = await _context.Books
+                .AsNoTracking()
+                .OrderByDescending(b => b.Id)
+                .Take(newArrivalsLimit)
+                .ToListAsync();
+
+            // Get genres/categories for the genre section
+            var genres = await _context.Books
+                .AsNoTracking()
+                .Where(b => !string.IsNullOrWhiteSpace(b.CategoryName))
+                .Select(b => b.CategoryName)
+                .Distinct()
+                .OrderBy(name => name)
+                .Take(4)
+                .ToListAsync();
+
+            var model = new HomeViewModel
+            {
+                Categories = categories,
+                TrendingBooks = trendingBooks,
+                NewArrivalBooks = newArrivalBooks,
+                Genres = genres
+            };
+
+            return View(model);
         }
 
         [HttpGet("about")]

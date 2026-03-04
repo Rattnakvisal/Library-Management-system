@@ -1,4 +1,5 @@
-﻿@{
+﻿@model Library_Management_system.Models.HomeViewModel
+@{
     ViewData["Title"] = "Home Page";
 }
 
@@ -22,10 +23,10 @@
                 <img src="/images/User/Slideshow/img_library2.jpg" class="d-block w-100 main-slider-img" alt="Slide 2">
             </div>
             <div class="carousel-item">
-                <img src="/images/User/Slideshow/img_library2.jpg" class="d-block w-100 main-slider-img" alt="Slide 2">
+                <img src="/images/User/Slideshow/img_library2.jpg" class="d-block w-100 main-slider-img" alt="Slide 3">
             </div>
             <div class="carousel-item">
-                <img src="/images/User/Slideshow/img_library2.jpg" class="d-block w-100 main-slider-img" alt="Slide 2">
+                <img src="/images/User/Slideshow/img_library2.jpg" class="d-block w-100 main-slider-img" alt="Slide 4">
             </div>
         </div>
 
@@ -36,352 +37,148 @@
             <span class="carousel-control-next-icon" aria-hidden="true"></span>
         </button>
     </div>
-<!-- slide show end -->
-<!-- categories -->
-<section class="container-fluid mt-4 home-section">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3 class="fw-bold text-navy">Book Categories</h3>
+    <!-- slide show end -->
+    <!-- categories -->
+    <section class="container-fluid mt-4 home-section">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="fw-bold text-navy">Book Categories</h3>
             <a asp-controller="Home" asp-action="BookIndex" class="btn btn-outline-secondary btn-sm">
                 Explore more
             </a>
-    </div>
+        </div>
         <div class="row g-4">
-            <div class="col-md-4">
-                <div class="card book-card shadow-sm h-100">
-                    <img src="/images/User/Book/acc.jpg" class="card-img-top custom-card-img" alt="Accounting">
-                    <div class="card-body py-2">
-                        <h6 class="mb-0">ACCOUNTING</h6>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card book-card shadow-sm h-100">
-                    <img src="/images/User/Book/law.jpg" class="card-img-top custom-card-img" alt="Law study">
-                    <div class="card-body py-2">
-                        <h6 class="mb-0">Law Study</h6>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card book-card shadow-sm h-100">
-                    <img src="/images/User/Book/programming.jpg" class="card-img-top custom-card-img" alt="Programming">
-                    <div class="card-body py-2">
-                        <h6 class="mb-0">Programming</h6>
-                    </div>
-                </div>
-            </div>
-        </div>
-</section>
-<!-- categories end -->
-
-<!-- Top Trending Books -->
-<section class="container-fluid mt-4 home-section">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3 class="fw-bold text-navy">Top Trending</h3>
-    </div>
-
-    <div class="d-flex flex-nowrap overflow-auto gap-3 pb-3 custom-scrollbar">
-
-            
-
-        <div class="flex-shrink-0 custom-card-width">
-            <div class="card book-card border-0 shadow-sm h-100">
-                <div class="card-img-wrapper p-2">
-                    <img src="/images/User/Book/math.jpg" class="card-img-top rounded" alt="Book" height="200">
-                </div>
-                <div class="card-body p-3">
-                    <div class="d-flex justify-content-between align-items-center mb-1">
-                        <span class="category-text small fw-bold">Professional and Technical</span>
-                            <button class="btn p-0 border-0 wishlist-btn text-secondary" data-id="book2">
-                            <i class="fa-solid fa-heart"></i>
-                        </button>
-                    </div>
-                    <h6 class="book-title mb-1 small fw-bold">
-                        Cambridge English for Engineering Students Book (SAE)
-                        with CDS(2)
-                    </h6>
-                    <p class="author-text mb-3 small italic">Jame Walton</p>
-                    <div class="text-end star-rating text-warning small">
-                            @for (int i = 0; i < 5; i++)
-                            {
-                                <i class="fa-solid fa-star"></i>
-                            }
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="flex-shrink-0 custom-card-width">
-            <div class="card book-card border-0 shadow-sm h-100">
-                <div class="card-img-wrapper p-2">
-                    <img src="/images/User/Book/math2.jpg" class="card-img-top rounded" alt="Book" height="200">
-                </div>
-                <div class="card-body p-3">
-                    <div class="d-flex justify-content-between align-items-center mb-1">
-                        <span class="category-text small fw-bold">Professional and Technical</span>
-                            <button class="btn p-0 border-0 wishlist-btn text-secondary" data-id="book3">
-                            <i class="fa-solid fa-heart"></i>
-                        </button>
-                    </div>
-                    <h6 class="book-title mb-1 small fw-bold">
-                        Cambridge English for Engineering Students Book (SAE)
-                        with CDS(2)
-                    </h6>
-                    <p class="author-text mb-3 small italic">Jame Walton</p>
-                    <div class="text-end star-rating text-warning small">
-                            @for (int i = 0; i < 5; i++)
-                            {
-                                <i class="fa-solid fa-star"></i>
-                            }
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="flex-shrink-0 custom-card-width">
-            <div class="card book-card border-0 shadow-sm h-100">
-                <div class="card-img-wrapper p-2">
-                    <img src="~/images/User/Book/math.jpg" class="card-img-top rounded" alt="Book" height="200">
-                </div>
-                <div class="card-body p-3">
-                    <div class="d-flex justify-content-between align-items-center mb-1">
-                        <span class="category-text small fw-bold">Professional and Technical</span>
-                        <button class="btn p-0 border-0 wishlist-btn text-secondary">
-                            <i class="fa-solid fa-heart"></i>
-                        </button>
-                    </div>
-                    <h6 class="book-title mb-1 small fw-bold">
-                        Cambridge English for Engineering Students Book (SAE)
-                        with CDS(2)
-                    </h6>
-                    <p class="author-text mb-3 small italic">Jame Walton</p>
-                    <div class="text-end star-rating text-warning small">
-                            @for (int i = 0; i < 5; i++)
-                            {
-                                <i class="fa-solid fa-star"></i>
-                            }
-                    </div>
-                </div>
-            </div>
-        </div>
-            <div class="flex-shrink-0 custom-card-width">
-                <div class="card book-card border-0 shadow-sm h-100">
-                    <div class="card-img-wrapper p-2">
-                        <img src="~/images/User/Book/math.jpg" class="card-img-top rounded" alt="Book" height="200">
-                    </div>
-                    <div class="card-body p-3">
-                        <div class="d-flex justify-content-between align-items-center mb-1">
-                            <span class="category-text small fw-bold">Professional and Technical</span>
-                            <button class="btn p-0 border-0 wishlist-btn text-secondary opacity-50">
-                                <i class="fa-solid fa-heart"></i>
-                            </button>
+            @foreach (var category in Model.Categories)
+            {
+                <div class="col-md-4">
+                    <a asp-controller="Home" asp-action="Category" asp-route-category="@category" class="text-decoration-none">
+                        <div class="card book-card shadow-sm h-100">
+                            <img src="/images/User/Book/general.jpg" class="card-img-top custom-card-img" alt="@category">
+                            <div class="card-body py-2">
+                                <h6 class="mb-0">@category.ToUpper()</h6>
+                            </div>
                         </div>
-                        <h6 class="book-title mb-1 small fw-bold">
-                            Cambridge English for Engineering Students Book (SAE)
-                            with CDS(2)
-                        </h6>
-                        <p class="author-text mb-3 small italic">Jame Walton</p>
-                        <div class="text-end star-rating text-warning small">
-                            @for (int i = 0; i < 5; i++)
-                            {
-                                <i class="fa-solid fa-star"></i>
-                            }
+                    </a>
+                </div>
+            }
+        </div>
+    </section>
+    <!-- categories end -->
+    <!-- Top Trending Books -->
+    <section class="container-fluid mt-4 home-section">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="fw-bold text-navy">Top Trending</h3>
+        </div>
+
+        <div class="d-flex flex-nowrap overflow-auto gap-3 pb-3 custom-scrollbar">
+            @foreach (var book in Model.TrendingBooks)
+            {
+                <div class="flex-shrink-0 custom-card-width">
+                    <div class="card book-card border-0 shadow-sm h-100">
+                        <div class="card-img-wrapper p-2">
+                            <a asp-controller="Home" asp-action="BookDetail" asp-route-id="@book.Id" class="text-decoration-none">
+                                <img src="@(string.IsNullOrWhiteSpace(book.ImageUrl) ? "/images/User/Book/book2.png" : book.ImageUrl)"
+                                     class="card-img-top rounded" alt="@book.Title" height="200">
+                            </a>
+                        </div>
+                        <div class="card-body p-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="category-text small fw-bold">@(string.IsNullOrWhiteSpace(book.CategoryName) ? "Professional and Technical" : book.CategoryName)</span>
+                                <button class="btn p-0 border-0 wishlist-btn text-secondary" data-id="@book.Id">
+                                    <i class="fa-solid fa-heart"></i>
+                                </button>
+                            </div>
+                            <h6 class="book-title mb-1 small fw-bold">
+                                <a asp-controller="Home" asp-action="BookDetail" asp-route-id="@book.Id" class="text-decoration-none text-dark">
+                                    @book.Title
+                                </a>
+                            </h6>
+                            <p class="author-text mb-3 small italic">@book.Author</p>
+                            <div class="text-end star-rating text-warning small">
+                                @for (int i = 0; i < Math.Clamp(book.Rating, 0, 5); i++)
+                                {
+                                    <i class="fa-solid fa-star"></i>
+                                }
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-    </div>
-</section>
-<!-- Top Trending Books End -->
-
-<!-- author by genre section -->
+            }
+        </div>
+    </section>
+    <!-- Top Trending Books End -->
+    <!-- author by genre section -->
     <section class="container-fluid mt-4 home-section">
         <h3 class="fw-bold mb-4 text-navy">Author by Genre</h3>
 
         <div class="d-flex custom-scrollbar pb-3" style="gap: 1rem;">
-
-            <div class="genre-card-wrapper flex-shrink-0">
-                <div class="card border-0 rounded-4 overflow-hidden position-relative genre-card shadow-sm">
-                    <img src="~/images/User/Book/novel.jpg" class="card-img" alt="Novel">
-                    <div class="genre-overlay d-flex align-items-end p-3">
-                        <h5 class="text-white fw-bold mb-0">Novel</h5>
-                    </div>
+            @foreach (var genre in Model.Genres)
+            {
+                <div class="genre-card-wrapper flex-shrink-0">
+                    <a asp-controller="Home" asp-action="Category" asp-route-category="@genre" class="text-decoration-none">
+                        <div class="card border-0 rounded-4 overflow-hidden position-relative genre-card shadow-sm">
+                            <img src="/images/User/Book/science-fiction.jpg" class="card-img" alt="@genre">
+                            <div class="genre-overlay d-flex align-items-end p-3">
+                                <h5 class="text-white fw-bold mb-0">@genre</h5>
+                            </div>
+                        </div>
+                    </a>
                 </div>
-            </div>
-
-            <div class="genre-card-wrapper flex-shrink-0">
-                <div class="card border-0 rounded-4 overflow-hidden position-relative genre-card shadow-sm">
-                    <img src="~/images/User/Book/science-fiction.jpg" class="card-img" alt="Science Fiction">
-                    <div class="genre-overlay d-flex align-items-end p-3">
-                        <h5 class="text-white fw-bold mb-0">Science Fiction</h5>
-                    </div>
-                </div>
-            </div>
-            <div class="genre-card-wrapper flex-shrink-0">
-                <div class="card border-0 rounded-4 overflow-hidden position-relative genre-card shadow-sm">
-                    <img src="~/images/User/Book/science-fiction.jpg" class="card-img" alt="Science Fiction">
-                    <div class="genre-overlay d-flex align-items-end p-3">
-                        <h5 class="text-white fw-bold mb-0">Science Fiction</h5>
-                    </div>
-                </div>
-            </div>
-
-            <div class="genre-card-wrapper flex-shrink-0">
-                <div class="card border-0 rounded-4 overflow-hidden position-relative genre-card shadow-sm">
-                    <img src="~/images/User/Book/romance.jpg" class="card-img" alt="Romance">
-                    <div class="genre-overlay d-flex align-items-end p-3">
-                        <h5 class="text-white fw-bold mb-0">Romance</h5>
-                    </div>
-                </div>
-            </div>
-
+            }
         </div>
     </section>
-<!-- author by genre section end -->
-
-<!-- New arrival section -->
-<section class="container-fluid mt-4 home-section">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3 class="fw-bold text-navy">New Arrival</h3>
-        <button class="btn btn-outline-secondary btn-sm">Explore more</button>
-    </div>
-
-    <div class="row row-cols-2 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3 g-md-4">
-
-        <!-- Card 1 -->
-        <div class="col">
-            <div class="card book-card border-0 shadow-sm h-100 position-relative">
-                <span class="badge bg-danger position-absolute top-0 start-0 m-3 px-3 py-2">New</span>
-
-                <div class="card-img-wrapper">
-                    <img src="~/images/User/Book/finance.jpg" class="card-img-top" alt="Book">
-                </div>
-
-                <div class="card-body p-3">
-                    <div class="d-flex justify-content-between align-items-center mb-1">
-                        <span class="category-text small fw-bold">Professional and Technical</span>
-                        <button class="btn p-0 border-0 wishlist-btn text-secondary" type="button">
-                            <i class="fa-solid fa-heart"></i>
-                        </button>
-                    </div>
-
-                    <h6 class="book-title mb-1 fw-bold">
-                        Cambridge English for Engineering Students Book (SAE) with CDS(2)
-                    </h6>
-
-                    <p class="author-text mb-3 small fst-italic">Jame Walton</p>
-
-                    <div class="text-end star-rating text-warning small">
-                        @for (int i = 0; i < 5; i++)
-                        {
-                            <i class="fa-solid fa-star"></i>
-                        }
-                    </div>
-                </div>
-            </div>
+    <!-- author by genre section end -->
+    <!-- New arrival section -->
+    <section class="container-fluid mt-4 home-section">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="fw-bold text-navy">New Arrival</h3>
+            <a asp-controller="Home" asp-action="BookIndex" class="btn btn-outline-secondary btn-sm">Explore more</a>
         </div>
 
-        <!-- Card 2 -->
-        <div class="col">
-            <div class="card book-card border-0 shadow-sm h-100 position-relative">
-                <span class="badge bg-danger position-absolute top-0 start-0 m-3 px-3 py-2">New</span>
+        <div class="row row-cols-2 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3 g-md-4">
+            @foreach (var book in Model.NewArrivalBooks)
+            {
+                <div class="col">
+                    <div class="card book-card border-0 shadow-sm h-100 position-relative">
+                        <span class="badge bg-danger position-absolute top-0 start-0 m-3 px-3 py-2">New</span>
 
-                <div class="card-img-wrapper">
-                    <img src="~/images/User/Book/general.jpg" class="card-img-top" alt="Book">
-                </div>
+                        <div class="card-img-wrapper">
+                            <a asp-controller="Home" asp-action="BookDetail" asp-route-id="@book.Id" class="text-decoration-none">
+                                <img src="@(string.IsNullOrWhiteSpace(book.ImageUrl) ? "/images/User/Book/book2.png" : book.ImageUrl)"
+                                     class="card-img-top" alt="@book.Title">
+                            </a>
+                        </div>
 
-                <div class="card-body p-3">
-                    <div class="d-flex justify-content-between align-items-center mb-1">
-                        <span class="category-text small fw-bold">Professional and Technical</span>
-                        <button class="btn p-0 border-0 wishlist-btn text-secondary" type="button">
-                            <i class="fa-solid fa-heart"></i>
-                        </button>
+                        <div class="card-body p-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="category-text small fw-bold">@(string.IsNullOrWhiteSpace(book.CategoryName) ? "Professional and Technical" : book.CategoryName)</span>
+                                <button class="btn p-0 border-0 wishlist-btn text-secondary" type="button" data-id="@book.Id">
+                                    <i class="fa-solid fa-heart"></i>
+                                </button>
+                            </div>
+
+                            <h6 class="book-title mb-1 fw-bold">
+                                <a asp-controller="Home" asp-action="BookDetail" asp-route-id="@book.Id" class="text-decoration-none text-dark">
+                                    @book.Title
+                                </a>
+                            </h6>
+
+                            <p class="author-text mb-3 small fst-italic">@book.Author</p>
+
+                            <div class="text-end star-rating text-warning small">
+                                @for (int i = 0; i < Math.Clamp(book.Rating, 0, 5); i++)
+                                {
+                                    <i class="fa-solid fa-star"></i>
+                                }
+                            </div>
+                        </div>
                     </div>
-
-                    <h6 class="book-title mb-1 fw-bold">
-                        Cambridge English for Engineering Students Book (SAE) with CDS(2)
-                    </h6>
-
-                    <p class="author-text mb-3 small fst-italic">Jame Walton</p>
-
-                    <div class="text-end star-rating text-warning small">
-                        <i class="fa-solid fa-star"></i>
-                        <i class="fa-solid fa-star"></i>
-                        <i class="fa-solid fa-star"></i>
-                        <i class="fa-solid fa-star"></i>
-                        <i class="fa-solid fa-star-half-stroke"></i>
-                    </div>
                 </div>
-            </div>
+            }
         </div>
-
-        <!-- Card 3 -->
-        <div class="col">
-            <div class="card book-card border-0 shadow-sm h-100 position-relative">
-                <span class="badge bg-danger position-absolute top-0 start-0 m-3 px-3 py-2">New</span>
-
-                <div class="card-img-wrapper">
-                    <img src="~/images/User/Book/general2.jpg" class="card-img-top" alt="Book">
-                </div>
-
-                <div class="card-body p-3">
-                    <div class="d-flex justify-content-between align-items-center mb-1">
-                        <span class="category-text small fw-bold">Professional and Technical</span>
-                        <button class="btn p-0 border-0 wishlist-btn text-secondary" type="button">
-                            <i class="fa-solid fa-heart"></i>
-                        </button>
-                    </div>
-
-                    <h6 class="book-title mb-1 fw-bold">
-                        Cambridge English for Engineering Students Book (SAE) with CDS(2)
-                    </h6>
-
-                    <p class="author-text mb-3 small fst-italic">Jame Walton</p>
-
-                    <div class="text-end star-rating text-warning small">
-                        @for (int i = 0; i < 5; i++)
-                        {
-                            <i class="fa-solid fa-star"></i>
-                        }
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Card 4 -->
-        <div class="col">
-            <div class="card book-card border-0 shadow-sm h-100 position-relative">
-                <span class="badge bg-danger position-absolute top-0 start-0 m-3 px-3 py-2">New</span>
-
-                <div class="card-img-wrapper">
-                    <img src="~/images/User/Book/general3.jpg" class="card-img-top" alt="Book">
-                </div>
-
-                <div class="card-body p-3">
-                    <div class="d-flex justify-content-between align-items-center mb-1">
-                        <span class="category-text small fw-bold">Professional and Technical</span>
-                        <button class="btn p-0 border-0 wishlist-btn text-secondary" type="button">
-                            <i class="fa-solid fa-heart"></i>
-                        </button>
-                    </div>
-
-                    <h6 class="book-title mb-1 fw-bold">
-                        Cambridge English for Engineering Students Book (SAE) with CDS(2)
-                    </h6>
-
-                    <p class="author-text mb-3 small fst-italic">Jame Walton</p>
-
-                    <div class="text-end star-rating text-warning small">
-                        @for (int i = 0; i < 5; i++)
-                        {
-                            <i class="fa-solid fa-star"></i>
-                        }
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </div>
-</section>
+    </section>
+    <!-- New arrival section end -->
 </div>
+
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const sliders = document.querySelectorAll(".custom-scrollbar");
@@ -396,7 +193,7 @@
         });
     });
 </script>
+
 @section Scripts {
     <script src="~/js/users/Home.js" asp-append-version="true"></script>
 }
-
