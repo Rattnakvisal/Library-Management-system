@@ -36,9 +36,9 @@
                         <span class="fw-bold">$@Model.EstimatedFine.ToString("0.00", CultureInfo.InvariantCulture)</span>
                     </div>
 
-                    <button type="button" class="btn btn-light w-100 fw-bold mb-2 py-2 summary-terms-btn">
-                        Read Term and Condition
-                    </button>
+                    <a asp-controller="Home" asp-action="AboutPolicies" class="btn btn-light w-100 fw-bold mb-2 py-2 summary-terms-btn">
+                        By borrowing, you agree to our <u>Terms and Conditions</u>.
+                    </a>
 
                     <div class="text-center">
                         <small class="gold-text">*Term and Condition Applied</small>
