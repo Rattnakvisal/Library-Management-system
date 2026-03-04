@@ -1,10 +1,10 @@
-# 📚 Library Management System
+#  Library Management System
 
 A web-based library management system built with **ASP.NET Core 9**, **Entity Framework Core**, and **Bootstrap 5**.
 
 ---
 
-## ✨ Features
+##  Features
 
 **Authentication & Security**
 - Email verification required for all new accounts
@@ -37,7 +37,7 @@ A web-based library management system built with **ASP.NET Core 9**, **Entity Fr
 
 ---
 
-## 🚀 Getting Started
+##  Getting Started
 
 ### Prerequisites
 - .NET 9 SDK
@@ -73,14 +73,14 @@ In `appsettings.json`:
 
 ---
 
-## 🔐 Default Admin Account
+##  Default Admin Account
 
 | Field | Value |
 |---|---|
 | Email | admin@library.com |
 | Password | Admin@123 |
 
-> ⚠️ Change these credentials immediately after first login.
+>  Change these credentials immediately after first login.
 
 ---
 
@@ -103,7 +103,7 @@ In `appsettings.json`:
 
 ---
 
-## 🤝 Contributing
+##  Contributing
 ```bash
 git checkout -b feature/your-feature
 git commit -m "feat: your description"
@@ -114,12 +114,12 @@ Then open a Pull Request on GitHub.
 
 ---
 
-## 📄 License
+##  License
 
 MIT License — see [LICENSE](LICENSE) for details.
 
 ---
 
-## 📬 Contact
+##  Contact
 
 GitHub: [@Rattnakvisal](https://github.com/Rattnakvisal)
