@@ -620,16 +620,41 @@
 /* =========================================================
    Mobile Offcanvas Nav
 ========================================================= */
+#mobileSidebar {
+    background: var(--navy-2);
+    color: #fff;
+    border-right: 0;
+}
+
+#mobileSidebar .offcanvas-header {
+    border-bottom: 0;
+}
+
+#mobileSidebar .offcanvas-title {
+    color: #fff;
+    font-weight: 700;
+}
+
+#mobileSidebar .btn-close {
+    filter: invert(1) grayscale(100%);
+    opacity: 0.9;
+}
+
+.mobile-nav {
+    padding: 8px 10px 14px;
+}
 
 .mobile-nav .nav-link {
     display: flex;
     align-items: center;
     gap: 10px;
     padding: 12px 14px;
-    border-bottom: 1px solid var(--line);
+    border-bottom: 0;
+    border-radius: 12px;
     text-decoration: none;
-    color: var(--text);
+    color: rgba(255, 255, 255, 0.9);
     font-weight: 600;
+    transition: background 0.15s ease, color 0.15s ease;
 }
 
 .mobile-nav .nav-link i {
@@ -637,24 +662,27 @@
     font-weight: 400;
 }
 
+.mobile-nav .nav-link:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
 .mobile-nav .nav-link.active {
-    background: rgba(37, 99, 235, 0.10);
-    color: #1d4ed8;
+    background: var(--primary-soft);
+    color: #fff;
 }
 
 .mobile-nav-title {
     font-size: 11px;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: var(--muted);
+    color: rgba(255, 255, 255, 0.7);
     font-weight: 800;
-    padding: 12px 14px 6px;
+    padding: 14px 14px 6px;
 }
 
 .mobile-nav-divider {
-    height: 1px;
-    background: var(--line);
-    margin: 8px 0;
+    display: none;
 }
 
 /* =========================================================
