@@ -53,6 +53,7 @@
 
   <ItemGroup>
     <Folder Include="Pages\NewFolder\" />
+    <Folder Include="wwwroot\images\Admin\Categories\" />
   </ItemGroup>
 
 </Project>
