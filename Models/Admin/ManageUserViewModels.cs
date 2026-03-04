@@ -33,8 +33,7 @@ public class ManageUserItemViewModel
 public class ManageUserFormInput
 {
     [Required]
-    [StringLength(7, MinimumLength = 7)]
-    [RegularExpression(@"^\d{7}$", ErrorMessage = "ID must be exactly 7 digits.")]
+    [StringLength(50)]
     public string UserCode { get; set; } = string.Empty;
 
     [Required]
@@ -74,8 +73,7 @@ public class ManageUserUpdateInput
     public string UserId { get; set; } = string.Empty;
 
     [Required]
-    [StringLength(7, MinimumLength = 7)]
-    [RegularExpression(@"^\d{7}$", ErrorMessage = "ID must be exactly 7 digits.")]
+    [StringLength(50)]
     public string UserCode { get; set; } = string.Empty;
 
     [Required]

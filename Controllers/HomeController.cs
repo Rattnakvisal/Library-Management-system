@@ -336,6 +336,17 @@ namespace Library_Management_system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddToCart(int bookId)
         {
+            if (User.Identity?.IsAuthenticated != true)
+            {
+                var referer = Request.Headers.Referer.ToString();
+                var fallbackReturnUrl = Url.Action(nameof(BookDetail), new { id = bookId }) ?? "/";
+                var returnUrl = !string.IsNullOrWhiteSpace(referer) && Url.IsLocalUrl(referer)
+                    ? referer
+                    : fallbackReturnUrl;
+
+                return RedirectToPage("/Account/Login", new { area = "Identity", returnUrl });
+            }
+
             var book = await _context.Books
                 .AsNoTracking()
                 .FirstOrDefaultAsync(b => b.Id == bookId);

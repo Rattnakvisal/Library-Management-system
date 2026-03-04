@@ -81,13 +81,25 @@
                         Feedback
                     </a>
                 }
-                <form method="post" asp-controller="Home" asp-action="AddToCart" asp-route-bookId="@book.Id"
-                      class="d-inline cart-form">
-                    @Html.AntiForgeryToken()
-                    <button type="submit" class="btn-cart text-decoration-none border-0">
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <form method="post" asp-controller="Home" asp-action="AddToCart" asp-route-bookId="@book.Id"
+                          class="d-inline cart-form">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn-cart text-decoration-none border-0">
+                            <i class="bi bi-cart2 me-2"></i> Add to cart
+                        </button>
+                    </form>
+                }
+                else
+                {
+                    <a class="btn-cart text-decoration-none d-inline-flex align-items-center justify-content-center"
+                       asp-area="Identity"
+                       asp-page="/Account/Login"
+                       asp-route-returnUrl="@returnUrl">
                         <i class="bi bi-cart2 me-2"></i> Add to cart
-                    </button>
-                </form>
+                    </a>
+                }
                 @if (Model.IsFavorite)
                 {
                     <form method="post" asp-controller="Home" asp-action="RemoveFavorite" asp-route-bookId="@book.Id"

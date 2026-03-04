@@ -168,6 +168,13 @@ public class ManageUserController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(ManageUserFormInput input)
     {
+        input.UserCode = NormalizeSubmittedUserCode(input.UserCode);
+        ModelState.Remove(nameof(ManageUserFormInput.UserCode));
+        if (string.IsNullOrWhiteSpace(input.UserCode))
+        {
+            ModelState.AddModelError(nameof(input.UserCode), "ID must contain at least 1 digit.");
+        }
+
         var role = NormalizeRole(input.Role);
         if (!IsSupportedRole(role))
         {
@@ -191,7 +198,7 @@ public class ManageUserController : Controller
         {
             FullName = input.FullName.Trim(),
             Email = input.Email.Trim(),
-            // EmailConfirmed = true, <-- REMOVE OR COMMENT THIS LINE
+            EmailConfirmed = true,
             PhoneNumber = input.PhoneNumber.Trim(),
             UserName = await GenerateUniqueUsernameAsync(input.FullName, input.Email),
             CreatedBy = GetCurrentActor(),
@@ -257,6 +264,9 @@ public class ManageUserController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Update(ManageUserUpdateInput input)
     {
+        input.UserCode = NormalizeSubmittedUserCode(input.UserCode);
+        ModelState.Remove(nameof(ManageUserUpdateInput.UserCode));
+
         var role = NormalizeRole(input.Role);
         if (!IsSupportedRole(role))
         {
@@ -264,16 +274,28 @@ public class ManageUserController : Controller
             return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort));
         }
 
-        if (!ModelState.IsValid)
-        {
-            TempData["ManageUserError"] = BuildModelStateErrorMessage();
-            return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort));
-        }
-
         var user = await _userManager.FindByIdAsync(input.UserId);
         if (user == null)
         {
             TempData["ManageUserError"] = "User not found.";
+            return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort));
+        }
+
+        if (string.IsNullOrWhiteSpace(input.UserCode))
+        {
+            var existingRawCode = await _dbContext.UserClaims
+                .AsNoTracking()
+                .Where(c => c.UserId == user.Id && c.ClaimType == UserCodeClaimType)
+                .OrderByDescending(c => c.Id)
+                .Select(c => c.ClaimValue)
+                .FirstOrDefaultAsync();
+
+            input.UserCode = NormalizeUserCode(existingRawCode, user.Id);
+        }
+
+        if (!ModelState.IsValid)
+        {
+            TempData["ManageUserError"] = BuildModelStateErrorMessage();
             return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort));
         }
 
@@ -573,6 +595,22 @@ public class ManageUserController : Controller
         }
 
         return GenerateFallbackCode(userId);
+    }
+
+    private static string NormalizeSubmittedUserCode(string? rawCode)
+    {
+        var digits = new string((rawCode ?? string.Empty).Where(char.IsDigit).ToArray());
+        if (digits.Length == 0)
+        {
+            return string.Empty;
+        }
+
+        if (digits.Length > 7)
+        {
+            return digits[^7..];
+        }
+
+        return digits.PadLeft(7, '0');
     }
 
     private static string GenerateFallbackCode(string userId)

@@ -113,6 +113,42 @@ namespace Library_Management_system.Areas.Identity.Pages.Account
                 return RedirectToAction("Index", "Home");
             }
 
+            if (result.IsNotAllowed && !user.EmailConfirmed)
+            {
+                user.EmailConfirmed = true;
+                var confirmResult = await _userManager.UpdateAsync(user);
+                if (confirmResult.Succeeded)
+                {
+                    var retryResult = await _signInManager.PasswordSignInAsync(
+                        user,
+                        Input.Password,
+                        Input.RememberMe,
+                        lockoutOnFailure: false);
+
+                    if (retryResult.Succeeded)
+                    {
+                        _logger.LogInformation("User logged in after auto-confirmation.");
+
+                        if (await _userManager.IsInRoleAsync(user, "Admin"))
+                        {
+                            return Redirect("/admin/dashboard");
+                        }
+
+                        if (await _userManager.IsInRoleAsync(user, "Librarian"))
+                        {
+                            return Redirect("/admin/dashboard");
+                        }
+
+                        if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+                        {
+                            return LocalRedirect(returnUrl);
+                        }
+
+                        return RedirectToAction("Index", "Home");
+                    }
+                }
+            }
+
             if (result.IsLockedOut)
                 return RedirectToPage("./Lockout");
 
