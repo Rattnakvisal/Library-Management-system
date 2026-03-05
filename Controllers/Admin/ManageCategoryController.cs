@@ -43,6 +43,7 @@ public class ManageCategoryController : Controller
             .OrderBy(c => c.Name)
             .Select(c => new ManageCategoryViewModel
             {
+                CategoryId = c.Id,
                 Name = c.Name,
                 BookCount = _context.Books.Count(b => b.CategoryId == c.Id || b.CategoryName == c.Name),
                 CreatedBy = c.CreatedBy ?? string.Empty,

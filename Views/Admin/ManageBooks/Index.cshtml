@@ -297,14 +297,20 @@
 
                             <div class="col-md-6">
                                 <label class="form-label">Author <span class="text-danger">*</span></label>
-                                <div class="custom-select-wrapper">
+                                <div class="input-group">
                                     <select class="form-select" id="authorSelect" required>
                                         <option value="">Select author</option>
                                         @foreach (var author in bookAuthors)
                                         {
                                             <option value="@author.AuthorID">@author.AuthorName</option>
                                         }
+                                        <option value="__new__">+ Add New Author</option>
                                     </select>
+                                    <button type="button" class="btn btn-outline-primary" id="showAddAuthorBtn">Add</button>
+                                </div>
+                                <div class="input-group mt-2 d-none" id="newAuthorGroup">
+                                    <input type="text" class="form-control" id="newAuthorInput" placeholder="New author name" />
+                                    <button type="button" class="btn btn-primary" id="addAuthorOptionBtn">Save</button>
                                 </div>
                             </div>
 

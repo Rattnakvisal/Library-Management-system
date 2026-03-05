@@ -1,8 +1,9 @@
- $(document).ready(function() {
+$(document).ready(function() {
     initializeSearchIcon();
     styleBookStatuses();
     initializeCustomSelects();
     initializeCategoryControls();
+    initializeAuthorControls();
     initializeEditButton();
     initializeAddBookButton();
     initializeUpdateBookButton();
@@ -89,6 +90,16 @@ function getSelectedCategoryName() {
     return value;
 }
 
+function getSelectedAuthorId() {
+    const value = ($('#authorSelect').val() || '').toString().trim();
+    if (!value || value === '__new__') {
+        return 0;
+    }
+
+    const parsed = Number(value);
+    return Number.isInteger(parsed) && parsed > 0 ? parsed : 0;
+}
+
 function getSelectedEditCategoryName() {
     return ($('#edit-categorySelect').val() || '').toString().trim();
 }
@@ -135,10 +146,22 @@ function upsertEditCategoryOption(categoryName) {
 }
 
 async function requestCreateCategory(name) {
+    const formData = new FormData();
+    formData.append('name', name);
+
     return fetch('/admin/managecategory/create', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name })
+        body: formData
+    });
+}
+
+async function requestCreateAuthor(name) {
+    const formData = new FormData();
+    formData.append('name', name);
+
+    return fetch('/admin/manageauthor/create', {
+        method: 'POST',
+        body: formData
     });
 }
 
@@ -206,6 +229,142 @@ function initializeCategoryControls() {
             upsertCategoryOption(newCategoryName);
             newCategoryInput.val('');
             newCategoryGroup.addClass('d-none');
+        } catch (error) {
+            Swal.fire({
+                title: 'Network Error',
+                text: 'Could not connect to server. Please try again.',
+                icon: 'error',
+                confirmButtonColor: '#dc3545'
+            });
+        } finally {
+            saveButton.prop('disabled', false);
+        }
+    });
+}
+
+function upsertAuthorOption(authorId, authorName) {
+    const addSelect = $('#authorSelect');
+    const editSelect = $('#edit-authorSelect');
+    const normalized = (authorName || '').toString().trim().toLowerCase();
+    if (!normalized) {
+        return;
+    }
+
+    const addExisting = addSelect.find('option').filter(function () {
+        return ($(this).text() || '').toString().trim().toLowerCase() === normalized;
+    });
+
+    if (addExisting.length > 0) {
+        addSelect.val(addExisting.first().val());
+    } else {
+        $('<option>', { value: String(authorId), text: authorName })
+            .insertBefore(addSelect.find('option[value="__new__"]'));
+        addSelect.val(String(authorId));
+    }
+
+    const editExisting = editSelect.find('option').filter(function () {
+        return ($(this).text() || '').toString().trim().toLowerCase() === normalized;
+    });
+
+    if (editExisting.length === 0) {
+        $('<option>', { value: String(authorId), text: authorName }).appendTo(editSelect);
+    } else if (authorId) {
+        editExisting.first().val(String(authorId));
+    }
+}
+
+function getExistingAuthorValueByName(authorName) {
+    const normalized = (authorName || '').toString().trim().toLowerCase();
+    if (!normalized) {
+        return '';
+    }
+
+    const existing = $('#authorSelect').find('option').filter(function () {
+        return ($(this).text() || '').toString().trim().toLowerCase() === normalized;
+    });
+
+    if (existing.length === 0) {
+        return '';
+    }
+
+    return (existing.first().val() || '').toString().trim();
+}
+
+function initializeAuthorControls() {
+    const authorSelect = $('#authorSelect');
+    const newAuthorGroup = $('#newAuthorGroup');
+    const newAuthorInput = $('#newAuthorInput');
+
+    if (authorSelect.length === 0) {
+        return;
+    }
+
+    function toggleAddAuthorInput() {
+        if (authorSelect.val() === '__new__') {
+            newAuthorGroup.removeClass('d-none');
+            newAuthorInput.trigger('focus');
+        } else {
+            newAuthorGroup.addClass('d-none');
+        }
+    }
+
+    authorSelect.on('change', toggleAddAuthorInput);
+
+    $('#showAddAuthorBtn').on('click', function () {
+        authorSelect.val('__new__');
+        toggleAddAuthorInput();
+    });
+
+    $('#addAuthorOptionBtn').on('click', async function () {
+        const newAuthorName = newAuthorInput.val().trim();
+
+        if (!newAuthorName) {
+            Swal.fire({
+                title: 'Missing Author Name',
+                text: 'Please type an author name.',
+                icon: 'warning',
+                confirmButtonColor: '#ffc107'
+            });
+            return;
+        }
+
+        const saveButton = $('#addAuthorOptionBtn');
+        saveButton.prop('disabled', true);
+
+        try {
+            const response = await requestCreateAuthor(newAuthorName);
+            const payload = await response.json().catch(() => ({}));
+
+            if (!response.ok || !payload.success) {
+                if ((payload.message || '').toLowerCase().includes('already exists')) {
+                    const existingValue = getExistingAuthorValueByName(newAuthorName);
+                    if (existingValue && existingValue !== '__new__') {
+                        authorSelect.val(existingValue);
+                        newAuthorInput.val('');
+                        newAuthorGroup.addClass('d-none');
+                        return;
+                    }
+
+                    Swal.fire({
+                        title: 'Author Already Exists',
+                        text: 'Please reload the page to refresh author options.',
+                        icon: 'info',
+                        confirmButtonColor: '#0d6efd'
+                    });
+                    return;
+                }
+                Swal.fire({
+                    title: 'Add Author Failed',
+                    text: payload.message || 'Unable to add author.',
+                    icon: 'error',
+                    confirmButtonColor: '#dc3545'
+                });
+                return;
+            }
+
+            upsertAuthorOption(payload.authorId || 0, newAuthorName);
+            newAuthorInput.val('');
+            newAuthorGroup.addClass('d-none');
         } catch (error) {
             Swal.fire({
                 title: 'Network Error',
@@ -293,7 +452,7 @@ function getAddBookFormData() {
         bookTitle: $('#bookTitleInput').val().trim(),
         categoryName: getSelectedCategoryName(),
         quantity: $('#quantityInput').val().trim(),
-        authorId: Number($('#authorSelect').val() || 0),
+        authorId: getSelectedAuthorId(),
         pages: $('#pagesInput').val().trim(),
         year: $('#yearInput').val().trim(),
         status: $('#statusSelect').val(),
@@ -369,6 +528,11 @@ function showSuccessAndCloseModal(message, modalId, formId, onComplete) {
                 $('#categorySelect').val('');
                 $('#newCategoryInput').val('');
                 $('#newCategoryGroup').addClass('d-none');
+            }
+            if ($('#authorSelect').length) {
+                $('#authorSelect').val('');
+                $('#newAuthorInput').val('');
+                $('#newAuthorGroup').addClass('d-none');
             }
             if (typeof onComplete === 'function') {
                 onComplete();

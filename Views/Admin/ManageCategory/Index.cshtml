@@ -10,7 +10,7 @@
 }
 
 @section Styles {
-    <link rel="stylesheet" href="~/css/admin/ManageBooks.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/admin/ManageUsers.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/admin/ManageCategory.css" asp-append-version="true" />
 }
 
@@ -45,20 +45,25 @@
     </section>
 
     <section class="controls-section">
-        <form method="get" class="search-form">
-            <i class="bi bi-search search-icon"></i>
-            <input type="text" name="q" class="search-input" placeholder="Search category..."
-                   value="@Context.Request.Query["q"]" />
-        </form>
+        <nav class="tabs" aria-label="Manage category and author">
+            <button type="button" class="tab active" id="categoryTab" data-tab="category">Category</button>
+            <button type="button" class="tab" id="authorTab" data-tab="author">Author</button>
+        </nav>
         <div class="action-controls">
             <button type="button" class="add-btn" id="addCategoryBtn">
                 <i class="bi bi-plus-lg"></i>
                 <span>Add Category</span>
             </button>
-            <button type="button" class="add-btn" id="addAuthorBtn">
+            <button type="button" class="add-btn hidden" id="addAuthorBtn">
                 <i class="bi bi-person-plus"></i>
                 <span>Add Author</span>
             </button>
+            <form method="get" class="search-form">
+                <input type="hidden" name="tab" id="tabInput" value="category" />
+                <i class="bi bi-search search-icon"></i>
+                <input type="text" name="q" class="search-input" placeholder="Search category..."
+                       value="@Context.Request.Query["q"]" />
+            </form>
             <a class="clear-filter-btn" href="@Url.Action("Index", "ManageCategory")">
                 <i class="bi bi-eraser"></i>
                 <span>Clear Filter</span>
@@ -66,11 +71,12 @@
         </div>
     </section>
 
-    <section class="table-container">
+    <section class="table-container" id="category-table-section">
         <div class="table-responsive">
-            <table class="table book-table align-middle category-table">
+            <table class="table user-table align-middle category-table">
                 <thead>
                     <tr>
+                        <th style="width:100px;">ID</th>
                         <th>Category</th>
                         <th style="width:130px;">Books</th>
                         <th style="width:170px;">Created By</th>
@@ -85,6 +91,9 @@
                         {
                             <tr data-category-name="@category.Name">
                                 <td>
+                                    <span class="category-id">@category.CategoryId</span>
+                                </td>
+                                <td>
                                     <span class="category-name">@category.Name</span>
                                 </td>
                                 <td>
@@ -94,11 +103,11 @@
                                 <td>@(category.CreatedDate?.ToLocalTime().ToString("yyyy-MM-dd HH:mm") ?? "-")</td>
                                 <td>
                                     <div class="action-container">
-                                        <button type="button" class="edit-book-btn edit-category-btn"
+                                        <button type="button" class="edit-user-btn edit-category-btn"
                                                 data-category-name="@category.Name" title="Edit @category.Name">
                                             <i class="bi bi-pencil-square"></i>
                                         </button>
-                                        <button type="button" class="delete-book-btn delete-category-btn"
+                                        <button type="button" class="delete-user-btn delete-category-btn"
                                                 data-category-name="@category.Name" title="Delete @category.Name">
                                             <i class="bi bi-trash"></i>
                                         </button>
@@ -110,7 +119,7 @@
                     else
                     {
                         <tr>
-                            <td colspan="5" class="text-center text-muted py-4">No categories found.</td>
+                            <td colspan="6" class="text-center text-muted py-4">No categories found.</td>
                         </tr>
                     }
                 </tbody>
@@ -118,14 +127,12 @@
         </div>
     </section>
 
-    <section class="table-container mt-4">
-        <div class="d-flex align-items-center justify-content-between mb-3">
-            <h2 class="h5 mb-0">Author Management</h2>
-        </div>
+    <section class="table-container mt-4 hidden" id="author-table-section">
         <div class="table-responsive">
-            <table class="table book-table align-middle category-table">
+            <table class="table user-table align-middle category-table">
                 <thead>
                     <tr>
+                        <th style="width:100px;">ID</th>
                         <th>Author</th>
                         <th style="width:180px;">Created By</th>
                         <th style="width:180px;">Created Date</th>
@@ -138,6 +145,7 @@
                         @foreach (var author in authors)
                         {
                             <tr>
+                                <td>@author.AuthorID</td>
                                 <td>
                                     <span class="category-name">@author.AuthorName</span>
                                 </td>
@@ -145,13 +153,13 @@
                                 <td>@(author.CreatedDate?.ToLocalTime().ToString("yyyy-MM-dd HH:mm") ?? "-")</td>
                                 <td>
                                     <div class="action-container">
-                                        <button type="button" class="edit-book-btn edit-author-btn"
+                                        <button type="button" class="edit-user-btn edit-author-btn"
                                                 data-author-id="@author.AuthorID"
                                                 data-author-name="@author.AuthorName"
                                                 title="Edit @author.AuthorName">
                                             <i class="bi bi-pencil-square"></i>
                                         </button>
-                                        <button type="button" class="delete-book-btn delete-author-btn"
+                                        <button type="button" class="delete-user-btn delete-author-btn"
                                                 data-author-id="@author.AuthorID"
                                                 data-author-name="@author.AuthorName"
                                                 title="Delete @author.AuthorName">
@@ -165,7 +173,7 @@
                     else
                     {
                         <tr>
-                            <td colspan="4" class="text-center text-muted py-4">No authors found.</td>
+                            <td colspan="5" class="text-center text-muted py-4">No authors found.</td>
                         </tr>
                     }
                 </tbody>

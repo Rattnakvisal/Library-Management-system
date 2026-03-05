@@ -25,16 +25,12 @@
     justify-content: center;
 }
 
-#manageCategoryPage .edit-book-btn,
-#manageCategoryPage .delete-book-btn {
-    width: 36px;
-    height: 36px;
+#manageCategoryPage .category-table tbody td {
+    white-space: nowrap;
 }
 
-#manageCategoryPage .edit-book-btn:hover,
-#manageCategoryPage .delete-book-btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 8px 16px rgba(15, 33, 56, 0.14);
+#manageCategoryPage .category-table tbody td:nth-child(2) {
+    white-space: normal;
 }
 
 @media (max-width: 1200px) {

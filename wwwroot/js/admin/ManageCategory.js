@@ -1,4 +1,12 @@
 document.addEventListener('DOMContentLoaded', function () {
+    const categoryTabBtn = document.getElementById('categoryTab');
+    const authorTabBtn = document.getElementById('authorTab');
+    const categoryTableSection = document.getElementById('category-table-section');
+    const authorTableSection = document.getElementById('author-table-section');
+    const addCategoryBtn = document.getElementById('addCategoryBtn');
+    const addAuthorBtn = document.getElementById('addAuthorBtn');
+    const clearFilterBtn = document.querySelector('.clear-filter-btn');
+    const tabInput = document.getElementById('tabInput');
     const categoryModal = new bootstrap.Modal(document.getElementById('categoryModal'));
     const authorModal = new bootstrap.Modal(document.getElementById('authorModal'));
     const categoryForm = document.getElementById('categoryForm');
@@ -19,9 +27,69 @@ document.addEventListener('DOMContentLoaded', function () {
     let editingCategoryName = null;
     let isAuthorEditMode = false;
     let editingAuthorId = null;
+    let activeTab = 'category';
+
+    function setActiveTab(tabName) {
+        const isAuthorTab = tabName === 'author';
+        activeTab = isAuthorTab ? 'author' : 'category';
+
+        if (categoryTabBtn) {
+            categoryTabBtn.classList.toggle('active', !isAuthorTab);
+        }
+        if (authorTabBtn) {
+            authorTabBtn.classList.toggle('active', isAuthorTab);
+        }
+        if (categoryTableSection) {
+            categoryTableSection.classList.toggle('hidden', isAuthorTab);
+        }
+        if (authorTableSection) {
+            authorTableSection.classList.toggle('hidden', !isAuthorTab);
+        }
+        if (addCategoryBtn) {
+            addCategoryBtn.classList.toggle('hidden', isAuthorTab);
+        }
+        if (addAuthorBtn) {
+            addAuthorBtn.classList.toggle('hidden', !isAuthorTab);
+        }
+        if (tabInput) {
+            tabInput.value = activeTab;
+        }
+        if (clearFilterBtn) {
+            const baseHref = clearFilterBtn.dataset.baseHref || clearFilterBtn.getAttribute('href') || '/admin/managecategory';
+            clearFilterBtn.dataset.baseHref = baseHref.split('?')[0];
+            clearFilterBtn.href = activeTab === 'author'
+                ? `${clearFilterBtn.dataset.baseHref}?tab=author`
+                : clearFilterBtn.dataset.baseHref;
+        }
+    }
+
+    function reloadWithActiveTab() {
+        const url = new URL(window.location.href);
+        if (activeTab === 'author') {
+            url.searchParams.set('tab', 'author');
+        } else {
+            url.searchParams.delete('tab');
+        }
+        window.location.href = url.toString();
+    }
+
+    if (categoryTabBtn) {
+        categoryTabBtn.addEventListener('click', function () {
+            setActiveTab('category');
+        });
+    }
+
+    if (authorTabBtn) {
+        authorTabBtn.addEventListener('click', function () {
+            setActiveTab('author');
+        });
+    }
+
+    const initialTab = (new URLSearchParams(window.location.search).get('tab') || '').toLowerCase();
+    setActiveTab(initialTab === 'author' ? 'author' : 'category');
 
     // Add category button
-    document.getElementById('addCategoryBtn').addEventListener('click', function () {
+    addCategoryBtn.addEventListener('click', function () {
         isEditMode = false;
         categoryForm.reset();
         previewContainer.style.display = 'none';
@@ -32,7 +100,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // Add author button
-    document.getElementById('addAuthorBtn').addEventListener('click', function () {
+    addAuthorBtn.addEventListener('click', function () {
         isAuthorEditMode = false;
         editingAuthorId = null;
         authorForm.reset();
@@ -105,7 +173,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 authorModal.hide();
                 authorForm.reset();
                 setTimeout(() => {
-                    location.reload();
+                    reloadWithActiveTab();
                 }, 1200);
             } else {
                 showAlert('Error', result.message || 'Failed to save author.', 'danger');
@@ -137,7 +205,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (response.ok && result.success) {
                         showAlert('Success', result.message, 'success');
                         setTimeout(() => {
-                            location.reload();
+                            reloadWithActiveTab();
                         }, 1200);
                     } else {
                         showAlert('Error', result.message || 'Failed to delete author.', 'danger');
@@ -201,7 +269,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 categoryModal.hide();
                 categoryForm.reset();
                 setTimeout(() => {
-                    location.reload();
+                    reloadWithActiveTab();
                 }, 1500);
             } else {
                 showAlert('Error', result.message || 'An error occurred.', 'danger');
@@ -232,7 +300,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (response.ok && result.success) {
                         showAlert('Success', result.message, 'success');
                         setTimeout(() => {
-                            location.reload();
+                            reloadWithActiveTab();
                         }, 1500);
                     } else {
                         showAlert('Error', result.message || 'An error occurred.', 'danger');
