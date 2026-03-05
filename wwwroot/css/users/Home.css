@@ -848,3 +848,196 @@ body {
         animation: none !important;
     }
 }
+
+/* Responsive refinements for Home categories + chatbot */
+.home-category-section .home-category-col .book-card {
+    height: 100%;
+}
+
+.home-category-section .custom-card-img {
+    height: clamp(150px, 20vw, 180px);
+}
+
+.home-category-section .card-body h6 {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.home-chatbot {
+    bottom: max(12px, env(safe-area-inset-bottom));
+}
+
+.home-chatbot__panel {
+    display: flex;
+    flex-direction: column;
+    max-height: min(72vh, 560px);
+}
+
+.home-chatbot__messages {
+    flex: 1 1 auto;
+    min-height: 110px;
+    max-height: none;
+}
+
+@media (max-width: 767.98px) {
+    .home-category-section .home-section-head {
+        margin-bottom: 0.85rem !important;
+        gap: 0.75rem;
+    }
+
+    .home-category-section .home-section-head h3 {
+        margin: 0;
+        font-size: 2rem;
+    }
+
+    .home-category-section .home-section-head .btn {
+        font-size: 0.84rem;
+        padding: 0.28rem 0.62rem;
+        white-space: nowrap;
+    }
+
+    .home-category-section .home-category-row {
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        gap: 0.75rem;
+        padding: 0 0.1rem 0.35rem;
+        margin-left: 0;
+        margin-right: 0;
+        scroll-snap-type: x proximity;
+    }
+
+    .home-category-section .home-category-row > * {
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    .home-category-section .home-category-col {
+        flex: 0 0 78vw;
+        max-width: 78vw;
+        scroll-snap-align: start;
+    }
+
+    .home-category-section .custom-card-img {
+        height: 160px;
+    }
+
+    .home-category-section .card-body {
+        padding: 0.58rem 0.76rem !important;
+    }
+
+    .home-chatbot {
+        right: 10px;
+        bottom: max(8px, env(safe-area-inset-bottom));
+    }
+
+    .home-chatbot:not(.is-open) {
+        left: auto;
+        align-items: flex-end;
+    }
+
+    .home-chatbot.is-open {
+        left: 8px;
+        right: 8px;
+        align-items: stretch;
+    }
+
+    .home-chatbot__toggle {
+        width: 64px;
+        height: 64px;
+        align-self: flex-end;
+    }
+
+    .home-chatbot__toggle-mark {
+        width: 50px;
+        height: 50px;
+    }
+
+    .home-chatbot__logo--tiny {
+        width: 50px;
+        height: 50px;
+    }
+
+    .home-chatbot__panel {
+        width: 100%;
+        max-height: min(64vh, 460px);
+        border-radius: 14px;
+    }
+
+    .home-chatbot__hero {
+        display: none;
+    }
+
+    .home-chatbot__header {
+        padding: 10px 12px;
+    }
+
+    .home-chatbot__messages {
+        min-height: 92px;
+        padding: 10px;
+    }
+
+    .home-chatbot__msg {
+        font-size: 0.81rem;
+    }
+
+    .home-chatbot__quick-actions {
+        padding: 0 10px 8px;
+    }
+
+    .home-chatbot__quick-actions button {
+        font-size: 0.74rem;
+        padding: 5px 9px;
+    }
+
+    .home-chatbot__input-row {
+        padding: 8px 10px 10px;
+    }
+
+    .home-chatbot__input-row input {
+        font-size: 0.82rem;
+        padding: 7px 10px;
+    }
+}
+
+@media (max-width: 420px) {
+    .home-category-section .home-category-col {
+        flex-basis: 84vw;
+        max-width: 84vw;
+    }
+
+    .home-category-section .home-section-head h3 {
+        font-size: 1.85rem;
+    }
+}
+
+/* Keep chatbot compact on mobile when opened (no full-page sheet) */
+@media (max-width: 767.98px) {
+    .home-chatbot,
+    .home-chatbot:not(.is-open),
+    .home-chatbot.is-open {
+        left: auto !important;
+        right: 10px !important;
+        align-items: flex-end !important;
+    }
+
+    .home-chatbot__panel {
+        width: min(340px, calc(100vw - 20px)) !important;
+        max-height: min(58vh, 420px) !important;
+        border-radius: 14px;
+    }
+}
+
+@media (max-width: 420px) {
+    .home-chatbot,
+    .home-chatbot:not(.is-open),
+    .home-chatbot.is-open {
+        right: 8px !important;
+    }
+
+    .home-chatbot__panel {
+        width: min(320px, calc(100vw - 16px)) !important;
+        max-height: min(56vh, 400px) !important;
+    }
+}

@@ -126,6 +126,25 @@
             sendUserMessage(value);
             input.focus();
         });
+
+        document.addEventListener("click", (event) => {
+            if (!chatbot.classList.contains("is-open")) {
+                return;
+            }
+
+            const target = event.target;
+            if (target instanceof Node && chatbot.contains(target)) {
+                return;
+            }
+
+            closePanel();
+        });
+
+        window.addEventListener("keydown", (event) => {
+            if (event.key === "Escape") {
+                closePanel();
+            }
+        });
     }
 
     document.addEventListener("DOMContentLoaded", setupStaticChatbot);

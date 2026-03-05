@@ -24,6 +24,69 @@
     --shadow-md: 0 10px 24px rgba(22, 58, 90, 0.08);
 }
 
+/* =========================================================
+   Admin Motion
+========================================================= */
+
+@keyframes adminFadeInDown {
+    from {
+        opacity: 0;
+        transform: translate3d(0, -16px, 0);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+    }
+}
+
+@keyframes adminFadeInUp {
+    from {
+        opacity: 0;
+        transform: translate3d(0, 18px, 0);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+    }
+}
+
+@keyframes adminSlideInLeft {
+    from {
+        opacity: 0;
+        transform: translate3d(-20px, 0, 0);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+    }
+}
+
+@keyframes adminScaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.96);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes adminBadgePulse {
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.08);
+    }
+}
+
 /* ===== Shell ===== */
 .admin-shell {
     background: var(--bg);
@@ -47,6 +110,7 @@
     position: sticky;
     top: 0;
     z-index: 1000;
+    animation: adminFadeInDown 360ms ease-out both;
 }
 
 .topbar-left,
@@ -107,6 +171,7 @@
     color: #fff;
     border-right: 1px solid rgba(255, 255, 255, 0.08);
     overflow: hidden;
+    animation: adminSlideInLeft 420ms cubic-bezier(0.22, 1, 0.36, 1) 60ms both;
 }
 
 .sidebar-inner {
@@ -332,6 +397,31 @@
     align-items: center;
     justify-content: center;
     border: 2px solid #fff;
+    transform-origin: center;
+}
+
+.action-badge:not(.d-none) {
+    animation: adminBadgePulse 1.8s ease-in-out 1s infinite;
+}
+
+.admin-motion-reveal {
+    opacity: 0;
+    transform: translate3d(0, 16px, 0);
+    will-change: transform, opacity;
+}
+
+.admin-motion-reveal.is-visible {
+    animation: adminFadeInUp 520ms cubic-bezier(0.22, 1, 0.36, 1) var(--admin-anim-delay, 0ms) both;
+}
+
+.admin-motion-pop {
+    opacity: 0;
+    transform: scale(0.96);
+    will-change: transform, opacity;
+}
+
+.admin-motion-pop.is-visible {
+    animation: adminScaleIn 420ms cubic-bezier(0.22, 1, 0.36, 1) var(--admin-anim-delay, 0ms) both;
 }
 
 .action-menu {
@@ -766,3 +856,17 @@
     }
 }
 
+@media (prefers-reduced-motion: reduce) {
+    .admin-shell .topbar,
+    .admin-shell .sidebar,
+    .admin-shell .action-badge,
+    .admin-motion-reveal,
+    .admin-motion-reveal.is-visible,
+    .admin-motion-pop,
+    .admin-motion-pop.is-visible {
+        animation: none !important;
+        transition: none !important;
+        transform: none !important;
+        opacity: 1 !important;
+    }
+}

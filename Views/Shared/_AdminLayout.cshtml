@@ -457,13 +457,11 @@
                 }
 
                 <div class="mobile-nav-divider"></div>
-                <div class="mobile-nav-title">LIBRARY</div>
-
                 <a class="nav-link @IsActive("ManageBooks")" asp-controller="ManageBooks" asp-action="Index">
                     <i class="bi bi-book"></i><span>Manage Books</span>
                 </a>
 
-                <!-- ✅ NEW: Categories -->
+                <!-- NEW: Categories -->
                 <a class="nav-link @IsActive(CATEGORY_CONTROLLER)" asp-controller="@CATEGORY_CONTROLLER" asp-action="Index">
                     <i class="bi bi-tags"></i><span>Categories</span>
                 </a>
@@ -473,8 +471,6 @@
                 </a>
 
                 <div class="mobile-nav-divider"></div>
-                <div class="mobile-nav-title">MANAGEMENT</div>
-
                 @if (isAdmin)
                 {
                     <a class="nav-link @IsActive("ManageUser")" asp-controller="ManageUser" asp-action="Index">
