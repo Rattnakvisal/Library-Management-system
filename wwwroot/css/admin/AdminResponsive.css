@@ -1,0 +1,275 @@
+/* Shared responsive overrides for all admin pages.
+   Loaded after page-level admin CSS. */
+
+@media (max-width: 1199.98px) {
+    .dashboard-page,
+    .feedback-page,
+    .event-page,
+    .borrowing-page,
+    .reports-page {
+        max-width: none !important;
+    }
+}
+
+@media (max-width: 991.98px) {
+    .admin-shell .content {
+        padding: 12px;
+    }
+
+    .admin-shell .topbar {
+        padding: 0 10px;
+    }
+
+    .admin-shell .brand img {
+        height: 30px;
+    }
+
+    .dashboard-page .page-header,
+    .dashboard-page .controls-section,
+    .dashboard-page .toolbar,
+    .feedback-page .page-header,
+    .event-page .page-header,
+    .borrowing-page .controls-section,
+    .reports-page .controls-row,
+    .reports-page .date-row {
+        align-items: stretch;
+    }
+
+    .dashboard-page .action-controls,
+    .feedback-page .header-actions,
+    .borrowing-page .action-controls,
+    .borrowing-page .filters {
+        width: 100%;
+    }
+
+    .dashboard-page .search-form,
+    .feedback-page .search-form,
+    .borrowing-page .search-form {
+        min-width: 0 !important;
+        max-width: none !important;
+        width: 100%;
+    }
+
+    .dashboard-page .action-controls > .add-btn,
+    .dashboard-page .action-controls > .filter-btn,
+    .dashboard-page .action-controls > .clear-filter-btn,
+    .borrowing-page .new-borrowing-btn,
+    .borrowing-page .clear-filter-btn,
+    .borrowing-page .filters .filter-btn,
+    .event-page .add-event-btn,
+    .feedback-page .mark-all-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .dashboard-page .table-container,
+    .dashboard-page .table-wrap,
+    .feedback-page .table-container,
+    .event-page .table-container,
+    .borrowing-page .table-container,
+    .reports-page .report-table-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .dashboard-page table.table,
+    .dashboard-page .dash-table,
+    .feedback-page table.table,
+    .event-page table.table,
+    .borrowing-page table.table,
+    .reports-page .report-table {
+        min-width: 760px;
+    }
+
+    .reports-page .report-table-wrapper {
+        max-height: none;
+    }
+
+    .reports-page .custom-select,
+    .reports-page .export-select {
+        width: 100%;
+    }
+
+    .reports-page .options.right {
+        width: 100%;
+    }
+
+    .reports-page .date-row .form-control {
+        width: 100%;
+    }
+
+    .dashboard-page .pagination-wrapper,
+    .feedback-page .pagination-wrapper,
+    .borrowing-page .pagination-wrapper,
+    .reports-page .pagination-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .dashboard-page .pagination,
+    .feedback-page .pagination,
+    .borrowing-page .pagination,
+    .reports-page .pagination {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .dashboard-page .quick-panel {
+        padding: 12px;
+    }
+
+    .dashboard-page .panel-head {
+        flex-wrap: wrap;
+    }
+
+    .dashboard-page .quick-add-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .dashboard-page .summary-row,
+    .dashboard-page .card-container,
+    .dashboard-page .stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .dashboard-page .charts-row {
+        grid-template-columns: 1fr;
+    }
+
+    .setting-body-security {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .admin-shell .content {
+        padding: 10px;
+    }
+
+    .dashboard-page .page-title,
+    .feedback-page .page-title,
+    .event-page .page-title,
+    .borrowing-page .page-title,
+    .reports-page .page-title,
+    .setting-title {
+        font-size: 1.5rem;
+        line-height: 1.2;
+    }
+
+    .dashboard-page .dash-header .welcome {
+        font-size: 1.5rem;
+    }
+
+    .dashboard-page .quick-title,
+    .feedback-page .section-title,
+    .borrowing-page .section-title {
+        font-size: 1.25rem;
+    }
+
+    .dashboard-page .page-subtitle,
+    .feedback-page .page-subtitle,
+    .event-page .page-subtitle,
+    .borrowing-page .page-subtitle,
+    .reports-page .page-subtitle {
+        font-size: 0.82rem;
+    }
+
+    .dashboard-page .summary-row,
+    .dashboard-page .card-container,
+    .dashboard-page .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-page .sum-card,
+    .dashboard-page .stat-card {
+        min-height: 96px;
+        padding: 12px;
+    }
+
+    .dashboard-page .sum-icon,
+    .dashboard-page .icon-box {
+        width: 54px;
+        height: 54px;
+    }
+
+    .dashboard-page .sum-value,
+    .dashboard-page .card-value {
+        font-size: 1.1rem;
+    }
+
+    .dashboard-page .qtab,
+    .dashboard-page .tab {
+        font-size: 0.85rem;
+        padding: 8px 10px;
+    }
+
+    .dashboard-page table.table,
+    .dashboard-page .dash-table,
+    .feedback-page table.table,
+    .event-page table.table,
+    .borrowing-page table.table,
+    .reports-page .report-table {
+        min-width: 700px;
+    }
+
+    .setting-shell {
+        padding: 12px;
+    }
+
+    .setting-card {
+        padding: 12px;
+    }
+
+    .setting-body,
+    .setting-body-security {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .setting-form {
+        max-width: none;
+    }
+
+    .form-grid.two-col {
+        grid-template-columns: 1fr;
+    }
+
+    .avatar-column {
+        align-items: flex-start;
+    }
+
+    .form-actions {
+        justify-content: stretch;
+    }
+
+    .btn-save-profile {
+        min-width: 0;
+        width: 100%;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .admin-shell .topbar-right,
+    .admin-shell .topbar-actions {
+        gap: 4px;
+    }
+
+    .admin-shell .action-icon-btn {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+    }
+
+    .admin-shell .user-btn {
+        padding: 4px 6px;
+    }
+
+    .admin-shell .avatar {
+        width: 30px;
+        height: 30px;
+    }
+}

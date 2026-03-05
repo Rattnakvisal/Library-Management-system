@@ -25,6 +25,10 @@
     var reservationNotificationCount = 0;
     var reservationNotifications = new List<(string Status, string BookTitle, DateTime UpdatedAt)>();
     var currentPath = Context.Request.Path.Value ?? "/";
+    var currentSearchQuery = Context.Request.Query["q"].ToString();
+    var isSignedIn = SignInManager.IsSignedIn(User);
+    var currentUserName = User.Identity?.Name ?? "User";
+    var currentUserEmail = User.FindFirstValue(ClaimTypes.Email) ?? string.Empty;
 
     string ToBreadcrumbLabel(string segment)
     {
@@ -83,38 +87,64 @@
 
     var showBreadcrumb = breadcrumbTrail.Count > 1;
 
+    if (isSignedIn)
+    {
+        try
+        {
+            var currentUser = await UserManager.GetUserAsync(User);
+            if (currentUser != null)
+            {
+                currentUserName = currentUser.FullName ?? currentUser.UserName ?? currentUserName;
+                currentUserEmail = currentUser.Email ?? currentUserEmail;
+            }
+        }
+        catch
+        {
+            // Allow page rendering even if database is temporarily unreachable.
+        }
+    }
+
     if (!string.IsNullOrWhiteSpace(cartOwnerKey))
     {
-        cartCount = await DbContext.CartItems
-            .AsNoTracking()
-            .Where(ci => ci.OwnerKey == cartOwnerKey)
-            .CountAsync();
+        try
+        {
+            cartCount = await DbContext.CartItems
+                .AsNoTracking()
+                .Where(ci => ci.OwnerKey == cartOwnerKey)
+                .CountAsync();
 
-        reservationNotificationCount = await DbContext.CartItems
-            .AsNoTracking()
-            .Where(ci => ci.OwnerKey == cartOwnerKey &&
-                         (ci.ReservationStatus == "approved" || ci.ReservationStatus == "rejected") &&
-                         !ci.IsReservationNotificationSeen)
-            .CountAsync();
+            reservationNotificationCount = await DbContext.CartItems
+                .AsNoTracking()
+                .Where(ci => ci.OwnerKey == cartOwnerKey &&
+                             (ci.ReservationStatus == "approved" || ci.ReservationStatus == "rejected") &&
+                             !ci.IsReservationNotificationSeen)
+                .CountAsync();
 
-        var rawNotifications = await DbContext.CartItems
-            .AsNoTracking()
-            .Include(ci => ci.Book)
-            .Where(ci => ci.OwnerKey == cartOwnerKey &&
-                         (ci.ReservationStatus == "approved" || ci.ReservationStatus == "rejected"))
-            .OrderByDescending(ci => ci.ReservationUpdatedDate ?? ci.RequestedDate ?? ci.CreatedDate)
-            .Take(5)
-            .Select(ci => new
-            {
-                Status = ci.ReservationStatus,
-                BookTitle = ci.Book != null ? ci.Book.Title : "Book",
-                UpdatedAt = ci.ReservationUpdatedDate ?? ci.RequestedDate ?? ci.CreatedDate
-            })
-            .ToListAsync();
+            var rawNotifications = await DbContext.CartItems
+                .AsNoTracking()
+                .Include(ci => ci.Book)
+                .Where(ci => ci.OwnerKey == cartOwnerKey &&
+                             (ci.ReservationStatus == "approved" || ci.ReservationStatus == "rejected"))
+                .OrderByDescending(ci => ci.ReservationUpdatedDate ?? ci.RequestedDate ?? ci.CreatedDate)
+                .Take(5)
+                .Select(ci => new
+                {
+                    Status = ci.ReservationStatus,
+                    BookTitle = ci.Book != null ? ci.Book.Title : "Book",
+                    UpdatedAt = ci.ReservationUpdatedDate ?? ci.RequestedDate ?? ci.CreatedDate
+                })
+                .ToListAsync();
 
-        reservationNotifications = rawNotifications
-            .Select(x => (x.Status ?? string.Empty, x.BookTitle ?? "Book", x.UpdatedAt))
-            .ToList();
+            reservationNotifications = rawNotifications
+                .Select(x => (x.Status ?? string.Empty, x.BookTitle ?? "Book", x.UpdatedAt))
+                .ToList();
+        }
+        catch
+        {
+            cartCount = 0;
+            reservationNotificationCount = 0;
+            reservationNotifications = new List<(string Status, string BookTitle, DateTime UpdatedAt)>();
+        }
     }
 }
 
@@ -174,21 +204,20 @@
                 </div>
 
                 <div class="user-info">
-                    @if (SignInManager.IsSignedIn(User))
+                    @if (isSignedIn)
                     {
-                        var u = await UserManager.GetUserAsync(User);
-                        var fullName = u?.FullName ?? u?.UserName ?? "User";
-                        var email = u?.Email ?? "";
-
-                        <a href="mailto:@email" class="email-address">
-                            <i class="bi bi-envelope"></i>
-                            @email
-                        </a>
+                        @if (!string.IsNullOrWhiteSpace(currentUserEmail))
+                        {
+                            <a href="mailto:@currentUserEmail" class="email-address">
+                                <i class="bi bi-envelope"></i>
+                                @currentUserEmail
+                            </a>
+                        }
 
                         <span>
                             <a href="/Profile">
                                 <i class="bi bi-person"></i>
-                                @fullName
+                                @currentUserName
                             </a>
                         </span>
                     }
@@ -225,10 +254,13 @@
                 </ul>
 
                 <div class="nav-right">
-                    <div class="search-box">
-                        <i class="bi bi-search"></i>
-                        <input type="text" placeholder="Search" />
-                    </div>
+                    <form asp-controller="Home" asp-action="Book" method="get" class="search-box" role="search">
+                        <button type="submit" class="search-submit" aria-label="Search books">
+                            <i class="bi bi-search"></i>
+                        </button>
+                        <input type="search" name="q" value="@currentSearchQuery" placeholder="Search books or categories" autocomplete="off" />
+                        <div class="search-suggestions d-none" aria-live="polite"></div>
+                    </form>
 
                     <a href="/BookMark" class="book-mark-text">Book Mark</a>
 
@@ -408,6 +440,7 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/js/users/page-animations.js" asp-append-version="true"></script>
     <script src="~/js/users/navbar.js" asp-append-version="true"></script>
+    <script src="~/js/logout.js" asp-append-version="true"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>

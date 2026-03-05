@@ -141,18 +141,16 @@
                 <a asp-controller="Home" asp-action="Book" class="btn btn-outline-secondary btn-sm">Explore more</a>
             </div>
 
-            <div class="row row-cols-2 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3 g-md-4">
+            <div class="d-flex flex-nowrap overflow-auto gap-3 pb-3 custom-scrollbar top-trending-scroll">
                 @foreach (var book in Model.NewArrivalBooks)
                 {
-                    <div class="col">
-                        <div class="card book-card border-0 shadow-sm h-100 position-relative">
-                            <span class="badge bg-danger position-absolute top-0 start-0 m-3 px-3 py-2">New</span>
-
-                            <div class="card-img-wrapper">
+                    <div class="top-trending-item flex-shrink-0">
+                        <div class="card book-card border-0 shadow-sm h-100">
+                            <div class="card-img-wrapper p-2">
                                 <a asp-controller="Home" asp-action="BookDetail" asp-route-id="@book.Id"
                                        class="text-decoration-none">
                                     <img src="@(string.IsNullOrWhiteSpace(book.ImageUrl) ? "/images/User/Book/book2.png" : book.ImageUrl)"
-                                         class="card-img-top" alt="@book.Title">
+                                         class="card-img-top rounded" alt="@book.Title" height="200">
                                 </a>
                             </div>
 
@@ -160,51 +158,64 @@
                                 <div class="d-flex justify-content-between align-items-center mb-1">
                                     <span class="category-text small fw-bold">@(string.IsNullOrWhiteSpace(book.CategoryName) ?
                                                                                                                                                                                                                                                                                                                         "Professional and Technical" : book.CategoryName)</span>
-                                        <button class="btn p-0 border-0 wishlist-btn text-secondary" type="button"
-                                                data-id="@book.Id">
-                                            <i class="fa-solid fa-heart"></i>
-                                        </button>
-                                    </div>
+                                    <button class="btn p-0 border-0 wishlist-btn text-secondary" data-id="@book.Id">
+                                        <i class="fa-solid fa-heart"></i>
+                                    </button>
+                                </div>
 
-                                    <h6 class="book-title mb-1 fw-bold">
-                                        <a asp-controller="Home" asp-action="BookDetail" asp-route-id="@book.Id"
-                                               class="text-decoration-none text-dark">
-                                            @book.Title
-                                        </a>
-                                    </h6>
+                                <h6 class="book-title mb-1 small fw-bold">
+                                    <a asp-controller="Home" asp-action="BookDetail" asp-route-id="@book.Id"
+                                           class="text-decoration-none text-dark">
+                                        @book.Title
+                                    </a>
+                                </h6>
 
-                                    <p class="author-text mb-3 small fst-italic">@book.Author</p>
+                                <p class="author-text mb-3 small italic">@book.Author</p>
 
-                                    <div class="text-end star-rating text-warning small">
-                                        @for (int i = 0; i < Math.Clamp(book.Rating, 0, 5); i++)
-                                        {
-                                            <i class="fa-solid fa-star"></i>
-                                        }
-                                    </div>
+                                <div class="text-end star-rating text-warning small">
+                                    @for (int i = 0; i < Math.Clamp(book.Rating, 0, 5); i++)
+                                    {
+                                        <i class="fa-solid fa-star"></i>
+                                    }
                                 </div>
                             </div>
                         </div>
+                    </div>
+                }
+            </div>
+        </section>
+        <!-- New arrival section end -->
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const sliders = document.querySelectorAll(".custom-scrollbar");
+
+            sliders.forEach((slider) => {
+                slider.addEventListener("wheel", function (e) {
+                    if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) {
+                        return;
                     }
-                </div>
-            </section>
-            <!-- New arrival section end -->
-        </div>
 
-        <script>
-            document.addEventListener("DOMContentLoaded", function () {
-                const sliders = document.querySelectorAll(".custom-scrollbar");
+                    const maxScrollLeft = slider.scrollWidth - slider.clientWidth;
+                    if (maxScrollLeft <= 0) {
+                        return;
+                    }
 
-                sliders.forEach(slider => {
-                    slider.addEventListener("wheel", function (e) {
-                        if (e.deltaY !== 0) {
-                            e.preventDefault();
-                            slider.scrollLeft += e.deltaY;
-                        }
-                    });
-                });
+                    const nextScrollLeft = slider.scrollLeft + e.deltaY;
+                    const clampedScrollLeft = Math.max(0, Math.min(maxScrollLeft, nextScrollLeft));
+
+                    if (clampedScrollLeft === slider.scrollLeft) {
+                        return;
+                    }
+
+                    e.preventDefault();
+                    slider.scrollLeft = clampedScrollLeft;
+                }, { passive: false });
             });
-        </script>
+        });
+    </script>
 
-        @section Scripts {
-            <script src="~/js/users/Home.js" asp-append-version="true"></script>
-        }
+    @section Scripts {
+        <script src="~/js/users/Home.js" asp-append-version="true"></script>
+    }

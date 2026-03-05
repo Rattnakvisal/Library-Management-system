@@ -6,6 +6,7 @@
     ViewBag.Title = "Book Category";
 
     var currentCategory = ViewBag.CurrentCategory as string;
+    var currentSearch = ViewBag.CurrentSearch as string;
     var currentPage = ViewBag.CurrentPage is int page ? page : 1;
     var totalPages = ViewBag.TotalPages is int pages ? pages : 1;
     var categories = ViewBag.Categories as IEnumerable<string> ?? Enumerable.Empty<string>();
@@ -15,14 +16,28 @@
     <h2 class="text-center fw-bold text-navy category-heading">Book Categories</h2>
     <p class="text-center text-muted category-subheading">Explore our collection of books by category. Find your next
         great read!</p>
+        @if (TempData["BookCategoryError"] is string categoryError && !string.IsNullOrWhiteSpace(categoryError))
+        {
+            <div class="alert alert-warning text-center mb-3" role="alert">
+                @categoryError
+            </div>
+        }
+        @if (!string.IsNullOrWhiteSpace(currentSearch))
+        {
+            <p class="text-center text-muted mb-3">
+                Search results for: <strong>@currentSearch</strong>
+            </p>
+        }
         <div class="filter-scroll-container mb-5">
             <div class="d-flex flex-nowrap px-4">
                 <a asp-controller="Home" asp-action="Book" asp-route-category=""
+                   asp-route-q="@currentSearch"
                    class="btn btn-filter category-chip @(string.IsNullOrEmpty(currentCategory) ? "active" : "")">All</a>
 
                 @foreach (var categoryName in categories)
                 {
                     <a asp-controller="Home" asp-action="Book" asp-route-category="@categoryName"
+                       asp-route-q="@currentSearch"
                        class="btn btn-filter category-chip @(currentCategory == categoryName ? "active" : "")">@categoryName</a>
                 }
             </div>
@@ -71,7 +86,11 @@
             else
             {
                 <div class="col-12">
-                    <div class="text-center py-5 text-muted">No books found in this category.</div>
+                    <div class="text-center py-5 text-muted">
+                        @(string.IsNullOrWhiteSpace(currentSearch)
+                            ? "No books found in this category."
+                            : "No books found for your search.")
+                    </div>
                 </div>
             }
         </div>
@@ -83,12 +102,14 @@
                     @if (currentPage > 1)
                     {
                         <a asp-controller="Home" asp-action="Book" asp-route-category="@currentCategory"
+                           asp-route-q="@currentSearch"
                            asp-route-page="@(currentPage - 1)" class="page-node px-3">Prev</a>
                     }
 
                     @for (var i = 1; i <= totalPages; i++)
                     {
                         <a asp-controller="Home" asp-action="Book" asp-route-page="@i" asp-route-category="@currentCategory"
+                               asp-route-q="@currentSearch"
                                class="page-node @(i == currentPage ? "active" : "")">
                             @i
                         </a>
@@ -97,6 +118,7 @@
                     @if (currentPage < totalPages)
                     {
                         <a asp-controller="Home" asp-action="Book" asp-route-category="@currentCategory"
+                           asp-route-q="@currentSearch"
                            asp-route-page="@(currentPage + 1)" class="page-node px-3">Next</a>
                     }
                 }

@@ -1,5 +1,6 @@
 using Library_Management_system.Data;
 using Library_Management_system.Models;
+using Microsoft.Data.SqlClient;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -679,60 +680,141 @@ namespace Library_Management_system.Controllers
             return View("~/Views/User/Cookie/Cookie.cshtml");
         }
 
-        //public IActionResult Category()
-        //{
-        //    return View("~/Views/User/Category/Category.cshtml");
-        //}
-        //[Area("User")]
-        //public IActionResult Category(int page = 1)
-        //{
-        //    ViewBag.CurrentPage = page;
-        //    return View("~/Views/User/Category/Category.cshtml");
-        //}
-
         [HttpGet("book")]
         [HttpGet("[controller]/[action]")]
-        public Task<IActionResult> Book(string? category, int page = 1)
+        public Task<IActionResult> Book(string? category, string? q, int page = 1)
         {
-            return Category(category, page);
+            return Category(category, q, page);
         }
 
-        public async Task<IActionResult> Category(string? category, int page = 1)
+        [HttpGet("book/suggest")]
+        public async Task<IActionResult> SuggestBooks([FromQuery] string? q, [FromQuery] int limit = 6)
         {
-            var normalizedCategory = string.IsNullOrWhiteSpace(category) ? null : category.Trim();
-            var pageSize = 8;
-
-            var categories = await _context.Books
-                .AsNoTracking()
-                .Where(b => !string.IsNullOrWhiteSpace(b.CategoryName))
-                .Select(b => b.CategoryName)
-                .Distinct()
-                .OrderBy(name => name)
-                .ToListAsync();
-
-            var booksQuery = _context.Books.AsNoTracking().AsQueryable();
-
-            if (!string.IsNullOrWhiteSpace(normalizedCategory))
+            var normalizedSearch = string.IsNullOrWhiteSpace(q) ? null : q.Trim();
+            if (string.IsNullOrWhiteSpace(normalizedSearch))
             {
-                booksQuery = booksQuery.Where(b => b.CategoryName == normalizedCategory);
+                return Json(new { categories = Array.Empty<object>(), books = Array.Empty<object>() });
             }
 
-            var totalItems = await booksQuery.CountAsync();
-            var totalPages = Math.Max(1, (int)Math.Ceiling(totalItems / (double)pageSize));
-            var currentPage = Math.Clamp(page, 1, totalPages);
+            var safeBookLimit = Math.Clamp(limit, 1, 10);
+            var safeCategoryLimit = Math.Clamp(limit, 1, 8);
 
-            var model = await booksQuery
-                .OrderByDescending(b => b.Id)
-                .Skip((currentPage - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
+            try
+            {
+                var categorySuggestions = await _context.Books
+                    .AsNoTracking()
+                    .Where(b => !string.IsNullOrWhiteSpace(b.CategoryName) && b.CategoryName.Contains(normalizedSearch))
+                    .Select(b => b.CategoryName)
+                    .Distinct()
+                    .OrderBy(name => name)
+                    .Take(safeCategoryLimit)
+                    .Select(name => new
+                    {
+                        name
+                    })
+                    .ToListAsync();
 
-            ViewBag.CurrentCategory = normalizedCategory;
-            ViewBag.CurrentPage = currentPage;
-            ViewBag.TotalPages = totalPages;
-            ViewBag.Categories = categories;
+                var bookSuggestions = await _context.Books
+                    .AsNoTracking()
+                    .Where(b =>
+                        b.Title.Contains(normalizedSearch) ||
+                        b.Author.Contains(normalizedSearch) ||
+                        b.CategoryName.Contains(normalizedSearch) ||
+                        b.BookCode.Contains(normalizedSearch) ||
+                        (b.Isbn != null && b.Isbn.Contains(normalizedSearch)))
+                    .OrderByDescending(b => b.Id)
+                    .Take(safeBookLimit)
+                    .Select(b => new
+                    {
+                        id = b.Id,
+                        title = b.Title,
+                        author = b.Author,
+                        category = b.CategoryName
+                    })
+                    .ToListAsync();
 
-            return View("~/Views/User/Category/category.cshtml", model);
+                return Json(new
+                {
+                    categories = categorySuggestions,
+                    books = bookSuggestions
+                });
+            }
+            catch (Exception ex) when (IsDatabaseTimeoutException(ex))
+            {
+                _logger.LogWarning(ex, "Database timeout while loading search suggestions for query: {Query}", normalizedSearch);
+                return Json(new { categories = Array.Empty<object>(), books = Array.Empty<object>() });
+            }
+        }
+
+        public async Task<IActionResult> Category(string? category, string? q, int page = 1)
+        {
+            var normalizedCategory = string.IsNullOrWhiteSpace(category) ? null : category.Trim();
+            var normalizedSearch = string.IsNullOrWhiteSpace(q) ? null : q.Trim();
+            var pageSize = 8;
+
+            try
+            {
+                var categories = await _context.Books
+                    .AsNoTracking()
+                    .Where(b => !string.IsNullOrWhiteSpace(b.CategoryName))
+                    .Select(b => b.CategoryName)
+                    .Distinct()
+                    .OrderBy(name => name)
+                    .ToListAsync();
+
+                var booksQuery = _context.Books.AsNoTracking().AsQueryable();
+
+                if (!string.IsNullOrWhiteSpace(normalizedCategory))
+                {
+                    booksQuery = booksQuery.Where(b => b.CategoryName == normalizedCategory);
+                }
+
+                if (!string.IsNullOrWhiteSpace(normalizedSearch))
+                {
+                    booksQuery = booksQuery.Where(b =>
+                        b.Title.Contains(normalizedSearch) ||
+                        b.Author.Contains(normalizedSearch) ||
+                        b.CategoryName.Contains(normalizedSearch) ||
+                        b.BookCode.Contains(normalizedSearch) ||
+                        (b.Isbn != null && b.Isbn.Contains(normalizedSearch)));
+                }
+
+                var totalItems = await booksQuery.CountAsync();
+                var totalPages = Math.Max(1, (int)Math.Ceiling(totalItems / (double)pageSize));
+                var currentPage = Math.Clamp(page, 1, totalPages);
+
+                var model = await booksQuery
+                    .OrderByDescending(b => b.Id)
+                    .Skip((currentPage - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToListAsync();
+
+                ViewBag.CurrentCategory = normalizedCategory;
+                ViewBag.CurrentSearch = normalizedSearch;
+                ViewBag.CurrentPage = currentPage;
+                ViewBag.TotalPages = totalPages;
+                ViewBag.Categories = categories;
+
+                return View("~/Views/User/Category/category.cshtml", model);
+            }
+            catch (Exception ex) when (IsDatabaseTimeoutException(ex))
+            {
+                _logger.LogWarning(
+                    ex,
+                    "Database timeout while loading book category page. Category: {Category}, Search: {Search}, Page: {Page}",
+                    normalizedCategory,
+                    normalizedSearch,
+                    page);
+
+                TempData["BookCategoryError"] = "The database is taking too long to respond. Please try again in a moment.";
+                ViewBag.CurrentCategory = normalizedCategory;
+                ViewBag.CurrentSearch = normalizedSearch;
+                ViewBag.CurrentPage = 1;
+                ViewBag.TotalPages = 1;
+                ViewBag.Categories = new List<string>();
+
+                return View("~/Views/User/Category/category.cshtml", new List<Book>());
+            }
         }
 
         [HttpGet("book/{id:int}")]
@@ -891,6 +973,21 @@ namespace Library_Management_system.Controllers
             }
 
             return (compareDate.Date - dueDate.Date).Days;
+        }
+
+        private static bool IsDatabaseTimeoutException(Exception ex)
+        {
+            if (ex is TimeoutException)
+            {
+                return true;
+            }
+
+            if (ex is SqlException sqlException && sqlException.Number == -2)
+            {
+                return true;
+            }
+
+            return ex.InnerException != null && IsDatabaseTimeoutException(ex.InnerException);
         }
 
         private async Task<IActionResult> SaveProfileImageAsync(
