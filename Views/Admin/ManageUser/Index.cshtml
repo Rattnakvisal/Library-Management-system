@@ -61,7 +61,7 @@
                 <input type="hidden" name="roleFilter" value="@Model.RoleFilter" />
                 <input type="hidden" name="sort" value="@Model.Sort" />
                 <i class="bi bi-search search-icon" id="searchIcon"></i>
-                <input type="search" name="search" value="@Model.Search" placeholder="Search users..."
+                <input type="search" name="search" value="@Model.Search" placeholder="Search by name or ID..."
                        class="search-input" id="searchInput" />
             </form>
 
@@ -72,7 +72,7 @@
             </button>
 
             <a id="clearFilterBtn" class="clear-filter-btn"
-                   href="@Url.Action("Index", "ManageUser", new { tab = Model.ActiveTab, search = Model.Search })">
+                   href="@Url.Action("Index", "ManageUser", new { tab = Model.ActiveTab })">
                 <i class="bi bi-eraser"></i>
                 <span>Clear Filter</span>
             </a>
@@ -313,15 +313,15 @@
                                                 </div>
 
                                                 <div class="col-12">
-                                                    <label class="form-label">Keyword</label>
+                                                    <label class="form-label">Search (Name or ID)</label>
                                                     <input class="form-control" type="text" name="search" value="@Model.Search"
-                                                           placeholder="Name / Email / ID / Phone" />
+                                                           placeholder="Name or ID" />
                                                 </div>
                                             </form>
                                         </div>
                                         <div class="modal-footer">
                                             <a id="filterResetLink" class="btn btn-outline-secondary"
-                                                   href="@Url.Action("Index", "ManageUser", new { tab = Model.ActiveTab, search = Model.Search })">Clear
+                                                   href="@Url.Action("Index", "ManageUser", new { tab = Model.ActiveTab })">Clear
                                                 Filter</a>
                                                 <button type="submit" form="filterForm" class="btn btn-success">Apply</button>
                                             </div>

@@ -107,11 +107,7 @@ public class ManageUserController : Controller
         {
             items = items.Where(item =>
                 ContainsIgnoreCase(item.UserCode, searchText) ||
-                ContainsIgnoreCase(item.FullName, searchText) ||
-                ContainsIgnoreCase(item.Email, searchText) ||
-                ContainsIgnoreCase(item.PhoneNumber, searchText) ||
-                ContainsIgnoreCase(item.Gender, searchText) ||
-                ContainsIgnoreCase(item.Role, searchText));
+                ContainsIgnoreCase(item.FullName, searchText));
         }
 
         if (!string.IsNullOrWhiteSpace(normalizedGenderFilter))

@@ -11,12 +11,8 @@ $(document).ready(function () {
     const buildClearFilterUrl = (tab) => {
         const params = new URLSearchParams();
         const activeTab = normalizeTab(tab || $('#searchTabInput').val());
-        const searchText = ($('#searchInput').val() || '').trim();
 
         params.set('tab', activeTab);
-        if (searchText) {
-            params.set('search', searchText);
-        }
 
         return `?${params.toString()}`;
     };
