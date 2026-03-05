@@ -1,0 +1,55 @@
+<div id="homeChatbot" class="home-chatbot" aria-live="polite">
+    <button type="button" id="homeChatbotToggle" class="home-chatbot__toggle" aria-expanded="false"
+            aria-controls="homeChatbotPanel">
+        <span class="home-chatbot__toggle-mark" aria-hidden="true">
+            <img src="~/images/User/chatbot/chatbot-logo.svg" asp-append-version="true"
+                 class="home-chatbot__logo home-chatbot__logo--tiny" alt="" />
+            <span class="home-chatbot__pulse"></span>
+        </span>
+    </button>
+
+    <section id="homeChatbotPanel" class="home-chatbot__panel" aria-label="Library assistant" hidden>
+        <header class="home-chatbot__header">
+            <div class="home-chatbot__title-wrap">
+                <span class="home-chatbot__avatar" aria-hidden="true">
+                    <img src="~/images/User/chatbot/chatbot-logo.svg" asp-append-version="true"
+                         class="home-chatbot__logo home-chatbot__logo--mini" alt="" />
+                </span>
+                <div>
+                    <h2 class="home-chatbot__title">Library Assistant</h2>
+                    <p class="home-chatbot__status">Static helper</p>
+                </div>
+            </div>
+            <button type="button" id="homeChatbotClose" class="home-chatbot__close" aria-label="Close chatbot">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </header>
+
+        <div class="home-chatbot__hero" aria-hidden="true">
+            <div class="home-chatbot__logo-stage">
+                <img src="~/images/User/chatbot/chatbot-logo.svg" asp-append-version="true"
+                     class="home-chatbot__logo home-chatbot__logo--hero" alt="" />
+                <span class="home-chatbot__orb home-chatbot__orb--one"></span>
+                <span class="home-chatbot__orb home-chatbot__orb--two"></span>
+                <span class="home-chatbot__orb home-chatbot__orb--three"></span>
+            </div>
+        </div>
+
+        <div id="homeChatbotMessages" class="home-chatbot__messages"></div>
+
+        <div class="home-chatbot__quick-actions" id="homeChatbotQuickActions">
+            <button type="button" data-intent="hours">Opening hours</button>
+            <button type="button" data-intent="borrow">Borrow limit</button>
+            <button type="button" data-intent="fine">Late fee</button>
+            <button type="button" data-intent="contact">Contact support</button>
+        </div>
+
+        <form id="homeChatbotForm" class="home-chatbot__input-row">
+            <input id="homeChatbotInput" type="text" maxlength="140" placeholder="Type a short question..."
+                   autocomplete="off" />
+            <button type="submit" aria-label="Send message">
+                <i class="bi bi-send-fill"></i>
+            </button>
+        </form>
+    </section>
+</div>

@@ -36,7 +36,14 @@ public class ManageUserController : Controller
     }
 
     [HttpGet("")]
-    public async Task<IActionResult> Index(string? tab, string? search, string? gender, string? roleFilter, string? sort)
+    public async Task<IActionResult> Index(
+        string? tab,
+        string? search,
+        string? gender,
+        string? roleFilter,
+        string? sort,
+        int pageStudents = 1,
+        int pageStaffs = 1)
     {
         var normalizedTab = NormalizeTab(tab);
         var searchText = (search ?? string.Empty).Trim();
@@ -123,16 +130,36 @@ public class ManageUserController : Controller
 
         var itemList = items.ToList();
 
-        var students = ApplySort(
+        var sortedStudents = ApplySort(
                 itemList.Where(x => !x.IsStaff),
                 normalizedSort
             )
             .ToList();
 
-        var staffs = ApplySort(
+        var sortedStaffs = ApplySort(
                 itemList.Where(x => x.IsStaff),
                 normalizedSort
             )
+            .ToList();
+
+        var studentsPage = NormalizePage(pageStudents);
+        var staffsPage = NormalizePage(pageStaffs);
+        var pageSize = ManageUserPageViewModel.DefaultPageSize;
+
+        var studentsTotalPages = Math.Max(1, (int)Math.Ceiling(sortedStudents.Count / (double)pageSize));
+        var staffsTotalPages = Math.Max(1, (int)Math.Ceiling(sortedStaffs.Count / (double)pageSize));
+
+        studentsPage = Math.Min(studentsPage, studentsTotalPages);
+        staffsPage = Math.Min(staffsPage, staffsTotalPages);
+
+        var students = sortedStudents
+            .Skip((studentsPage - 1) * pageSize)
+            .Take(pageSize)
+            .ToList();
+
+        var staffs = sortedStaffs
+            .Skip((staffsPage - 1) * pageSize)
+            .Take(pageSize)
             .ToList();
 
         var totalStudents = users.Count(u =>
@@ -153,6 +180,13 @@ public class ManageUserController : Controller
             GenderFilter = normalizedGenderFilter,
             RoleFilter = normalizedRoleFilter,
             Sort = normalizedSort,
+            PageSize = pageSize,
+            StudentsPage = studentsPage,
+            StudentsTotalPages = studentsTotalPages,
+            StudentsTotalCount = sortedStudents.Count,
+            StaffsPage = staffsPage,
+            StaffsTotalPages = staffsTotalPages,
+            StaffsTotalCount = sortedStaffs.Count,
             Students = students,
             Staffs = staffs
         };
@@ -175,19 +209,19 @@ public class ManageUserController : Controller
         if (!IsSupportedRole(role))
         {
             TempData["ManageUserError"] = "Invalid role selected.";
-            return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort));
+            return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort, input.PageStudents, input.PageStaffs));
         }
 
         if (!ModelState.IsValid)
         {
             TempData["ManageUserError"] = BuildModelStateErrorMessage();
-            return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort));
+            return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort, input.PageStudents, input.PageStaffs));
         }
 
         if (await _userManager.FindByEmailAsync(input.Email.Trim()) != null)
         {
             TempData["ManageUserError"] = "A user with this email already exists.";
-            return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort));
+            return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort, input.PageStudents, input.PageStaffs));
         }
 
         var user = new ApplicationUser
@@ -205,7 +239,7 @@ public class ManageUserController : Controller
         if (!createResult.Succeeded)
         {
             TempData["ManageUserError"] = BuildIdentityErrorMessage(createResult);
-            return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort));
+            return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort, input.PageStudents, input.PageStaffs));
         }
 
         var roleResult = await _userManager.AddToRoleAsync(user, role);
@@ -213,7 +247,7 @@ public class ManageUserController : Controller
         {
             await _userManager.DeleteAsync(user);
             TempData["ManageUserError"] = BuildIdentityErrorMessage(roleResult);
-            return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort));
+            return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort, input.PageStudents, input.PageStaffs));
         }
 
         await UpsertUserClaimsAsync(user, input.UserCode, input.Gender);
@@ -253,7 +287,7 @@ public class ManageUserController : Controller
         }
 
         TempData["ManageUserSuccess"] = successMessage;
-        return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort));
+        return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort, input.PageStudents, input.PageStaffs));
     }
 
     [HttpPost("update")]
@@ -267,14 +301,14 @@ public class ManageUserController : Controller
         if (!IsSupportedRole(role))
         {
             TempData["ManageUserError"] = "Invalid role selected.";
-            return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort));
+            return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort, input.PageStudents, input.PageStaffs));
         }
 
         var user = await _userManager.FindByIdAsync(input.UserId);
         if (user == null)
         {
             TempData["ManageUserError"] = "User not found.";
-            return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort));
+            return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort, input.PageStudents, input.PageStaffs));
         }
 
         if (string.IsNullOrWhiteSpace(input.UserCode))
@@ -292,7 +326,7 @@ public class ManageUserController : Controller
         if (!ModelState.IsValid)
         {
             TempData["ManageUserError"] = BuildModelStateErrorMessage();
-            return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort));
+            return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort, input.PageStudents, input.PageStaffs));
         }
 
         var normalizedEmail = input.Email.Trim();
@@ -300,7 +334,7 @@ public class ManageUserController : Controller
         if (existingEmailUser != null && existingEmailUser.Id != user.Id)
         {
             TempData["ManageUserError"] = "Another user is already using this email.";
-            return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort));
+            return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort, input.PageStudents, input.PageStaffs));
         }
 
         user.FullName = input.FullName.Trim();
@@ -311,20 +345,20 @@ public class ManageUserController : Controller
         if (!userUpdateResult.Succeeded)
         {
             TempData["ManageUserError"] = BuildIdentityErrorMessage(userUpdateResult);
-            return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort));
+            return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort, input.PageStudents, input.PageStaffs));
         }
 
         var syncRoleResult = await SyncUserRoleAsync(user, role);
         if (!syncRoleResult.Succeeded)
         {
             TempData["ManageUserError"] = BuildIdentityErrorMessage(syncRoleResult);
-            return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort));
+            return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort, input.PageStudents, input.PageStaffs));
         }
 
         await UpsertUserClaimsAsync(user, input.UserCode, input.Gender);
 
         TempData["ManageUserSuccess"] = "User updated successfully.";
-        return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort));
+        return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort, input.PageStudents, input.PageStaffs));
     }
 
     [HttpPost("delete")]
@@ -334,35 +368,42 @@ public class ManageUserController : Controller
         if (!ModelState.IsValid)
         {
             TempData["ManageUserError"] = "Invalid delete request.";
-            return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort));
+            return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort, input.PageStudents, input.PageStaffs));
         }
 
         var currentUserId = _userManager.GetUserId(User);
         if (string.Equals(currentUserId, input.UserId, StringComparison.Ordinal))
         {
             TempData["ManageUserError"] = "You cannot delete your own account.";
-            return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort));
+            return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort, input.PageStudents, input.PageStaffs));
         }
 
         var user = await _userManager.FindByIdAsync(input.UserId);
         if (user == null)
         {
             TempData["ManageUserError"] = "User not found.";
-            return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort));
+            return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort, input.PageStudents, input.PageStaffs));
         }
 
         var result = await _userManager.DeleteAsync(user);
         if (!result.Succeeded)
         {
             TempData["ManageUserError"] = BuildIdentityErrorMessage(result);
-            return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort));
+            return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort, input.PageStudents, input.PageStaffs));
         }
 
         TempData["ManageUserSuccess"] = "User deleted successfully.";
-        return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort));
+        return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort, input.PageStudents, input.PageStaffs));
     }
 
-    private static object BuildIndexRouteValues(string? tab, string? search, string? gender, string? roleFilter, string? sort)
+    private static object BuildIndexRouteValues(
+        string? tab,
+        string? search,
+        string? gender,
+        string? roleFilter,
+        string? sort,
+        int pageStudents = 1,
+        int pageStaffs = 1)
     {
         return new
         {
@@ -370,8 +411,15 @@ public class ManageUserController : Controller
             search = (search ?? string.Empty).Trim(),
             gender = NormalizeGenderFilter(gender),
             roleFilter = NormalizeRoleFilter(roleFilter),
-            sort = NormalizeSort(sort)
+            sort = NormalizeSort(sort),
+            pageStudents = NormalizePage(pageStudents),
+            pageStaffs = NormalizePage(pageStaffs)
         };
+    }
+
+    private static int NormalizePage(int page)
+    {
+        return page <= 0 ? 1 : page;
     }
 
     private static string NormalizeTab(string? tab)
@@ -727,3 +775,4 @@ public class ManageUserController : Controller
         return string.IsNullOrWhiteSpace(firstError) ? "Please fill all required fields correctly." : firstError;
     }
 }
+

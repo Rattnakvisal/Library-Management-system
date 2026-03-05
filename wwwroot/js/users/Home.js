@@ -1,4 +1,3 @@
-﻿
 (() => {
     function setupWishlistButtons(root) {
         const buttons = root.querySelectorAll(".wishlist-btn");

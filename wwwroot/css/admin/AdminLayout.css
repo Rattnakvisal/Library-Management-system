@@ -87,6 +87,7 @@
 
 .layout {
     display: flex;
+    align-items: flex-start;
     min-height: calc(100vh - 84px);
 }
 
@@ -95,6 +96,12 @@
 ========================================================= */
 
 .sidebar {
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 64px;
+    align-self: flex-start;
+    height: calc(100vh - 64px);
     width: 260px;
     background: var(--navy-2);
     color: #fff;
@@ -104,7 +111,7 @@
 
 .sidebar-inner {
     padding: 14px;
-    height: calc(100vh - 64px);
+    height: 100%;
     overflow-y: auto;
 
     scrollbar-width: thin;

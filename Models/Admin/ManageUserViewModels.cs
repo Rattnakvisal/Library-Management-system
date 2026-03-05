@@ -4,14 +4,23 @@ namespace Library_Management_system.Models.Admin;
 
 public class ManageUserPageViewModel
 {
+    public const int DefaultPageSize = 10;
+
     public int TotalStudents { get; set; }
     public int TotalStaff { get; set; }
     public int TotalUsers { get; set; }
+    public int PageSize { get; set; } = DefaultPageSize;
     public string ActiveTab { get; set; } = "students";
     public string Search { get; set; } = string.Empty;
     public string GenderFilter { get; set; } = string.Empty;
     public string RoleFilter { get; set; } = string.Empty;
     public string Sort { get; set; } = "name_asc";
+    public int StudentsPage { get; set; } = 1;
+    public int StudentsTotalPages { get; set; } = 1;
+    public int StudentsTotalCount { get; set; }
+    public int StaffsPage { get; set; } = 1;
+    public int StaffsTotalPages { get; set; } = 1;
+    public int StaffsTotalCount { get; set; }
     public IReadOnlyList<ManageUserItemViewModel> Students { get; set; } = Array.Empty<ManageUserItemViewModel>();
     public IReadOnlyList<ManageUserItemViewModel> Staffs { get; set; } = Array.Empty<ManageUserItemViewModel>();
 }
@@ -65,6 +74,8 @@ public class ManageUserFormInput
     public string? FilterGender { get; set; }
     public string? RoleFilter { get; set; }
     public string? Sort { get; set; }
+    public int PageStudents { get; set; } = 1;
+    public int PageStaffs { get; set; } = 1;
 }
 
 public class ManageUserUpdateInput
@@ -101,6 +112,8 @@ public class ManageUserUpdateInput
     public string? FilterGender { get; set; }
     public string? RoleFilter { get; set; }
     public string? Sort { get; set; }
+    public int PageStudents { get; set; } = 1;
+    public int PageStaffs { get; set; } = 1;
 }
 
 public class ManageUserDeleteInput
@@ -113,4 +126,6 @@ public class ManageUserDeleteInput
     public string? FilterGender { get; set; }
     public string? RoleFilter { get; set; }
     public string? Sort { get; set; }
+    public int PageStudents { get; set; } = 1;
+    public int PageStaffs { get; set; } = 1;
 }

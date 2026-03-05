@@ -60,6 +60,7 @@
     string profileImageUrl = string.Empty;
     int newUsersCount = 0;
     int newBooksCount = 0;
+    int pendingReservationsCount = 0;
     int unreadContactCount = 0;
     var recentContacts = new List<ContactMessage>();
 
@@ -95,6 +96,10 @@
             .AsNoTracking()
             .CountAsync(x => (x.CreatedDate ?? DateTime.MinValue) >= since);
 
+        pendingReservationsCount = await DbContext.CartItems
+            .AsNoTracking()
+            .CountAsync(x => x.ReservationStatus == "pending");
+
         unreadContactCount = await DbContext.ContactMessages
             .AsNoTracking()
             .CountAsync(x => !x.IsRead);
@@ -106,7 +111,8 @@
             .ToListAsync();
     }
 
-    var notificationCount = newUsersCount + newBooksCount + unreadContactCount;
+    var baseNotificationCount = newUsersCount + newBooksCount + pendingReservationsCount;
+    var notificationCount = baseNotificationCount + unreadContactCount;
 
     // ✅ CHANGE THIS if your controller name is different
     // Example: "Category" instead of "ManageCategory"
@@ -154,8 +160,8 @@
             {
                 <div class="topbar-actions"
                      id="topbarActions"
-                     data-base-notification-count="@(newUsersCount + newBooksCount)"
-                     data-server-base-notification-count="@(newUsersCount + newBooksCount)">
+                     data-base-notification-count="@baseNotificationCount"
+                     data-server-base-notification-count="@baseNotificationCount">
                     <div class="dropdown action-dropdown" id="notificationDropdown">
                         <button class="action-icon-btn dropdown-toggle"
                                 type="button"
@@ -171,9 +177,9 @@
                             <div class="action-menu-header">
                                 <span>Notifications</span>
                                 <div class="notification-header-right">
-                                    <small id="notificationMenuUnreadText">@(newUsersCount + newBooksCount) unread</small>
+                                    <small id="notificationMenuUnreadText">@baseNotificationCount unread</small>
                                     <button type="button"
-                                            class="mark-all-notification-read-btn @((newUsersCount + newBooksCount) > 0 ? "" : "d-none")"
+                                            class="mark-all-notification-read-btn @(baseNotificationCount > 0 ? "" : "d-none")"
                                             id="markAllNotificationsReadBtn">
                                         Mark all
                                     </button>
@@ -205,6 +211,16 @@
                                         </span>
                                     </span>
                                     <span class="action-item-meta">@newBooksCount new</span>
+                                </a>
+                                <a class="dropdown-item action-item" asp-controller="ManageBorrowingBook" asp-action="Index" asp-route-rs="pending">
+                                    <span class="action-item-left">
+                                        <span class="action-item-icon"><i class="bi bi-hourglass-split"></i></span>
+                                        <span class="action-item-stack">
+                                            <span class="action-item-title">Pending Requests</span>
+                                            <span class="action-item-sub">User reservations awaiting approval</span>
+                                        </span>
+                                    </span>
+                                    <span class="action-item-meta">@pendingReservationsCount pending</span>
                                 </a>
                                 <a class="dropdown-item action-item" asp-controller="ManageFeedback" asp-action="Index">
                                     <span class="action-item-left">
@@ -362,19 +378,13 @@
 
                 <!-- LIBRARY GROUP -->
                 <div class="sidebar-section">
-                    <div class="nav-group-title">
-                        <span class="nav-group-label">
-                            <i class="bi bi-collection me-2"></i> Library
-                        </span>
-                    </div>
-
                     <div class="nav-group">
                         <a class="nav-link @IsActive("ManageBooks")" asp-controller="ManageBooks" asp-action="Index">
                             <i class="bi bi-book"></i>
                             <span>Manage Books</span>
                         </a>
 
-                        <!-- ✅ NEW: Categories -->
+                        <!-- NEW: Categories -->
                         <a class="nav-link @IsActive(CATEGORY_CONTROLLER)" asp-controller="@CATEGORY_CONTROLLER" asp-action="Index">
                             <i class="bi bi-tags"></i>
                             <span>Categories</span>
@@ -391,14 +401,7 @@
 
                 <!-- MANAGEMENT GROUP -->
                 <div class="sidebar-section">
-                    <div class="nav-group-title">
-                        <span class="nav-group-label">
-                            <i class="bi bi-gear me-2"></i> Management
-                        </span>
-                    </div>
-
                     <div class="nav-group">
-
                         @if (isAdmin)
                         {
                             <a class="nav-link @IsActive("ManageUser")" asp-controller="ManageUser" asp-action="Index">
@@ -748,11 +751,11 @@
                             text: "You have been logged out successfully.",
                             icon: "success",
                             showConfirmButton: false,
-                            
+
                             });
                             setTimeout(() => {
                                 logoutForm.submit(); // Submit the form after showing the success message
-                            }, 1700);                      
+                            }, 1700);
                         }
                     });
                 });
@@ -763,4 +766,3 @@
     @RenderSection("Scripts", required: false)
 </body>
 </html>
-

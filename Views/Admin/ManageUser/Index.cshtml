@@ -1,6 +1,23 @@
 @model Library_Management_system.Models.Admin.ManageUserPageViewModel
 @{
     ViewBag.Title = "Manage Users";
+
+    object BuildIndexRouteValues(string tab, int pageStudents, int pageStaffs)
+    {
+        return new
+        {
+            tab,
+            search = Model.Search,
+            gender = Model.GenderFilter,
+            roleFilter = Model.RoleFilter,
+            sort = Model.Sort,
+            pageStudents,
+            pageStaffs
+        };
+    }
+
+    var studentRowStart = ((Model.StudentsPage - 1) * Model.PageSize) + 1;
+    var staffRowStart = ((Model.StaffsPage - 1) * Model.PageSize) + 1;
 }
 
 @section Styles {
@@ -60,6 +77,8 @@
                 <input type="hidden" name="gender" value="@Model.GenderFilter" />
                 <input type="hidden" name="roleFilter" value="@Model.RoleFilter" />
                 <input type="hidden" name="sort" value="@Model.Sort" />
+                <input type="hidden" name="pageStudents" value="1" />
+                <input type="hidden" name="pageStaffs" value="1" />
                 <i class="bi bi-search search-icon" id="searchIcon"></i>
                 <input type="search" name="search" value="@Model.Search" placeholder="Search by name or ID..."
                        class="search-input" id="searchInput" />
@@ -109,7 +128,7 @@
                         {
                             var student = Model.Students[i];
                             <tr>
-                                <td>@(i + 1)</td>
+                                <td>@(studentRowStart + i)</td>
                                 <td>@student.UserCode</td>
                                 <td>@student.FullName</td>
                                 <td>@student.Email</td>
@@ -140,6 +159,10 @@
                                             <input type="hidden" name="RoleFilter" value="@Model.RoleFilter"
                                                    class="return-role-filter-input" />
                                             <input type="hidden" name="Sort" value="@Model.Sort" class="return-sort-input" />
+                                            <input type="hidden" name="PageStudents" value="@Model.StudentsPage"
+                                                   class="return-page-students-input" />
+                                            <input type="hidden" name="PageStaffs" value="@Model.StaffsPage"
+                                                   class="return-page-staffs-input" />
                                             <button type="submit" class="delete-user-btn" aria-label="Delete @student.FullName">
                                                 <i class="bi bi-trash"></i>
                                             </button>
@@ -152,14 +175,23 @@
                 </tbody>
             </table>
             <div class="pagination-wrapper">
-                <nav aria-label="Page navigation">
+                <nav aria-label="Students page navigation">
                     <ul class="pagination justify-content-end">
-                        <li class="page-item"><a class="page-link" href="#">Previous</a></li>
-                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                        <li class="page-item"><a class="page-link" href="#">2</a></li>
-                        <li class="page-item"><a class="page-link" href="#">3</a></li>
-                        <li class="page-item"><a class="page-link" href="#">4</a></li>
-                        <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                        <li class="page-item @(Model.StudentsPage <= 1 ? "disabled" : null)">
+                            <a class="page-link"
+                               href="@Url.Action("Index", "ManageUser", BuildIndexRouteValues("students", Model.StudentsPage - 1, Model.StaffsPage))">Previous</a>
+                        </li>
+                        @for (var pageNumber = 1; pageNumber <= Model.StudentsTotalPages; pageNumber++)
+                        {
+                            <li class="page-item @(pageNumber == Model.StudentsPage ? "active" : null)">
+                                <a class="page-link"
+                                   href="@Url.Action("Index", "ManageUser", BuildIndexRouteValues("students", pageNumber, Model.StaffsPage))">@pageNumber</a>
+                            </li>
+                        }
+                        <li class="page-item @(Model.StudentsPage >= Model.StudentsTotalPages ? "disabled" : null)">
+                            <a class="page-link"
+                               href="@Url.Action("Index", "ManageUser", BuildIndexRouteValues("students", Model.StudentsPage + 1, Model.StaffsPage))">Next</a>
+                        </li>
                     </ul>
                 </nav>
             </div>
@@ -196,7 +228,7 @@
                         {
                             var staff = Model.Staffs[i];
                             <tr>
-                                <td>@(i + 1)</td>
+                                <td>@(staffRowStart + i)</td>
                                 <td>@staff.UserCode</td>
                                 <td>@staff.FullName</td>
                                 <td>@staff.Email</td>
@@ -227,6 +259,10 @@
                                             <input type="hidden" name="RoleFilter" value="@Model.RoleFilter"
                                                    class="return-role-filter-input" />
                                             <input type="hidden" name="Sort" value="@Model.Sort" class="return-sort-input" />
+                                            <input type="hidden" name="PageStudents" value="@Model.StudentsPage"
+                                                   class="return-page-students-input" />
+                                            <input type="hidden" name="PageStaffs" value="@Model.StaffsPage"
+                                                   class="return-page-staffs-input" />
                                             <button type="submit" class="delete-user-btn" aria-label="Delete @staff.FullName">
                                                 <i class="bi bi-trash"></i>
                                             </button>
@@ -239,14 +275,23 @@
                 </tbody>
             </table>
             <div class="pagination-wrapper">
-                <nav aria-label="Page navigation">
+                <nav aria-label="Staff page navigation">
                     <ul class="pagination justify-content-end">
-                        <li class="page-item"><a class="page-link" href="#">Previous</a></li>
-                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                        <li class="page-item"><a class="page-link" href="#">2</a></li>
-                        <li class="page-item"><a class="page-link" href="#">3</a></li>
-                        <li class="page-item"><a class="page-link" href="#">4</a></li>
-                        <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                        <li class="page-item @(Model.StaffsPage <= 1 ? "disabled" : null)">
+                            <a class="page-link"
+                               href="@Url.Action("Index", "ManageUser", BuildIndexRouteValues("staffs", Model.StudentsPage, Model.StaffsPage - 1))">Previous</a>
+                        </li>
+                        @for (var pageNumber = 1; pageNumber <= Model.StaffsTotalPages; pageNumber++)
+                        {
+                            <li class="page-item @(pageNumber == Model.StaffsPage ? "active" : null)">
+                                <a class="page-link"
+                                   href="@Url.Action("Index", "ManageUser", BuildIndexRouteValues("staffs", Model.StudentsPage, pageNumber))">@pageNumber</a>
+                            </li>
+                        }
+                        <li class="page-item @(Model.StaffsPage >= Model.StaffsTotalPages ? "disabled" : null)">
+                            <a class="page-link"
+                               href="@Url.Action("Index", "ManageUser", BuildIndexRouteValues("staffs", Model.StudentsPage, Model.StaffsPage + 1))">Next</a>
+                        </li>
                     </ul>
                 </nav>
             </div>
@@ -263,6 +308,8 @@
                 <div class="modal-body">
                     <form id="filterForm" method="get" asp-controller="ManageUser" asp-action="Index" class="row g-3">
                         <input type="hidden" name="tab" id="filterTabInput" value="@Model.ActiveTab" />
+                        <input type="hidden" name="pageStudents" value="1" />
+                        <input type="hidden" name="pageStaffs" value="1" />
 
                         <div class="col-12">
                             <label class="form-label">Gender</label>
@@ -348,6 +395,10 @@
                                                     <input type="hidden" name="RoleFilter" value="@Model.RoleFilter"
                                                            class="return-role-filter-input" />
                                                     <input type="hidden" name="Sort" value="@Model.Sort" class="return-sort-input" />
+                                                    <input type="hidden" name="PageStudents" value="@Model.StudentsPage"
+                                                           class="return-page-students-input" />
+                                                    <input type="hidden" name="PageStaffs" value="@Model.StaffsPage"
+                                                           class="return-page-staffs-input" />
                                                     <div class="row">
                                                         <div class="col-md-6 mb-3">
                                                             <label class="form-label">ID <span class="text-danger">*</span></label>
@@ -412,6 +463,10 @@
                                                     <input type="hidden" name="RoleFilter" value="@Model.RoleFilter"
                                                            class="return-role-filter-input" />
                                                     <input type="hidden" name="Sort" value="@Model.Sort" class="return-sort-input" />
+                                                    <input type="hidden" name="PageStudents" value="@Model.StudentsPage"
+                                                           class="return-page-students-input" />
+                                                    <input type="hidden" name="PageStaffs" value="@Model.StaffsPage"
+                                                           class="return-page-staffs-input" />
                                                     <div class="row">
                                                         <div class="col-md-6 mb-3">
                                                             <label class="form-label">ID <span class="text-danger">*</span></label>
@@ -487,6 +542,10 @@
                                                     <input type="hidden" name="RoleFilter" value="@Model.RoleFilter"
                                                            class="return-role-filter-input" />
                                                     <input type="hidden" name="Sort" value="@Model.Sort" class="return-sort-input" />
+                                                    <input type="hidden" name="PageStudents" value="@Model.StudentsPage"
+                                                           class="return-page-students-input" />
+                                                    <input type="hidden" name="PageStaffs" value="@Model.StaffsPage"
+                                                           class="return-page-staffs-input" />
                                                     <div class="row">
                                                         <div class="col-md-6 mb-3">
                                                             <label class="form-label">ID <span class="text-danger">*</span></label>
@@ -542,6 +601,10 @@
                                                     <input type="hidden" name="RoleFilter" value="@Model.RoleFilter"
                                                            class="return-role-filter-input" />
                                                     <input type="hidden" name="Sort" value="@Model.Sort" class="return-sort-input" />
+                                                    <input type="hidden" name="PageStudents" value="@Model.StudentsPage"
+                                                           class="return-page-students-input" />
+                                                    <input type="hidden" name="PageStaffs" value="@Model.StaffsPage"
+                                                           class="return-page-staffs-input" />
                                                     <div class="row">
                                                         <div class="col-md-6 mb-3">
                                                             <label class="form-label">ID <span class="text-danger">*</span></label>

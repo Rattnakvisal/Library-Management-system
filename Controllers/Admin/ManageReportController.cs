@@ -122,6 +122,7 @@ public class ManageReportController : Controller
                 title = x.Title,
                 borrowDate = x.BorrowDate.ToString("yyyy-MM-dd"),
                 dueDate = x.DueDate.ToString("yyyy-MM-dd"),
+                duration = "1 week",
                 status = ToDisplayStatus(ComputeBorrowingStatus(x.Status, x.DueDate, x.ReturnDate, utcToday))
             })
             .ToList();
