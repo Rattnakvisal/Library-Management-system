@@ -89,8 +89,8 @@
                         <input asp-for="Input.Password" type="password" class="password" placeholder="Your Password"
                                autocomplete="new-password" aria-required="true" required />
 
-                        <span class="toggle-password" role="button" tabindex="0">
-                            <i class="bi bi-eye-slash" id="togglePassword"></i>
+                        <span class="toggle-password" role="button" tabindex="0" data-target="#Input_Password">
+                            <i class="bi bi-eye-slash" id="togglePassword1"></i>
                         </span>
 
                     </div>
@@ -104,8 +104,9 @@
 
                         <input asp-for="Input.ConfirmPassword" type="password" class="password"
                                placeholder="Confirm Password" autocomplete="new-password" aria-required="true" required />
-                         <span class="toggle-password" role="button" tabindex="0">
-                            <i class="bi bi-eye-slash" id="togglePassword"></i>
+
+                        <span class="toggle-password" role="button" tabindex="0" data-target="#Input_ConfirmPassword">
+                            <i class="bi bi-eye-slash" id="togglePassword2"></i>
                         </span>
                     </div>
                     <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>

@@ -1,26 +1,33 @@
 document.addEventListener("DOMContentLoaded", function () {
-  const toggleBtn = document.querySelector(".toggle-password");
-  const toggleIcon =
-    document.getElementById("togglePassword") ||
-    (toggleBtn && toggleBtn.querySelector("i"));
-  const passwordInput = document.querySelector(".password");
-
-  if (toggleBtn && passwordInput) {
+  // Handle all password toggle buttons
+  document.querySelectorAll(".toggle-password").forEach(function (toggleBtn) {
     toggleBtn.addEventListener("click", function () {
-      const isHidden = passwordInput.type === "password";
-      passwordInput.type = isHidden ? "text" : "password";
+      const target = toggleBtn.getAttribute("data-target");
+      const passwordInput = document.querySelector(target) || toggleBtn.parentElement.querySelector("input[type='password'], input[type='text']");
+      const toggleIcon = toggleBtn.querySelector("i");
 
-      if (toggleIcon) {
+      if (passwordInput && toggleIcon) {
+        const isHidden = passwordInput.type === "password";
+        passwordInput.type = isHidden ? "text" : "password";
+
         toggleIcon.classList.toggle("bi-eye");
         toggleIcon.classList.toggle("bi-eye-slash");
-      }
 
-      toggleBtn.setAttribute(
-        "aria-label",
-        isHidden ? "Hide password" : "Show password",
-      );
+        toggleBtn.setAttribute(
+          "aria-label",
+          isHidden ? "Hide password" : "Show password",
+        );
+      }
     });
-  }
+
+    // Handle keyboard toggle (Enter/Space)
+    toggleBtn.addEventListener("keypress", function (e) {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        toggleBtn.click();
+      }
+    });
+  });
 
   function applyLoadingState(form) {
     const submitButton =
