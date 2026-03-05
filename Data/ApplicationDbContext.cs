@@ -19,6 +19,7 @@ namespace Library_Management_system.Data
         public DbSet<Category> Categories { get; set; }
         public DbSet<ContactMessage> ContactMessages { get; set; }
         public DbSet<BookReview> BookReviews { get; set; }
+        public DbSet<Author> Authors { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -41,6 +42,46 @@ namespace Library_Management_system.Data
                     .WithMany(x => x.Reviews)
                     .HasForeignKey(x => x.BookId)
                     .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            builder.Entity<Author>(entity =>
+            {
+                entity.HasKey(x => x.AuthorID);
+                entity.Property(x => x.AuthorID).HasColumnName("Id");
+                entity.Property(x => x.AuthorName).HasColumnName("Name").HasMaxLength(100);
+                entity.Property(x => x.CreatedBy).HasMaxLength(150);
+                entity.Property(x => x.CreatedDate);
+                entity.HasIndex(x => x.AuthorName).IsUnique();
+            });
+
+            builder.Entity<Book>(entity =>
+            {
+                entity.Property(x => x.Title).HasMaxLength(200);
+                entity.Property(x => x.BookCode).HasMaxLength(50);
+                entity.Property(x => x.BookImage).HasMaxLength(255);
+                entity.Property(x => x.Summarized).HasMaxLength(500);
+
+                entity.HasOne(x => x.Category)
+                    .WithMany()
+                    .HasForeignKey(x => x.CategoryId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(x => x.AuthorEntity)
+                    .WithMany()
+                    .HasForeignKey(x => x.AuthorId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            builder.Entity<BorrowingRecord>(entity =>
+            {
+                entity.Property(x => x.DurationDays).HasDefaultValue(14);
+                entity.Property(x => x.ReturnUserId).HasMaxLength(450);
+                entity.Property(x => x.Reason).HasMaxLength(100);
+
+                entity.HasOne(x => x.Reservation)
+                    .WithMany()
+                    .HasForeignKey(x => x.ReservationId)
+                    .OnDelete(DeleteBehavior.NoAction);
             });
         }
     }

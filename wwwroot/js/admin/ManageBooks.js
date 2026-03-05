@@ -93,30 +93,6 @@ function getSelectedEditCategoryName() {
     return ($('#edit-categorySelect').val() || '').toString().trim();
 }
 
-function upsertEditBookCodeOption(bookCode) {
-    const select = $('#edit-bookCodeSelect');
-    if (!select.length) {
-        return;
-    }
-    if (!bookCode || !bookCode.trim()) {
-        select.val('');
-        return;
-    }
-
-    const normalized = bookCode.trim().toLowerCase();
-    const existing = select.find('option').filter(function () {
-        return ($(this).val() || '').toString().trim().toLowerCase() === normalized;
-    });
-
-    if (existing.length > 0) {
-        select.val(existing.first().val());
-        return;
-    }
-
-    $('<option>', { value: bookCode, text: bookCode }).appendTo(select);
-    select.val(bookCode);
-}
-
 function upsertCategoryOption(categoryName) {
     const select = $('#categorySelect');
     const normalized = categoryName.trim().toLowerCase();
@@ -252,10 +228,10 @@ function extractBookDataFromRow(row) {
         bookId: row.data('book-id'),
         rowIndex: row.index(),
         bookCode: (row.data('book-code') || '').toString().trim(),
+        authorId: Number(row.data('author-id') || 0),
         bookCover: row.find('td').eq(0).text().trim(),
         bookTitle: row.find('td').eq(1).find('div').first().text().trim(),
         categoryName: categoryText,
-        author: row.find('td').eq(2).text().trim(),
         isbn,
         pages: (row.data('pages') || '').toString().trim(),
         year: (row.data('year') || '').toString().trim(),
@@ -285,12 +261,12 @@ function mapStatusToValue(status) {
 // Populate edit modal with book data
 function populateEditModal(bookData) {
     $('#editBookIdInput').val(bookData.bookId || '');
-    upsertEditBookCodeOption(bookData.bookCode || '');
+    $('#edit-bookCodeInput').val(bookData.bookCode || '');
     $('#edit-bookTitleInput').val(bookData.bookTitle);
     upsertEditCategoryOption(bookData.categoryName || '');
     $('#edit-quantityInput').val(bookData.quantity);
     $('#edit-isbnInput').val(bookData.isbn);
-    $('#edit-authorInput').val(bookData.author);
+    $('#edit-authorSelect').val(bookData.authorId || '');
     $('#edit-pagesInput').val(bookData.pages);
     $('#edit-yearInput').val(bookData.year);
     $('#edit-statusSelect').val(mapStatusToValue(bookData.status));
@@ -313,11 +289,11 @@ function initializeEditButton() {
 // Get book data from add form
 function getAddBookFormData() {
     return {
-        bookCode: $('#bookCodeSelect').val(),
+        bookCode: $('#bookCodeInput').val().trim(),
         bookTitle: $('#bookTitleInput').val().trim(),
         categoryName: getSelectedCategoryName(),
         quantity: $('#quantityInput').val().trim(),
-        author: $('#authorInput').val().trim(),
+        authorId: Number($('#authorSelect').val() || 0),
         pages: $('#pagesInput').val().trim(),
         year: $('#yearInput').val().trim(),
         status: $('#statusSelect').val(),
@@ -350,8 +326,9 @@ function hasValidBookNumbers(bookData) {
 
 // Validate required add-book fields
 function validateAddBookData(bookData) {
+    const hasValidAuthorId = Number.isInteger(bookData.authorId) && bookData.authorId > 0;
     if (!bookData.bookCode || !bookData.bookTitle || !bookData.categoryName || !bookData.quantity ||
-        !bookData.author || !bookData.pages || !bookData.year || !bookData.status ||
+        !hasValidAuthorId || !bookData.pages || !bookData.year || !bookData.status ||
         !hasValidBookNumbers(bookData)) {
         showMissingInformationAlert();
         return false;
@@ -361,8 +338,9 @@ function validateAddBookData(bookData) {
 
 // Validate required edit-book fields
 function validateEditBookData(bookData) {
+    const hasValidAuthorId = Number.isInteger(bookData.authorId) && bookData.authorId > 0;
     if (!bookData.bookId || !bookData.bookCode || !bookData.bookTitle || !bookData.categoryName ||
-        !bookData.quantity || !bookData.author || !bookData.pages || !bookData.year || !bookData.status ||
+        !bookData.quantity || !hasValidAuthorId || !bookData.pages || !bookData.year || !bookData.status ||
         !hasValidBookNumbers(bookData)) {
         showMissingInformationAlert();
         return false;
@@ -403,7 +381,7 @@ async function submitNewBook(bookData) {
     const formData = new FormData();
     formData.append('bookCode', bookData.bookCode);
     formData.append('bookTitle', bookData.bookTitle);
-    formData.append('author', bookData.author);
+    formData.append('authorId', String(bookData.authorId));
     formData.append('categoryName', bookData.categoryName);
     formData.append('isbn', bookData.isbn || '');
     formData.append('quantity', bookData.quantity || '0');
@@ -427,7 +405,7 @@ async function submitUpdatedBook(bookData) {
     const formData = new FormData();
     formData.append('bookCode', bookData.bookCode);
     formData.append('bookTitle', bookData.bookTitle);
-    formData.append('author', bookData.author);
+    formData.append('authorId', String(bookData.authorId));
     formData.append('categoryName', bookData.categoryName);
     formData.append('isbn', bookData.isbn || '');
     formData.append('quantity', bookData.quantity || '0');
@@ -502,11 +480,11 @@ function initializeAddBookButton() {
 function getEditBookFormData() {
     return {
         bookId: $('#editBookIdInput').val(),
-        bookCode: $('#edit-bookCodeSelect').val(),
+        bookCode: $('#edit-bookCodeInput').val().trim(),
         bookTitle: $('#edit-bookTitleInput').val().trim(),
         categoryName: getSelectedEditCategoryName(),
         quantity: $('#edit-quantityInput').val().trim(),
-        author: $('#edit-authorInput').val().trim(),
+        authorId: Number($('#edit-authorSelect').val() || 0),
         pages: $('#edit-pagesInput').val().trim(),
         year: $('#edit-yearInput').val().trim(),
         status: $('#edit-statusSelect').val(),

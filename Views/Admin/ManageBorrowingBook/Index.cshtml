@@ -79,6 +79,15 @@
                             {
                                 <option value="returned">Returned</option>
                             }
+
+                            @if (Model.BorrowingStatus == "rejected")
+                            {
+                                <option value="rejected" selected>Rejected</option>
+                            }
+                            else
+                            {
+                                <option value="rejected">Rejected</option>
+                            }
                         </select>
                     </form>
 
@@ -100,6 +109,9 @@
                             <th scope="col">Book Title</th>
                             <th scope="col">Borrow Date</th>
                             <th scope="col">Due Date</th>
+                            <th scope="col">Duration</th>
+                            <th scope="col">Return Date</th>
+                            <th scope="col">Reason</th>
                             <th scope="col">Created By</th>
                             <th scope="col">Created Date</th>
                             <th scope="col">Status</th>
@@ -118,13 +130,15 @@
                                     "active" => "Active",
                                     "overdue" => "Overdue",
                                     "returned" => "Returned",
+                                    "rejected" => "Rejected",
                                     _ => "Active"
                                 };
                                 var statusClass = borrowing.Status switch
                                 {
                                     "active" => "status-active",
                                     "overdue" => "status-overdue",
-                                    _ => "status-returned"
+                                    "returned" => "status-returned",
+                                    _ => "status-rejected"
                                 };
 
                                 <tr data-borrowing-id="@borrowing.Id"
@@ -137,6 +151,9 @@
                                     <td>@borrowing.BookTitle</td>
                                     <td>@borrowing.BorrowDate.ToString("yyyy-MM-dd")</td>
                                     <td>@borrowing.DueDate.ToString("yyyy-MM-dd")</td>
+                                    <td>@borrowing.DurationDays day(s)</td>
+                                    <td>@(borrowing.ReturnDate?.ToString("yyyy-MM-dd") ?? "-")</td>
+                                    <td>@(string.IsNullOrWhiteSpace(borrowing.Reason) ? "-" : borrowing.Reason)</td>
                                     <td>@borrowing.CreatedBy</td>
                                     <td>@borrowing.CreatedDate.ToString("yyyy-MM-dd")</td>
                                     <td><span class="table-status @statusClass">@statusLabel</span></td>
@@ -146,7 +163,7 @@
                                                     type="button"
                                                     data-borrowing-id="@borrowing.Id"
                                                     aria-label="Process return"
-                                                    @(borrowing.Status == "returned" ? "disabled" : null)>
+                                                    @((borrowing.Status == "returned" || borrowing.Status == "rejected") ? "disabled" : null)>
                                                 <i class="bi bi-arrow-counterclockwise"></i>
                                             </button>
                                             <button class="edit-borrowing-btn"
@@ -154,7 +171,7 @@
                                                     data-bs-toggle="modal"
                                                     data-bs-target="#updateBorrowingModal"
                                                     aria-label="Edit borrowing"
-                                                    @(borrowing.Status == "returned" ? "disabled" : null)>
+                                                    @((borrowing.Status == "returned" || borrowing.Status == "rejected") ? "disabled" : null)>
                                                 <i class="bi bi-pencil-square"></i>
                                             </button>
                                         </div>
@@ -165,7 +182,7 @@
                         else
                         {
                             <tr>
-                                <td colspan="9" class="text-center text-muted py-4">No borrowing records found.</td>
+                                <td colspan="12" class="text-center text-muted py-4">No borrowing records found.</td>
                             </tr>
                         }
                     </tbody>

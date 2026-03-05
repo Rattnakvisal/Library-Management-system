@@ -342,6 +342,9 @@ function initializeRejectReservationButton() {
         Swal.fire({
             title: 'Reject Reservation',
             text: 'Reject this reservation request?',
+            input: 'text',
+            inputLabel: 'Reason (optional)',
+            inputPlaceholder: 'Enter rejection reason',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Reject',
@@ -354,7 +357,13 @@ function initializeRejectReservationButton() {
             }
 
             try {
-                const payload = await postNoBody(`/admin/manageborrowingbook/reservation/reject/${id}`);
+                const formData = new FormData();
+                const reason = (result.value || '').toString().trim();
+                if (reason) {
+                    formData.append('reason', reason);
+                }
+
+                const payload = await postForm(`/admin/manageborrowingbook/reservation/reject/${id}`, formData);
                 await showAlert('Rejected', payload.message || 'Reservation rejected.', 'success', '#16a34a');
                 window.location.reload();
             } catch (error) {

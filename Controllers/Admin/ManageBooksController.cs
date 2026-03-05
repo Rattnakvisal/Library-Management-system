@@ -60,16 +60,22 @@ public class ManageBooksController : Controller
             .OrderBy(c => c)
             .ToListAsync();
 
+        var authors = await _context.Authors
+            .AsNoTracking()
+            .OrderBy(a => a.AuthorName)
+            .ToListAsync();
+
         ViewBag.TotalBooks = books.Count;
         ViewBag.AvailableCopies = books
-            .Where(b => string.Equals(b.Status, "available", StringComparison.OrdinalIgnoreCase))
+            .Where(b => b.Availability)
             .Sum(b => b.Quantity);
         ViewBag.UnavailableBooks = books.Count(b =>
-            string.Equals(b.Status, "unavailable", StringComparison.OrdinalIgnoreCase) || b.Quantity <= 0);
+            !b.Availability || b.Quantity <= 0);
         ViewBag.BorrowedBooks = books
             .Where(b => string.Equals(b.Status, "borrowed", StringComparison.OrdinalIgnoreCase))
             .Sum(b => b.Quantity);
         ViewBag.BookCategories = categories;
+        ViewBag.BookAuthors = authors;
 
         return View("~/Views/Admin/ManageBooks/Index.cshtml", books);
     }
@@ -79,7 +85,7 @@ public class ManageBooksController : Controller
     {
         if (string.IsNullOrWhiteSpace(request.BookCode) ||
             string.IsNullOrWhiteSpace(request.BookTitle) ||
-            string.IsNullOrWhiteSpace(request.Author) ||
+            request.AuthorId <= 0 ||
             string.IsNullOrWhiteSpace(request.CategoryName) ||
             !request.Quantity.HasValue ||
             request.Quantity.Value < 0 ||
@@ -116,36 +122,37 @@ public class ManageBooksController : Controller
 
         var actor = GetCurrentActor();
         var now = DateTime.UtcNow;
+        var category = await ResolveCategoryAsync(request.CategoryName.Trim(), actor, now);
+        var author = await ResolveAuthorByIdAsync(request.AuthorId);
+        if (author == null)
+        {
+            return BadRequest(new { success = false, message = "Please select a valid author." });
+        }
 
         var book = new Book
         {
             BookCode = request.BookCode.Trim(),
             Title = request.BookTitle.Trim(),
-            Author = request.Author.Trim(),
+            Author = author.AuthorName,
             CategoryName = request.CategoryName.Trim(),
+            CategoryId = category.Id,
+            Category = category,
+            AuthorId = author.AuthorID,
+            AuthorEntity = author,
             Isbn = NormalizeOptionalText(request.Isbn),
             Quantity = request.Quantity.Value,
+            Availability = ComputeAvailability(normalizedStatus, request.Quantity.Value),
             Pages = request.Pages.Value,
             Year = request.Year.Value,
             Status = normalizedStatus,
             Description = NormalizeOptionalText(request.Description),
             ImageUrl = imageUrl,
+            BookImage = imageUrl,
+            Summarized = NormalizeOptionalText(request.Description),
             Rating = Math.Clamp(request.Rating ?? 5, 0, 5),
             CreatedBy = actor,
             CreatedDate = now
         };
-
-        var categoryExists = await _context.Categories
-            .AnyAsync(c => c.Name == book.CategoryName);
-        if (!categoryExists)
-        {
-            _context.Categories.Add(new Category
-            {
-                Name = book.CategoryName,
-                CreatedBy = actor,
-                CreatedDate = now
-            });
-        }
 
         _context.Books.Add(book);
         await _context.SaveChangesAsync();
@@ -173,7 +180,7 @@ public class ManageBooksController : Controller
     {
         if (string.IsNullOrWhiteSpace(request.BookCode) ||
             string.IsNullOrWhiteSpace(request.BookTitle) ||
-            string.IsNullOrWhiteSpace(request.Author) ||
+            request.AuthorId <= 0 ||
             string.IsNullOrWhiteSpace(request.CategoryName) ||
             !request.Quantity.HasValue ||
             request.Quantity.Value < 0 ||
@@ -197,16 +204,29 @@ public class ManageBooksController : Controller
             return NotFound(new { success = false, message = "Book not found." });
         }
 
+        var actor = GetCurrentActor();
+        var now = DateTime.UtcNow;
+        var category = await ResolveCategoryAsync(request.CategoryName.Trim(), actor, now);
+        var author = await ResolveAuthorByIdAsync(request.AuthorId);
+        if (author == null)
+        {
+            return BadRequest(new { success = false, message = "Please select a valid author." });
+        }
+
         book.BookCode = request.BookCode.Trim();
         book.Title = request.BookTitle.Trim();
-        book.Author = request.Author.Trim();
+        book.Author = author.AuthorName;
         book.CategoryName = request.CategoryName.Trim();
+        book.CategoryId = category.Id;
+        book.AuthorId = author.AuthorID;
         book.Isbn = NormalizeOptionalText(request.Isbn);
         book.Quantity = request.Quantity.Value;
+        book.Availability = ComputeAvailability(normalizedStatus, request.Quantity.Value);
         book.Pages = request.Pages.Value;
         book.Year = request.Year.Value;
         book.Status = normalizedStatus;
         book.Description = NormalizeOptionalText(request.Description);
+        book.Summarized = NormalizeOptionalText(request.Description);
 
         if (request.Rating.HasValue)
         {
@@ -226,18 +246,11 @@ public class ManageBooksController : Controller
             await request.BookImage.CopyToAsync(stream);
 
             book.ImageUrl = $"/images/User/Book/uploads/{fileName}";
+            book.BookImage = book.ImageUrl;
         }
-
-        var categoryExists = await _context.Categories
-            .AnyAsync(c => c.Name == book.CategoryName);
-        if (!categoryExists)
+        else if (string.IsNullOrWhiteSpace(book.BookImage))
         {
-            _context.Categories.Add(new Category
-            {
-                Name = book.CategoryName,
-                CreatedBy = GetCurrentActor(),
-                CreatedDate = DateTime.UtcNow
-            });
+            book.BookImage = book.ImageUrl;
         }
 
         await _context.SaveChangesAsync();
@@ -248,7 +261,7 @@ public class ManageBooksController : Controller
     {
         public string BookCode { get; set; } = string.Empty;
         public string BookTitle { get; set; } = string.Empty;
-        public string Author { get; set; } = string.Empty;
+        public int AuthorId { get; set; }
         public string CategoryName { get; set; } = string.Empty;
         public string? Isbn { get; set; }
         public int? Quantity { get; set; }
@@ -264,7 +277,7 @@ public class ManageBooksController : Controller
     {
         public string BookCode { get; set; } = string.Empty;
         public string BookTitle { get; set; } = string.Empty;
-        public string Author { get; set; } = string.Empty;
+        public int AuthorId { get; set; }
         public string CategoryName { get; set; } = string.Empty;
         public string? Isbn { get; set; }
         public int? Quantity { get; set; }
@@ -296,6 +309,44 @@ public class ManageBooksController : Controller
 
         var normalized = value.Trim().ToLowerInvariant();
         return AllowedStatuses.Contains(normalized) ? normalized : string.Empty;
+    }
+
+    private static bool ComputeAvailability(string status, int quantity)
+    {
+        if (quantity <= 0)
+        {
+            return false;
+        }
+
+        return !string.Equals(status, "unavailable", StringComparison.OrdinalIgnoreCase) &&
+               !string.Equals(status, "maintenance", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private async Task<Category> ResolveCategoryAsync(string categoryName, string actor, DateTime nowUtc)
+    {
+        var category = await _context.Categories
+            .FirstOrDefaultAsync(c => c.Name == categoryName);
+
+        if (category != null)
+        {
+            return category;
+        }
+
+        category = new Category
+        {
+            Name = categoryName,
+            CreatedBy = actor,
+            CreatedDate = nowUtc
+        };
+
+        _context.Categories.Add(category);
+        await _context.SaveChangesAsync();
+        return category;
+    }
+
+    private async Task<Author?> ResolveAuthorByIdAsync(int authorId)
+    {
+        return await _context.Authors.FirstOrDefaultAsync(a => a.AuthorID == authorId);
     }
 
     private string GetCurrentActor()

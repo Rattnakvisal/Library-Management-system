@@ -379,6 +379,10 @@ body {
     color: #334155;
 }
 
+.status.rejected {
+    color: #92400e;
+}
+
 /* icon buttons */
 .ico-btn {
     width: 36px;

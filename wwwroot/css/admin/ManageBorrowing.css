@@ -327,6 +327,12 @@
   color: #334155;
 }
 
+.borrowing-page .status-rejected {
+  background: #fef3c7;
+  border-color: #fcd34d;
+  color: #92400e;
+}
+
 .borrowing-page .action-container {
   display: flex;
   align-items: center;

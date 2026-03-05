@@ -8,6 +8,7 @@
     int availableCopies = ViewBag.AvailableCopies ?? 0;
     int unavailableBooks = ViewBag.UnavailableBooks ?? 0;
     var bookCategories = ViewBag.BookCategories as IEnumerable<string> ?? Enumerable.Empty<string>();
+    var bookAuthors = ViewBag.BookAuthors as IEnumerable<Library_Management_system.Models.Author> ?? Enumerable.Empty<Library_Management_system.Models.Author>();
     var selectedStatus = (Context.Request.Query["status"].ToString() ?? string.Empty).Trim().ToLowerInvariant();
 }
 
@@ -110,6 +111,7 @@
 
                         <tr data-book-id="@book.Id"
                             data-book-code="@book.BookCode"
+                            data-author-id="@book.AuthorId"
                             data-category-name="@book.CategoryName"
                             data-isbn="@book.Isbn"
                             data-quantity="@book.Quantity"
@@ -256,15 +258,7 @@
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label">Book Code <span class="text-danger">*</span></label>
-                                <div class="custom-select-wrapper">
-                                    <select class="form-select" id="bookCodeSelect" required>
-                                        <option value="">eg. 1010</option>
-                                        <option value="1010">1010</option>
-                                        <option value="1011">1011</option>
-                                        <option value="1012">1012</option>
-                                        <option value="1013">1013</option>
-                                    </select>
-                                </div>
+                                <input type="text" class="form-control" id="bookCodeInput" placeholder="eg. 1010" required />
                             </div>
 
                             <div class="col-md-6">
@@ -303,7 +297,15 @@
 
                             <div class="col-md-6">
                                 <label class="form-label">Author <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="authorInput" placeholder="eg. John Doe" required />
+                                <div class="custom-select-wrapper">
+                                    <select class="form-select" id="authorSelect" required>
+                                        <option value="">Select author</option>
+                                        @foreach (var author in bookAuthors)
+                                        {
+                                            <option value="@author.AuthorID">@author.AuthorName</option>
+                                        }
+                                    </select>
+                                </div>
                             </div>
 
                             <div class="col-md-6">
@@ -379,15 +381,7 @@
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label">Book Code <span class="text-danger">*</span></label>
-                                <div class="custom-select-wrapper">
-                                    <select class="form-select" id="edit-bookCodeSelect" required>
-                                        <option value="">eg. 1010</option>
-                                        <option value="1010">1010</option>
-                                        <option value="1011">1011</option>
-                                        <option value="1012">1012</option>
-                                        <option value="1013">1013</option>
-                                    </select>
-                                </div>
+                                <input type="text" class="form-control" id="edit-bookCodeInput" placeholder="eg. 1010" required />
                             </div>
 
                             <div class="col-md-6">
@@ -420,7 +414,15 @@
 
                             <div class="col-md-6">
                                 <label class="form-label">Author <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="edit-authorInput" required />
+                                <div class="custom-select-wrapper">
+                                    <select class="form-select" id="edit-authorSelect" required>
+                                        <option value="">Select author</option>
+                                        @foreach (var author in bookAuthors)
+                                        {
+                                            <option value="@author.AuthorID">@author.AuthorName</option>
+                                        }
+                                    </select>
+                                </div>
                             </div>
 
                             <div class="col-md-6">

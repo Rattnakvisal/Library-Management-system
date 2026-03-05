@@ -138,7 +138,7 @@ namespace Library_Management_system.Controllers.Admin
                 })
                 .ToList();
 
-            var borrowedBooks = borrowingSnapshots.Count(x => x.Status != "returned");
+            var borrowedBooks = borrowingSnapshots.Count(x => x.Status is not "returned" and not "rejected");
             var totalFines = borrowingSnapshots.Sum(x => x.Fine);
 
             var overdueBorrowings = borrowingSnapshots
@@ -213,6 +213,11 @@ namespace Library_Management_system.Controllers.Admin
 
         private static string ComputeBorrowingStatus(string? currentStatus, DateTime dueDate, DateTime? returnDate, DateTime utcToday)
         {
+            if (string.Equals(currentStatus, "rejected", StringComparison.OrdinalIgnoreCase))
+            {
+                return "rejected";
+            }
+
             if (returnDate.HasValue || string.Equals(currentStatus, "returned", StringComparison.OrdinalIgnoreCase))
             {
                 return "returned";

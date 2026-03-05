@@ -44,14 +44,21 @@ public class ManageCategoryController : Controller
             .Select(c => new ManageCategoryViewModel
             {
                 Name = c.Name,
-                BookCount = _context.Books.Count(b => b.CategoryName == c.Name),
+                BookCount = _context.Books.Count(b => b.CategoryId == c.Id || b.CategoryName == c.Name),
                 CreatedBy = c.CreatedBy ?? string.Empty,
                 CreatedDate = c.CreatedDate
             })
             .ToListAsync();
 
+        var authors = await _context.Authors
+            .AsNoTracking()
+            .OrderBy(a => a.AuthorID)
+            .ToListAsync();
+
         ViewBag.TotalCategories = categories.Count;
         ViewBag.TotalBooksInCategories = categories.Sum(c => c.BookCount);
+        ViewBag.TotalAuthors = authors.Count;
+        ViewBag.Authors = authors;
 
         return View("~/Views/Admin/ManageCategory/Index.cshtml", categories);
     }
@@ -85,6 +92,32 @@ public class ManageCategoryController : Controller
         return Ok(new { success = true, message = "Category added successfully." });
     }
 
+    [HttpPost("create-author")]
+    public async Task<IActionResult> CreateAuthor([FromForm] CreateAuthorRequest request)
+    {
+        var name = request.Name?.Trim();
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            return BadRequest(new { success = false, message = "Author name is required." });
+        }
+
+        var exists = await _context.Authors.AnyAsync(a => a.AuthorName == name);
+        if (exists)
+        {
+            return BadRequest(new { success = false, message = "Author already exists." });
+        }
+
+        _context.Authors.Add(new Author
+        {
+            AuthorName = name,
+            CreatedBy = GetCurrentActor(),
+            CreatedDate = DateTime.UtcNow
+        });
+
+        await _context.SaveChangesAsync();
+        return Ok(new { success = true, message = "Author added successfully." });
+    }
+
     [HttpPost("update")]
     public async Task<IActionResult> Update([FromForm] UpdateCategoryRequest request)
     {
@@ -111,10 +144,13 @@ public class ManageCategoryController : Controller
                 return BadRequest(new { success = false, message = "Category name already exists." });
             }
 
-            var books = await _context.Books.Where(b => b.CategoryName == oldName).ToListAsync();
+            var books = await _context.Books
+                .Where(b => b.CategoryId == targetCategory.Id || b.CategoryName == oldName)
+                .ToListAsync();
             foreach (var book in books)
             {
                 book.CategoryName = newName;
+                book.CategoryId = targetCategory.Id;
             }
             targetCategory.Name = newName;
         }
@@ -155,20 +191,29 @@ public class ManageCategoryController : Controller
         }
 
         var uncategorizedName = "Uncategorized";
-        if (!await _context.Categories.AnyAsync(c => c.Name == uncategorizedName))
+        var uncategorizedCategory = await _context.Categories
+            .FirstOrDefaultAsync(c => c.Name == uncategorizedName);
+
+        if (uncategorizedCategory == null)
         {
-            _context.Categories.Add(new Category
+            uncategorizedCategory = new Category
             {
                 Name = uncategorizedName,
                 CreatedBy = GetCurrentActor(),
                 CreatedDate = DateTime.UtcNow
-            });
+            };
+
+            _context.Categories.Add(uncategorizedCategory);
+            await _context.SaveChangesAsync();
         }
 
-        var books = await _context.Books.Where(b => b.CategoryName == categoryName).ToListAsync();
+        var books = await _context.Books
+            .Where(b => b.CategoryId == targetCategory.Id || b.CategoryName == categoryName)
+            .ToListAsync();
         foreach (var book in books)
         {
             book.CategoryName = uncategorizedName;
+            book.CategoryId = uncategorizedCategory.Id;
         }
 
         _context.Categories.Remove(targetCategory);
@@ -223,6 +268,11 @@ public class ManageCategoryController : Controller
         public string NewName { get; set; } = string.Empty;
         public IFormFile? ImageFile { get; set; }
         public string? Description { get; set; }
+    }
+
+    public sealed class CreateAuthorRequest
+    {
+        public string Name { get; set; } = string.Empty;
     }
 
     public sealed class DeleteCategoryRequest

@@ -238,13 +238,15 @@
                                     {
                                         "active" => "status active",
                                         "overdue" => "status overdue",
-                                        _ => "status returned"
+                                        "returned" => "status returned",
+                                        _ => "status rejected"
                                     };
                                     var statusLabel = row.Status switch
                                     {
                                         "active" => "Active",
                                         "overdue" => "Overdue",
-                                        _ => "Returned"
+                                        "returned" => "Returned",
+                                        _ => "Rejected"
                                     };
 
                                     <tr>

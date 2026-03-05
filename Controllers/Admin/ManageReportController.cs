@@ -137,7 +137,7 @@ public class ManageReportController : Controller
         var query = _context.BorrowingRecords
             .AsNoTracking()
             .Include(x => x.Book)
-            .Where(x => x.ReturnDate.HasValue || x.Status == "returned");
+            .Where(x => (x.ReturnDate.HasValue || x.Status == "returned") && x.Status != "rejected");
 
         if (fromBoundary.HasValue)
         {
@@ -321,6 +321,11 @@ public class ManageReportController : Controller
 
     private static string ComputeBorrowingStatus(string? currentStatus, DateTime dueDate, DateTime? returnDate, DateTime utcToday)
     {
+        if (string.Equals(currentStatus, "rejected", StringComparison.OrdinalIgnoreCase))
+        {
+            return "rejected";
+        }
+
         if (returnDate.HasValue || string.Equals(currentStatus, "returned", StringComparison.OrdinalIgnoreCase))
         {
             return "returned";
@@ -351,6 +356,7 @@ public class ManageReportController : Controller
             "active" => "Borrowed",
             "overdue" => "Overdue",
             "returned" => "Returned",
+            "rejected" => "Rejected",
             _ => "Borrowed"
         };
     }

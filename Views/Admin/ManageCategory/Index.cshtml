@@ -4,6 +4,9 @@
     ViewBag.Title = "Manage Categories";
     int totalCategories = ViewBag.TotalCategories ?? 0;
     int totalBooksInCategories = ViewBag.TotalBooksInCategories ?? 0;
+    int totalAuthors = ViewBag.TotalAuthors ?? 0;
+    var authors = ViewBag.Authors as IEnumerable<Library_Management_system.Models.Author>
+        ?? Enumerable.Empty<Library_Management_system.Models.Author>();
 }
 
 @section Styles {
@@ -32,6 +35,13 @@
                 <span class="card-value">@totalBooksInCategories</span>
             </div>
         </article>
+        <article class="stat-card">
+            <div class="icon-box"><i class="bi bi-person-lines-fill"></i></div>
+            <div class="card-content">
+                <span class="card-label">Total Authors</span>
+                <span class="card-value">@totalAuthors</span>
+            </div>
+        </article>
     </section>
 
     <section class="controls-section">
@@ -44,6 +54,10 @@
             <button type="button" class="add-btn" id="addCategoryBtn">
                 <i class="bi bi-plus-lg"></i>
                 <span>Add Category</span>
+            </button>
+            <button type="button" class="add-btn" id="addAuthorBtn">
+                <i class="bi bi-person-plus"></i>
+                <span>Add Author</span>
             </button>
             <a class="clear-filter-btn" href="@Url.Action("Index", "ManageCategory")">
                 <i class="bi bi-eraser"></i>
@@ -104,6 +118,62 @@
         </div>
     </section>
 
+    <section class="table-container mt-4">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <h2 class="h5 mb-0">Author Management</h2>
+        </div>
+        <div class="table-responsive">
+            <table class="table book-table align-middle category-table">
+                <thead>
+                    <tr>
+                        <th>Author</th>
+                        <th style="width:180px;">Created By</th>
+                        <th style="width:180px;">Created Date</th>
+                        <th style="width:140px; text-align:center;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (authors.Any())
+                    {
+                        @foreach (var author in authors)
+                        {
+                            <tr>
+                                <td>
+                                    <span class="category-name">@author.AuthorName</span>
+                                </td>
+                                <td>@(string.IsNullOrWhiteSpace(author.CreatedBy) ? "-" : author.CreatedBy)</td>
+                                <td>@(author.CreatedDate?.ToLocalTime().ToString("yyyy-MM-dd HH:mm") ?? "-")</td>
+                                <td>
+                                    <div class="action-container">
+                                        <button type="button" class="edit-book-btn edit-author-btn"
+                                                data-author-id="@author.AuthorID"
+                                                data-author-name="@author.AuthorName"
+                                                title="Edit @author.AuthorName">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </button>
+                                        <button type="button" class="delete-book-btn delete-author-btn"
+                                                data-author-id="@author.AuthorID"
+                                                data-author-name="@author.AuthorName"
+                                                title="Delete @author.AuthorName">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="4" class="text-center text-muted py-4">No authors found.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+
     <!-- Add/Edit Category Modal -->
     <div class="modal fade" id="categoryModal" tabindex="-1">
         <div class="modal-dialog">
@@ -116,18 +186,18 @@
                     <div class="modal-body">
                         <div class="mb-3">
                             <label for="categoryName" class="form-label">Category Name <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="categoryName" name="name" 
+                            <input type="text" class="form-control" id="categoryName" name="name"
                                    placeholder="Enter category name" required>
                         </div>
                         <div class="mb-3">
                             <label for="categoryImage" class="form-label">Category Image</label>
-                            <input type="file" class="form-control" id="categoryImage" name="imageFile" 
+                            <input type="file" class="form-control" id="categoryImage" name="imageFile"
                                    accept="image/jpeg,image/png,image/webp" />
                             <small class="text-muted">Accepted formats: JPG, PNG, WEBP (Max 5MB)</small>
                         </div>
                         <div class="mb-3">
                             <label for="categoryDescription" class="form-label">Description</label>
-                            <textarea class="form-control" id="categoryDescription" name="description" 
+                            <textarea class="form-control" id="categoryDescription" name="description"
                                       rows="3" placeholder="Enter category description"></textarea>
                         </div>
                         <div id="previewContainer" class="mb-3" style="display:none;">
@@ -137,6 +207,34 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                         <button type="submit" class="btn btn-primary" id="submitBtn">Add Category</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="authorModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="authorModalTitle">Add Author</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="authorForm">
+                    <div class="modal-body">
+                        <input type="hidden" id="authorId" name="authorId" />
+                        <div class="mb-3">
+                            <label for="authorName" class="form-label">Author Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="authorName" name="name"
+                                   placeholder="Enter author name" required>
+                        </div>
+                        <small class="text-muted">
+                            Created by and created date are set automatically from your account and current time.
+                        </small>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary" id="submitAuthorBtn">Add Author</button>
                     </div>
                 </form>
             </div>

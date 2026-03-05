@@ -1,16 +1,24 @@
 document.addEventListener('DOMContentLoaded', function () {
     const categoryModal = new bootstrap.Modal(document.getElementById('categoryModal'));
+    const authorModal = new bootstrap.Modal(document.getElementById('authorModal'));
     const categoryForm = document.getElementById('categoryForm');
+    const authorForm = document.getElementById('authorForm');
     const categoryNameInput = document.getElementById('categoryName');
     const categoryImageInput = document.getElementById('categoryImage');
     const categoryDescriptionInput = document.getElementById('categoryDescription');
+    const authorIdInput = document.getElementById('authorId');
+    const authorNameInput = document.getElementById('authorName');
     const submitBtn = document.getElementById('submitBtn');
+    const submitAuthorBtn = document.getElementById('submitAuthorBtn');
     const categoryModalTitle = document.getElementById('categoryModalTitle');
+    const authorModalTitle = document.getElementById('authorModalTitle');
     const imagePreview = document.getElementById('imagePreview');
     const previewContainer = document.getElementById('previewContainer');
 
     let isEditMode = false;
     let editingCategoryName = null;
+    let isAuthorEditMode = false;
+    let editingAuthorId = null;
 
     // Add category button
     document.getElementById('addCategoryBtn').addEventListener('click', function () {
@@ -21,6 +29,34 @@ document.addEventListener('DOMContentLoaded', function () {
         categoryModalTitle.textContent = 'Add Category';
         submitBtn.textContent = 'Add Category';
         categoryModal.show();
+    });
+
+    // Add author button
+    document.getElementById('addAuthorBtn').addEventListener('click', function () {
+        isAuthorEditMode = false;
+        editingAuthorId = null;
+        authorForm.reset();
+        authorIdInput.value = '';
+        authorModalTitle.textContent = 'Add Author';
+        submitAuthorBtn.textContent = 'Add Author';
+        authorModal.show();
+    });
+
+    // Edit author button
+    document.querySelectorAll('.edit-author-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const authorId = this.getAttribute('data-author-id');
+            const authorName = this.getAttribute('data-author-name');
+
+            isAuthorEditMode = true;
+            editingAuthorId = authorId;
+            authorForm.reset();
+            authorIdInput.value = authorId;
+            authorNameInput.value = authorName;
+            authorModalTitle.textContent = `Edit Author: ${authorName}`;
+            submitAuthorBtn.textContent = 'Update Author';
+            authorModal.show();
+        });
     });
 
     // Edit category button
@@ -37,6 +73,80 @@ document.addEventListener('DOMContentLoaded', function () {
             categoryModalTitle.textContent = `Edit Category: ${categoryName}`;
             submitBtn.textContent = 'Update Category';
             categoryModal.show();
+        });
+    });
+
+    // Author form submission
+    authorForm.addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const authorName = authorNameInput.value.trim();
+        if (!authorName) {
+            showAlert('Error', 'Author name is required.', 'danger');
+            return;
+        }
+
+        const formData = new FormData();
+        if (isAuthorEditMode && editingAuthorId) {
+            formData.append('authorId', editingAuthorId);
+        }
+        formData.append('name', authorName);
+
+        try {
+            const response = await fetch(isAuthorEditMode ? '/admin/manageauthor/update' : '/admin/manageauthor/create', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+
+            if (response.ok && result.success) {
+                showAlert('Success', result.message, 'success');
+                authorModal.hide();
+                authorForm.reset();
+                setTimeout(() => {
+                    location.reload();
+                }, 1200);
+            } else {
+                showAlert('Error', result.message || 'Failed to save author.', 'danger');
+            }
+        } catch (error) {
+            showAlert('Error', 'Failed to save author. Please try again.', 'danger');
+            console.error('Error:', error);
+        }
+    });
+
+    // Delete author
+    document.querySelectorAll('.delete-author-btn').forEach(btn => {
+        btn.addEventListener('click', async function () {
+            const authorId = this.getAttribute('data-author-id');
+            const authorName = this.getAttribute('data-author-name');
+
+            if (confirm(`Are you sure you want to delete the author "${authorName}"? Related books will be moved to "Unknown Author".`)) {
+                try {
+                    const response = await fetch('/admin/manageauthor/delete', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ authorId: Number(authorId) })
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok && result.success) {
+                        showAlert('Success', result.message, 'success');
+                        setTimeout(() => {
+                            location.reload();
+                        }, 1200);
+                    } else {
+                        showAlert('Error', result.message || 'Failed to delete author.', 'danger');
+                    }
+                } catch (error) {
+                    showAlert('Error', 'Failed to delete author. Please try again.', 'danger');
+                    console.error('Error:', error);
+                }
+            }
         });
     });
 

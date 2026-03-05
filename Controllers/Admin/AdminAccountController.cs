@@ -250,10 +250,15 @@ public class AdminAccountController : Controller
         var profileImageUrl = await GetUserImageClaimValueAsync(user.Id) ?? string.Empty;
         var activeBorrowings = await _dbContext.BorrowingRecords
             .AsNoTracking()
-            .CountAsync(x => x.ReturnDate == null);
+            .CountAsync(x => x.ReturnDate == null &&
+                             x.Status != "returned" &&
+                             x.Status != "rejected");
         var overdueBorrowings = await _dbContext.BorrowingRecords
             .AsNoTracking()
-            .CountAsync(x => x.ReturnDate == null && x.DueDate.Date < DateTime.UtcNow.Date);
+            .CountAsync(x => x.ReturnDate == null &&
+                             x.Status != "returned" &&
+                             x.Status != "rejected" &&
+                             x.DueDate.Date < DateTime.UtcNow.Date);
 
         ViewBag.DisplayName = displayName;
         ViewBag.UserName = user.UserName ?? "N/A";

@@ -15,11 +15,16 @@ namespace Library_Management_system.Models.Admin
     {
         public int Id { get; set; }
         public string Username { get; set; } = string.Empty;
+        public int? ReservationId { get; set; }
         public int BookId { get; set; }
         public string BookCode { get; set; } = string.Empty;
         public string BookTitle { get; set; } = string.Empty;
         public DateTime BorrowDate { get; set; }
         public DateTime DueDate { get; set; }
+        public int DurationDays { get; set; }
+        public DateTime? ReturnDate { get; set; }
+        public string? ReturnUserId { get; set; }
+        public string? Reason { get; set; }
         public string CreatedBy { get; set; } = "System";
         public DateTime CreatedDate { get; set; }
         public string Status { get; set; } = "active";

@@ -3,6 +3,7 @@ using Library_Management_system.Models.Admin;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace Library_Management_system.Controllers.Admin;
 
@@ -10,7 +11,7 @@ namespace Library_Management_system.Controllers.Admin;
 [Route("admin/manageborrowingbook")]
 public class ManageBorrowingBookController : Controller
 {
-    private const int DefaultBorrowingDays = 7;
+    private const int DefaultBorrowingDays = 14;
     private const int MaxActiveBorrowingsPerUser = 3;
     private const decimal FinePerLateDay = 1.00m;
 
@@ -18,7 +19,8 @@ public class ManageBorrowingBookController : Controller
     {
         "active",
         "overdue",
-        "returned"
+        "returned",
+        "rejected"
     };
 
     private static readonly HashSet<string> ReservationStatuses = new(StringComparer.OrdinalIgnoreCase)
@@ -62,11 +64,16 @@ public class ManageBorrowingBookController : Controller
                 {
                     Id = x.Id,
                     Username = x.Username,
+                    ReservationId = x.ReservationId,
                     BookId = x.BookId,
                     BookCode = string.IsNullOrWhiteSpace(x.Book?.BookCode) ? $"A{x.BookId:0000}" : x.Book!.BookCode,
                     BookTitle = x.Book?.Title ?? "(Missing book)",
                     BorrowDate = x.BorrowDate,
                     DueDate = x.DueDate,
+                    DurationDays = x.DurationDays <= 0 ? DefaultBorrowingDays : x.DurationDays,
+                    ReturnDate = x.ReturnDate,
+                    ReturnUserId = x.ReturnUserId,
+                    Reason = x.Reason,
                     CreatedBy = string.IsNullOrWhiteSpace(x.CreatedBy) ? "System" : x.CreatedBy,
                     CreatedDate = x.CreatedDate == default ? x.BorrowDate : x.CreatedDate,
                     Status = status
@@ -84,8 +91,8 @@ public class ManageBorrowingBookController : Controller
             .AsNoTracking()
             .Include(ci => ci.Book)
             .Where(ci => ci.ReservationStatus != "none")
-            .OrderByDescending(ci => ci.RequestedDate ?? ci.CreatedDate)
-            .ThenByDescending(ci => ci.Id)
+            .OrderBy(ci => ci.RequestedDate ?? ci.CreatedDate)
+            .ThenBy(ci => ci.Id)
             .ToListAsync();
 
         var userIds = reservationCandidates
@@ -198,17 +205,22 @@ public class ManageBorrowingBookController : Controller
         }
 
         var borrowDate = (request.BorrowDate ?? DateTime.UtcNow).Date;
-        var dueDate = borrowDate.AddDays(DefaultBorrowingDays);
+        var durationDays = DefaultBorrowingDays;
+        var dueDate = borrowDate.AddDays(durationDays);
         var status = ComputeBorrowingStatus("active", dueDate, null);
+        var reservationId = reservationPriority.MatchedReservation?.Id;
+        var source = reservationId.HasValue ? BuildReservationBorrowingSource(reservationId.Value) : "in_person";
 
         _context.BorrowingRecords.Add(new Models.BorrowingRecord
         {
             Username = normalizedUsername,
+            ReservationId = reservationId,
             BookId = book.Id,
             BorrowDate = borrowDate,
             DueDate = dueDate,
+            DurationDays = durationDays,
             Status = status,
-            Source = "in_person",
+            Source = source,
             CreatedBy = User?.Identity?.Name,
             CreatedDate = DateTime.UtcNow
         });
@@ -245,9 +257,10 @@ public class ManageBorrowingBookController : Controller
             return NotFound(new { success = false, message = "Borrowing record not found." });
         }
 
-        if (string.Equals(borrowing.Status, "returned", StringComparison.OrdinalIgnoreCase))
+        if (string.Equals(borrowing.Status, "returned", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(borrowing.Status, "rejected", StringComparison.OrdinalIgnoreCase))
         {
-            return BadRequest(new { success = false, message = "Returned borrowing cannot be edited." });
+            return BadRequest(new { success = false, message = "Closed borrowing cannot be edited." });
         }
 
         var userBorrowingState = await GetBorrowingStateAsync(normalizedUsername, borrowing.Id);
@@ -291,10 +304,12 @@ public class ManageBorrowingBookController : Controller
         }
 
         var borrowDate = (request.BorrowDate ?? borrowing.BorrowDate).Date;
-        var dueDate = borrowDate.AddDays(DefaultBorrowingDays);
+        var durationDays = borrowing.DurationDays > 0 ? borrowing.DurationDays : DefaultBorrowingDays;
+        var dueDate = borrowDate.AddDays(durationDays);
         borrowing.Username = normalizedUsername;
         borrowing.BorrowDate = borrowDate;
         borrowing.DueDate = dueDate;
+        borrowing.DurationDays = durationDays;
         borrowing.Status = ComputeBorrowingStatus("active", dueDate, borrowing.ReturnDate);
 
         await _context.SaveChangesAsync();
@@ -317,9 +332,16 @@ public class ManageBorrowingBookController : Controller
             return BadRequest(new { success = false, message = "This borrowing was already returned." });
         }
 
+        if (string.Equals(borrowing.Status, "rejected", StringComparison.OrdinalIgnoreCase))
+        {
+            return BadRequest(new { success = false, message = "This borrowing was rejected and cannot be returned." });
+        }
+
         var returnedAt = DateTime.UtcNow;
         borrowing.Status = "returned";
         borrowing.ReturnDate = returnedAt;
+        borrowing.ReturnUserId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User?.Identity?.Name;
+        borrowing.Reason = null;
 
         if (borrowing.Book != null)
         {
@@ -371,7 +393,7 @@ public class ManageBorrowingBookController : Controller
         var sourceKey = BuildReservationBorrowingSource(id);
         var linkedBorrowingExists = await _context.BorrowingRecords
             .AsNoTracking()
-            .AnyAsync(br => br.Source == sourceKey);
+            .AnyAsync(br => br.ReservationId == id || br.Source == sourceKey);
 
         var currentStatus = NormalizeReservationStatus(reservation.ReservationStatus);
         if (currentStatus == "approved")
@@ -388,9 +410,11 @@ public class ManageBorrowingBookController : Controller
             _context.BorrowingRecords.Add(new Models.BorrowingRecord
             {
                 Username = borrowerNameForSync,
+                ReservationId = reservation.Id,
                 BookId = reservation.BookId,
                 BorrowDate = syncBorrowDate,
                 DueDate = syncDueDate,
+                DurationDays = DefaultBorrowingDays,
                 Status = ComputeBorrowingStatus("active", syncDueDate, null),
                 Source = sourceKey,
                 CreatedBy = User?.Identity?.Name,
@@ -412,21 +436,25 @@ public class ManageBorrowingBookController : Controller
         }
 
         var reservationOrderDate = reservation.RequestedDate ?? reservation.CreatedDate;
-        var hasEarlierPendingReservation = await _context.CartItems
+        var earlierPendingReservation = await _context.CartItems
             .AsNoTracking()
             .Where(ci => ci.BookId == reservation.BookId &&
                          ci.ReservationStatus == "pending" &&
                          ci.Id != reservation.Id)
-            .AnyAsync(ci =>
+            .Where(ci =>
                 (ci.RequestedDate ?? ci.CreatedDate) < reservationOrderDate ||
-                ((ci.RequestedDate ?? ci.CreatedDate) == reservationOrderDate && ci.Id < reservation.Id));
+                ((ci.RequestedDate ?? ci.CreatedDate) == reservationOrderDate && ci.Id < reservation.Id))
+            .OrderBy(ci => ci.RequestedDate ?? ci.CreatedDate)
+            .ThenBy(ci => ci.Id)
+            .FirstOrDefaultAsync();
 
-        if (hasEarlierPendingReservation)
+        if (earlierPendingReservation != null)
         {
+            var priorityUser = await ResolveBorrowerNameForReservationAsync(earlierPendingReservation.OwnerKey);
             return BadRequest(new
             {
                 success = false,
-                message = "This reservation cannot be approved yet. FIFO rule: approve the earliest pending reservation first."
+                message = $"This reservation cannot be approved yet. FIFO priority is for {priorityUser} (reservation #{earlierPendingReservation.Id})."
             });
         }
 
@@ -462,9 +490,11 @@ public class ManageBorrowingBookController : Controller
             _context.BorrowingRecords.Add(new Models.BorrowingRecord
             {
                 Username = borrowerName,
+                ReservationId = reservation.Id,
                 BookId = reservation.BookId,
                 BorrowDate = borrowDate,
                 DueDate = dueDate,
+                DurationDays = DefaultBorrowingDays,
                 Status = ComputeBorrowingStatus("active", dueDate, null),
                 Source = sourceKey,
                 CreatedBy = User?.Identity?.Name,
@@ -484,7 +514,7 @@ public class ManageBorrowingBookController : Controller
     }
 
     [HttpPost("reservation/reject/{id:int}")]
-    public async Task<IActionResult> RejectReservation(int id)
+    public async Task<IActionResult> RejectReservation(int id, [FromForm] string? reason)
     {
         var reservation = await _context.CartItems
             .Include(ci => ci.Book)
@@ -494,10 +524,34 @@ public class ManageBorrowingBookController : Controller
             return NotFound(new { success = false, message = "Reservation not found." });
         }
 
+        var rejectionReason = string.IsNullOrWhiteSpace(reason)
+            ? "Reservation rejected by librarian."
+            : reason.Trim();
+        if (rejectionReason.Length > 100)
+        {
+            rejectionReason = rejectionReason[..100];
+        }
+        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User?.Identity?.Name;
         var currentStatus = NormalizeReservationStatus(reservation.ReservationStatus);
         if (currentStatus == "approved" && reservation.Book != null)
         {
             reservation.Book.Quantity += 1;
+
+            var linkedBorrowing = await _context.BorrowingRecords
+                .Where(br => br.ReservationId == reservation.Id || br.Source == BuildReservationBorrowingSource(reservation.Id))
+                .OrderByDescending(br => br.BorrowDate)
+                .ThenByDescending(br => br.Id)
+                .FirstOrDefaultAsync();
+
+            if (linkedBorrowing != null &&
+                !string.Equals(linkedBorrowing.Status, "returned", StringComparison.OrdinalIgnoreCase) &&
+                !string.Equals(linkedBorrowing.Status, "rejected", StringComparison.OrdinalIgnoreCase))
+            {
+                linkedBorrowing.Status = "rejected";
+                linkedBorrowing.Reason = rejectionReason;
+                linkedBorrowing.ReturnDate = DateTime.UtcNow;
+                linkedBorrowing.ReturnUserId = currentUserId;
+            }
         }
 
         reservation.IsRequested = false;
@@ -561,6 +615,11 @@ public class ManageBorrowingBookController : Controller
 
     private static string ComputeBorrowingStatus(string? currentStatus, DateTime dueDate, DateTime? returnDate)
     {
+        if (string.Equals(currentStatus, "rejected", StringComparison.OrdinalIgnoreCase))
+        {
+            return "rejected";
+        }
+
         if (returnDate.HasValue || string.Equals(currentStatus, "returned", StringComparison.OrdinalIgnoreCase))
         {
             return "returned";
@@ -573,7 +632,9 @@ public class ManageBorrowingBookController : Controller
     {
         var query = _context.BorrowingRecords
             .AsNoTracking()
-            .Where(br => br.Username == username && br.Status != "returned");
+            .Where(br => br.Username == username &&
+                         br.Status != "returned" &&
+                         br.Status != "rejected");
 
         if (excludeBorrowingId.HasValue)
         {

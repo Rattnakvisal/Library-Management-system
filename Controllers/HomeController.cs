@@ -184,11 +184,14 @@ namespace Library_Management_system.Controllers
                 }
             }
 
-            var reservationSourceKeys = await _context.CartItems
+            var reservationIds = await _context.CartItems
                 .AsNoTracking()
                 .Where(ci => ci.OwnerKey == ownerKey)
-                .Select(ci => $"reservation:{ci.Id}")
+                .Select(ci => ci.Id)
                 .ToListAsync();
+            var reservationSourceKeys = reservationIds
+                .Select(id => $"reservation:{id}")
+                .ToList();
 
             var borrowingRecords = new List<BorrowingRecord>();
 
@@ -205,12 +208,13 @@ namespace Library_Management_system.Controllers
                 borrowingRecords.AddRange(byUsername);
             }
 
-            if (reservationSourceKeys.Count > 0)
+            if (reservationIds.Count > 0 || reservationSourceKeys.Count > 0)
             {
                 var byReservationSource = await _context.BorrowingRecords
                     .AsNoTracking()
                     .Include(br => br.Book)
-                    .Where(br => reservationSourceKeys.Contains(br.Source))
+                    .Where(br => (br.ReservationId.HasValue && reservationIds.Contains(br.ReservationId.Value)) ||
+                                 reservationSourceKeys.Contains(br.Source))
                     .OrderByDescending(br => br.BorrowDate)
                     .ThenByDescending(br => br.Id)
                     .ToListAsync();
@@ -236,10 +240,13 @@ namespace Library_Management_system.Controllers
                     {
                         "returned" => "Returned",
                         "overdue" => "Overdue",
+                        "rejected" => "Rejected",
                         _ => "Borrowing"
                     };
                     var fineDate = br.ReturnDate ?? nowUtc;
-                    var lateDays = status == "borrowing" ? 0 : CalculateLateDaysForHistory(br.DueDate, fineDate);
+                    var lateDays = status is "overdue" or "returned"
+                        ? CalculateLateDaysForHistory(br.DueDate, fineDate)
+                        : 0;
                     var fineAmount = lateDays * finePerLateDay;
 
                     return new HistoryItemViewModel
@@ -263,7 +270,7 @@ namespace Library_Management_system.Controllers
                 })
                 .ToList();
 
-            var onHoldCount = items.Count(x => x.Status != "returned");
+            var onHoldCount = items.Count(x => x.Status is "borrowing" or "overdue");
             var returnedCount = items.Count(x => x.Status == "returned");
             var estimatedFine = items.Sum(x => x.FineAmount);
 
@@ -956,6 +963,11 @@ namespace Library_Management_system.Controllers
 
         private static string ComputeHistoryStatus(BorrowingRecord borrowing, DateTime nowUtc)
         {
+            if (string.Equals(borrowing.Status, "rejected", StringComparison.OrdinalIgnoreCase))
+            {
+                return "rejected";
+            }
+
             if (borrowing.ReturnDate.HasValue ||
                 string.Equals(borrowing.Status, "returned", StringComparison.OrdinalIgnoreCase))
             {

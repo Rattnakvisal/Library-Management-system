@@ -7,12 +7,30 @@ namespace Library_Management_system.Models
         [Key]
         public int Id { get; set; }
 
+        // Schema-aligned fields (books table)
+        [MaxLength(50)]
         public string BookCode { get; set; } = string.Empty;
+
+        [MaxLength(200)]
         public string Title { get; set; } = string.Empty;
+
+        [MaxLength(255)]
+        public string? BookImage { get; set; }
+
+        [MaxLength(500)]
+        public string? Summarized { get; set; }
+
+        public int CategoryId { get; set; }
+        public Category? Category { get; set; }
+
+        public int AuthorId { get; set; }
+        public Author? AuthorEntity { get; set; }
+
         public string Author { get; set; } = string.Empty;
         public string CategoryName { get; set; } = string.Empty;
         public string? Isbn { get; set; }
         public int Quantity { get; set; }
+        public bool Availability { get; set; } = true;
         public int Pages { get; set; }
         public int Year { get; set; }
         public string Status { get; set; } = "available";

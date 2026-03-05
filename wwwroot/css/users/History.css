@@ -9,6 +9,7 @@
     --borrow: #f1b400;
     --overdue: #d14343;
     --return: #24a148;
+    --rejected: #9a3412;
 }
 
 body {
@@ -115,6 +116,10 @@ body {
 
 .status.returned {
     color: var(--return);
+}
+
+.status.rejected {
+    color: var(--rejected);
 }
 
 .summary-dropdown {
