@@ -28,6 +28,10 @@ namespace Library_Management_system.Models.Admin
         public string CreatedBy { get; set; } = "System";
         public DateTime CreatedDate { get; set; }
         public string Status { get; set; } = "active";
+        public decimal FineAmount { get; set; }
+        public bool IsFinePaid { get; set; }
+        public DateTime? FinePaidDate { get; set; }
+        public string? FineRemark { get; set; }
     }
 
     public sealed class ReservationRowViewModel

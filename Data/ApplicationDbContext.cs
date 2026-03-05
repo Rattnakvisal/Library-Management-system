@@ -20,6 +20,7 @@ namespace Library_Management_system.Data
         public DbSet<ContactMessage> ContactMessages { get; set; }
         public DbSet<BookReview> BookReviews { get; set; }
         public DbSet<Author> Authors { get; set; }
+        public DbSet<Fine> Fines { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -74,6 +75,7 @@ namespace Library_Management_system.Data
 
             builder.Entity<BorrowingRecord>(entity =>
             {
+                entity.ToTable("Borrowing");
                 entity.Property(x => x.DurationDays).HasDefaultValue(14);
                 entity.Property(x => x.ReturnUserId).HasMaxLength(450);
                 entity.Property(x => x.Reason).HasMaxLength(100);
@@ -82,6 +84,23 @@ namespace Library_Management_system.Data
                     .WithMany()
                     .HasForeignKey(x => x.ReservationId)
                     .OnDelete(DeleteBehavior.NoAction);
+            });
+
+            builder.Entity<Fine>(entity =>
+            {
+                entity.ToTable("fines");
+                entity.HasKey(x => x.FineID);
+                entity.Property(x => x.FineID).ValueGeneratedOnAdd();
+                entity.Property(x => x.Amount).HasColumnType("decimal(10,2)");
+                entity.Property(x => x.Paid).HasDefaultValue(false);
+                entity.Property(x => x.Remark).HasMaxLength(1000);
+
+                entity.HasIndex(x => x.BorrowID).IsUnique();
+
+                entity.HasOne(x => x.Borrowing)
+                    .WithOne(x => x.Fine)
+                    .HasForeignKey<Fine>(x => x.BorrowID)
+                    .OnDelete(DeleteBehavior.Cascade);
             });
         }
     }

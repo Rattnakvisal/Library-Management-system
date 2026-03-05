@@ -26,5 +26,7 @@ namespace Library_Management_system.Models
         public DateTime? ReturnDate { get; set; }
         public int LateDays { get; set; }
         public decimal FineAmount { get; set; }
+        public bool FinePaid { get; set; }
+        public DateTime? FinePaidDate { get; set; }
     }
 }

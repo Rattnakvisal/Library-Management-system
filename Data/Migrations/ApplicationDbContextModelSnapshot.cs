@@ -107,16 +107,18 @@ namespace Library_Management_system.Data.Migrations
 
             modelBuilder.Entity("Library_Management_system.Models.Author", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("AuthorID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AuthorID"));
 
-                    b.Property<string>("Name")
+                    b.Property<string>("AuthorName")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(100)")
+                        .HasColumnName("Name");
 
                     b.Property<string>("CreatedBy")
                         .HasMaxLength(150)
@@ -125,9 +127,9 @@ namespace Library_Management_system.Data.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.HasKey("Id");
+                    b.HasKey("AuthorID");
 
-                    b.HasIndex("Name")
+                    b.HasIndex("AuthorName")
                         .IsUnique();
 
                     b.ToTable("Authors");
@@ -321,7 +323,7 @@ namespace Library_Management_system.Data.Migrations
 
                     b.HasIndex("ReservationId");
 
-                    b.ToTable("BorrowingRecords");
+                    b.ToTable("Borrowing");
                 });
 
             modelBuilder.Entity("Library_Management_system.Models.CartItem", b =>
@@ -453,6 +455,40 @@ namespace Library_Management_system.Data.Migrations
                         .IsUnique();
 
                     b.ToTable("FavoriteBooks");
+                });
+
+            modelBuilder.Entity("Library_Management_system.Models.Fine", b =>
+                {
+                    b.Property<int>("FineID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FineID"));
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<int>("BorrowID")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("Paid")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<DateTime?>("PaidDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Remark")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.HasKey("FineID");
+
+                    b.HasIndex("BorrowID")
+                        .IsUnique();
+
+                    b.ToTable("fines", (string)null);
                 });
 
             modelBuilder.Entity("Library_Management_system.Models.LibraryEvent", b =>
@@ -703,6 +739,17 @@ namespace Library_Management_system.Data.Migrations
                     b.Navigation("Book");
                 });
 
+            modelBuilder.Entity("Library_Management_system.Models.Fine", b =>
+                {
+                    b.HasOne("Library_Management_system.Models.BorrowingRecord", "Borrowing")
+                        .WithOne("Fine")
+                        .HasForeignKey("Library_Management_system.Models.Fine", "BorrowID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Borrowing");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -757,6 +804,11 @@ namespace Library_Management_system.Data.Migrations
             modelBuilder.Entity("Library_Management_system.Models.Book", b =>
                 {
                     b.Navigation("Reviews");
+                });
+
+            modelBuilder.Entity("Library_Management_system.Models.BorrowingRecord", b =>
+                {
+                    b.Navigation("Fine");
                 });
 #pragma warning restore 612, 618
         }

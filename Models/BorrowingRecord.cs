@@ -36,5 +36,7 @@ namespace Library_Management_system.Models
         [MaxLength(150)]
         public string? CreatedBy { get; set; }
         public DateTime CreatedDate { get; set; }
+
+        public Fine? Fine { get; set; }
     }
 }

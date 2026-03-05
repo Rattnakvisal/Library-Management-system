@@ -111,6 +111,9 @@
             cartCount = await DbContext.CartItems
                 .AsNoTracking()
                 .Where(ci => ci.OwnerKey == cartOwnerKey)
+                .Where(ci => !(ci.ReservationStatus != null &&
+                               ci.ReservationStatus.ToLower() == "approved" &&
+                               DbContext.BorrowingRecords.Any(br => br.ReservationId == ci.Id)))
                 .CountAsync();
 
             reservationNotificationCount = await DbContext.CartItems

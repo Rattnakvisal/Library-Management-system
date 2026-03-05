@@ -1,4 +1,4 @@
-﻿@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Identity
 @using Library_Management_system.Models
 @using Library_Management_system.Data
 @using Microsoft.EntityFrameworkCore
@@ -362,17 +362,13 @@
 
                 <!-- LIBRARY GROUP -->
                 <div class="sidebar-section">
-                    <button class="nav-group-toggle" type="button"
-                            data-bs-toggle="collapse"
-                            data-bs-target="#navLibrary"
-                            aria-expanded="true">
+                    <div class="nav-group-title">
                         <span class="nav-group-label">
                             <i class="bi bi-collection me-2"></i> Library
                         </span>
-                        <i class="bi bi-chevron-down nav-group-icon"></i>
-                    </button>
+                    </div>
 
-                    <div class="collapse show nav-group" id="navLibrary">
+                    <div class="nav-group">
                         <a class="nav-link @IsActive("ManageBooks")" asp-controller="ManageBooks" asp-action="Index">
                             <i class="bi bi-book"></i>
                             <span>Manage Books</span>
@@ -395,17 +391,13 @@
 
                 <!-- MANAGEMENT GROUP -->
                 <div class="sidebar-section">
-                    <button class="nav-group-toggle" type="button"
-                            data-bs-toggle="collapse"
-                            data-bs-target="#navManage"
-                            aria-expanded="true">
+                    <div class="nav-group-title">
                         <span class="nav-group-label">
                             <i class="bi bi-gear me-2"></i> Management
                         </span>
-                        <i class="bi bi-chevron-down nav-group-icon"></i>
-                    </button>
+                    </div>
 
-                    <div class="collapse show nav-group" id="navManage">
+                    <div class="nav-group">
 
                         @if (isAdmin)
                         {
@@ -534,33 +526,6 @@
                 btn.setAttribute('aria-pressed', collapsed ? 'true' : 'false');
             });
         })();
-
-        // Remember nav-group collapse state
-        (function () {
-            const toggles = document.querySelectorAll('.nav-group-toggle');
-            if (!toggles.length) return;
-
-            toggles.forEach(btn => {
-                const target = btn.getAttribute('data-bs-target');
-                if (!target) return;
-
-                const key = 'navGroup:' + target;
-                const el = document.querySelector(target);
-                if (!el) return;
-
-                // restore
-                const saved = localStorage.getItem(key);
-                if (saved === 'hide') {
-                    el.classList.remove('show');
-                    btn.setAttribute('aria-expanded', 'false');
-                }
-
-                // save
-                el.addEventListener('shown.bs.collapse', () => localStorage.setItem(key, 'show'));
-                el.addEventListener('hidden.bs.collapse', () => localStorage.setItem(key, 'hide'));
-            });
-        })();
-
         // Topbar action dropdown behavior
         (function () {
             const actionDropdowns = Array.from(document.querySelectorAll('.action-dropdown'));
@@ -798,3 +763,4 @@
     @RenderSection("Scripts", required: false)
 </body>
 </html>
+

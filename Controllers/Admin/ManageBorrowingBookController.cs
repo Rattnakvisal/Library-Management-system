@@ -1,4 +1,5 @@
 using Library_Management_system.Data;
+using Library_Management_system.Models;
 using Library_Management_system.Models.Admin;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -56,10 +57,19 @@ public class ManageBorrowingBookController : Controller
             .ThenByDescending(x => x.Id)
             .ToListAsync();
 
+        var borrowingIds = borrowingsRaw.Select(x => x.Id).ToList();
+        var fineByBorrowingId = borrowingIds.Count == 0
+            ? new Dictionary<int, Fine>()
+            : await _context.Fines
+                .AsNoTracking()
+                .Where(f => borrowingIds.Contains(f.BorrowID))
+                .ToDictionaryAsync(f => f.BorrowID);
+
         var borrowingRows = borrowingsRaw
             .Select(x =>
             {
                 var status = ComputeBorrowingStatus(x.Status, x.DueDate, x.ReturnDate);
+                fineByBorrowingId.TryGetValue(x.Id, out var fine);
                 return new BorrowingRowViewModel
                 {
                     Id = x.Id,
@@ -76,7 +86,11 @@ public class ManageBorrowingBookController : Controller
                     Reason = x.Reason,
                     CreatedBy = string.IsNullOrWhiteSpace(x.CreatedBy) ? "System" : x.CreatedBy,
                     CreatedDate = x.CreatedDate == default ? x.BorrowDate : x.CreatedDate,
-                    Status = status
+                    Status = status,
+                    FineAmount = fine?.Amount ?? 0m,
+                    IsFinePaid = fine?.Paid ?? false,
+                    FinePaidDate = fine?.PaidDate,
+                    FineRemark = fine?.Remark
                 };
             })
             .Where(x =>
@@ -350,6 +364,28 @@ public class ManageBorrowingBookController : Controller
 
         var lateDays = CalculateLateDays(borrowing.DueDate, returnedAt);
         var fineAmount = lateDays > 0 ? lateDays * FinePerLateDay : 0m;
+        Fine? fine = null;
+        if (lateDays > 0)
+        {
+            fine = await _context.Fines.FirstOrDefaultAsync(f => f.BorrowID == borrowing.Id);
+            if (fine == null)
+            {
+                fine = new Fine
+                {
+                    BorrowID = borrowing.Id,
+                    Amount = fineAmount,
+                    Paid = false,
+                    PaidDate = null,
+                    Remark = $"Auto-generated for {lateDays} late day(s)."
+                };
+                _context.Fines.Add(fine);
+            }
+            else
+            {
+                fine.Amount = fineAmount;
+                fine.Remark ??= $"Auto-generated for {lateDays} late day(s).";
+            }
+        }
 
         var nextPendingReservation = await _context.CartItems
             .Where(ci => ci.BookId == borrowing.BookId && ci.ReservationStatus == "pending")
@@ -360,7 +396,8 @@ public class ManageBorrowingBookController : Controller
         string message;
         if (lateDays > 0)
         {
-            message = $"Book marked as returned. Overdue by {lateDays} day(s). Estimated fine: ${fineAmount:0.00}.";
+            var paymentStatus = fine?.Paid == true ? "paid" : "unpaid";
+            message = $"Book marked as returned. Overdue by {lateDays} day(s). Fine: ${fineAmount:0.00} ({paymentStatus}).";
         }
         else
         {
@@ -377,6 +414,37 @@ public class ManageBorrowingBookController : Controller
 
         await _context.SaveChangesAsync();
         return Ok(new { success = true, message });
+    }
+
+    [HttpPost("fine/mark-paid/{borrowingId:int}")]
+    public async Task<IActionResult> MarkFineAsPaid(int borrowingId, [FromForm] string? remark)
+    {
+        var fine = await _context.Fines.FirstOrDefaultAsync(x => x.BorrowID == borrowingId);
+        if (fine == null)
+        {
+            return NotFound(new { success = false, message = "Fine record not found for this borrowing." });
+        }
+
+        if (fine.Paid)
+        {
+            return BadRequest(new { success = false, message = "This fine is already marked as paid." });
+        }
+
+        fine.Paid = true;
+        fine.PaidDate = DateTime.UtcNow;
+
+        if (!string.IsNullOrWhiteSpace(remark))
+        {
+            var trimmed = remark.Trim();
+            fine.Remark = trimmed.Length > 1000 ? trimmed[..1000] : trimmed;
+        }
+        else if (string.IsNullOrWhiteSpace(fine.Remark))
+        {
+            fine.Remark = "Marked as paid by librarian.";
+        }
+
+        await _context.SaveChangesAsync();
+        return Ok(new { success = true, message = $"Fine marked as paid (${fine.Amount:0.00})." });
     }
 
     [HttpPost("reservation/approve/{id:int}")]

@@ -229,6 +229,14 @@ namespace Library_Management_system.Controllers
                 .ThenByDescending(br => br.Id)
                 .ToList();
 
+            var borrowingIds = normalizedRecords.Select(br => br.Id).ToList();
+            var finesByBorrowingId = borrowingIds.Count == 0
+                ? new Dictionary<int, Fine>()
+                : await _context.Fines
+                    .AsNoTracking()
+                    .Where(f => borrowingIds.Contains(f.BorrowID))
+                    .ToDictionaryAsync(f => f.BorrowID);
+
             const decimal finePerLateDay = 1.00m;
             var nowUtc = DateTime.UtcNow;
 
@@ -236,6 +244,7 @@ namespace Library_Management_system.Controllers
                 .Select(br =>
                 {
                     var status = ComputeHistoryStatus(br, nowUtc);
+                    finesByBorrowingId.TryGetValue(br.Id, out var fineRecord);
                     var statusLabel = status switch
                     {
                         "returned" => "Returned",
@@ -247,7 +256,9 @@ namespace Library_Management_system.Controllers
                     var lateDays = status is "overdue" or "returned"
                         ? CalculateLateDaysForHistory(br.DueDate, fineDate)
                         : 0;
-                    var fineAmount = lateDays * finePerLateDay;
+                    var computedFineAmount = lateDays * finePerLateDay;
+                    var fineAmount = fineRecord?.Amount ?? computedFineAmount;
+                    var finePaid = fineRecord?.Paid ?? false;
 
                     return new HistoryItemViewModel
                     {
@@ -265,14 +276,16 @@ namespace Library_Management_system.Controllers
                         DueDate = br.DueDate,
                         ReturnDate = br.ReturnDate,
                         LateDays = lateDays,
-                        FineAmount = fineAmount
+                        FineAmount = fineAmount,
+                        FinePaid = finePaid,
+                        FinePaidDate = fineRecord?.PaidDate
                     };
                 })
                 .ToList();
 
             var onHoldCount = items.Count(x => x.Status is "borrowing" or "overdue");
             var returnedCount = items.Count(x => x.Status == "returned");
-            var estimatedFine = items.Sum(x => x.FineAmount);
+            var estimatedFine = items.Sum(x => x.FinePaid ? 0m : x.FineAmount);
 
             var model = new HistoryViewModel
             {
@@ -292,10 +305,15 @@ namespace Library_Management_system.Controllers
             ViewBag.Title = "Cart";
 
             var ownerKey = ResolveCartOwnerKey();
+
             var items = await _context.CartItems
                 .AsNoTracking()
                 .Include(ci => ci.Book)
                 .Where(ci => ci.OwnerKey == ownerKey && ci.Book != null)
+                // Hide approved reservations that are already in borrowing/history.
+                .Where(ci => !(ci.ReservationStatus != null &&
+                               ci.ReservationStatus.ToLower() == "approved" &&
+                               _context.BorrowingRecords.Any(br => br.ReservationId == ci.Id)))
                 .OrderByDescending(ci => ci.CreatedDate)
                 .ToListAsync();
 
@@ -455,6 +473,37 @@ namespace Library_Management_system.Controllers
             await _context.SaveChangesAsync();
 
             TempData["CartMessage"] = $"Request submitted for {itemsToRequest.Count} item(s).";
+            return RedirectToAction(nameof(Cart));
+        }
+
+        [HttpPost("cart/cancel-pending")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CancelPendingRequests()
+        {
+            var ownerKey = ResolveCartOwnerKey();
+            var pendingItems = await _context.CartItems
+                .Where(ci => ci.OwnerKey == ownerKey && ci.ReservationStatus == "pending")
+                .ToListAsync();
+
+            if (pendingItems.Count == 0)
+            {
+                TempData["CartError"] = "No pending request to cancel.";
+                return RedirectToAction(nameof(Cart));
+            }
+
+            var now = DateTime.UtcNow;
+            foreach (var item in pendingItems)
+            {
+                item.IsRequested = false;
+                item.RequestedDate = null;
+                item.ReservationStatus = "none";
+                item.ReservationUpdatedDate = now;
+                item.IsReservationNotificationSeen = true;
+            }
+
+            await _context.SaveChangesAsync();
+
+            TempData["CartMessage"] = $"Canceled {pendingItems.Count} pending request(s).";
             return RedirectToAction(nameof(Cart));
         }
 

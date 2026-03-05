@@ -102,8 +102,19 @@
                                     @if (item.LateDays > 0)
                                     {
                                         <div class="small text-danger mt-1">
-                                            Late @item.LateDays day(s) | Fine: $@item.FineAmount.ToString("0.00", CultureInfo.InvariantCulture)
+                                            Late @item.LateDays day(s)
                                         </div>
+                                    }
+                                    @if (item.FineAmount > 0)
+                                    {
+                                        <div class="small mt-1 @(item.FinePaid ? "text-success" : "text-danger")">
+                                            Fine: $@item.FineAmount.ToString("0.00", CultureInfo.InvariantCulture)
+                                            (@(item.FinePaid ? "Paid" : "Unpaid"))
+                                        </div>
+                                        @if (item.FinePaidDate.HasValue)
+                                        {
+                                            <div class="small text-success">Paid Date: @item.FinePaidDate.Value.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture)</div>
+                                        }
                                     }
                                 </div>
                             </div>

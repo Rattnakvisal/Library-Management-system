@@ -8,6 +8,7 @@ $(document).ready(function () {
     initializeUpdateBorrowingButton();
     initializeUpdateReservationButton();
     initializeProcessBorrowingButton();
+    initializeMarkFinePaidButton();
     initializeApproveReservationButton();
     initializeRejectReservationButton();
 });
@@ -293,6 +294,50 @@ function initializeProcessBorrowingButton() {
                 window.location.reload();
             } catch (error) {
                 await showAlert('Return Failed', error.message, 'error', '#dc2626');
+            }
+        });
+    });
+}
+
+function initializeMarkFinePaidButton() {
+    $('.borrowing-book-table').on('click', '.mark-fine-paid-btn', function () {
+        const id = ($(this).data('borrowing-id') || '').toString().trim();
+        const fineAmount = ($(this).data('fine-amount') || '0.00').toString().trim();
+
+        if (!id) {
+            showAlert('Missing Id', 'Could not find borrowing id.', 'error', '#dc2626');
+            return;
+        }
+
+        Swal.fire({
+            title: 'Mark Fine as Paid',
+            text: `Confirm payment for fine amount $${fineAmount}?`,
+            input: 'text',
+            inputLabel: 'Remark (optional)',
+            inputPlaceholder: 'Payment note',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Mark Paid',
+            cancelButtonText: 'Cancel',
+            confirmButtonColor: '#16a34a',
+            cancelButtonColor: '#64748b'
+        }).then(async function (result) {
+            if (!result.isConfirmed) {
+                return;
+            }
+
+            try {
+                const formData = new FormData();
+                const remark = (result.value || '').toString().trim();
+                if (remark) {
+                    formData.append('remark', remark);
+                }
+
+                const payload = await postForm(`/admin/manageborrowingbook/fine/mark-paid/${id}`, formData);
+                await showAlert('Fine Paid', payload.message || 'Fine marked as paid.', 'success', '#16a34a');
+                window.location.reload();
+            } catch (error) {
+                await showAlert('Update Failed', error.message, 'error', '#dc2626');
             }
         });
     });

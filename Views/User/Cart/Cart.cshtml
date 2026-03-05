@@ -58,7 +58,11 @@
                 @if (showPendingState)
                 {
                     <span class="toolbar-pill toolbar-pending">Request Pending</span>
-                    <button type="button" class="toolbar-btn toolbar-cancel" disabled>Cancel</button>
+                    <button type="submit"
+                            class="toolbar-btn toolbar-cancel"
+                            formaction="@Url.Action("CancelPendingRequests", "Home")">
+                        Cancel
+                    </button>
                 }
                 else if (showRejectedState)
                 {
