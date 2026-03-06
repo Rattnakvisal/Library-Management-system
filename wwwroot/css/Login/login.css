@@ -144,7 +144,8 @@ body{
   margin-bottom:15px;
 }
 
-.input-group input{
+.input-group input,
+.input-group select{
   width:100%;
   padding:12px 45px;
   border:1px solid #ddd;
@@ -156,7 +157,8 @@ body{
 }
 
 /* focus */
-.input-group input:focus{
+.input-group input:focus,
+.input-group select:focus{
   border-color:#a27c19;
   box-shadow:0 0 0 0.2rem rgba(162,124,25,0.2);
 }

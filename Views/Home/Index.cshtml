@@ -195,7 +195,10 @@
 
                 sliders.forEach((slider) => {
                     slider.addEventListener("wheel", function (e) {
-                        if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) {
+                        const hasHorizontalIntent = Math.abs(e.deltaX) > Math.abs(e.deltaY);
+                        const useVerticalAsHorizontal = e.shiftKey && Math.abs(e.deltaY) > 0;
+
+                        if (!hasHorizontalIntent && !useVerticalAsHorizontal) {
                             return;
                         }
 
@@ -204,7 +207,8 @@
                             return;
                         }
 
-                        const nextScrollLeft = slider.scrollLeft + e.deltaY;
+                        const delta = hasHorizontalIntent ? e.deltaX : e.deltaY;
+                        const nextScrollLeft = slider.scrollLeft + delta;
                         const clampedScrollLeft = Math.max(0, Math.min(maxScrollLeft, nextScrollLeft));
 
                         if (clampedScrollLeft === slider.scrollLeft) {

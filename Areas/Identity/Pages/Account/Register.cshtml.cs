@@ -24,6 +24,7 @@ namespace Library_Management_system.Areas.Identity.Pages.Account
     [AllowAnonymous]
     public class RegisterModel : PageModel
     {
+        private const string GenderClaimType = "Gender";
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
@@ -77,6 +78,10 @@ namespace Library_Management_system.Areas.Identity.Pages.Account
             [Display(Name = "Confirm password")]
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
+
+            [Required]
+            [Display(Name = "Gender")]
+            public string Gender { get; set; }
         }
 
         public async Task OnGetAsync(string returnUrl = null)
@@ -168,6 +173,20 @@ namespace Library_Management_system.Areas.Identity.Pages.Account
                     return Page();
                 }
 
+                var genderClaimResult = await _userManager.AddClaimAsync(
+                    user,
+                    new Claim(GenderClaimType, NormalizeGenderForStore(Input.Gender)));
+                if (!genderClaimResult.Succeeded)
+                {
+                    foreach (var error in genderClaimResult.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
+
+                    await _userManager.DeleteAsync(user);
+                    return Page();
+                }
+
                 var approvalClaimResult = await _userManager.AddClaimAsync(
                     user,
                     new Claim(AccountApproval.ClaimType, AccountApproval.Pending));
@@ -211,6 +230,7 @@ namespace Library_Management_system.Areas.Identity.Pages.Account
                     "New user registration pending approval.",
                     $"Name: {user.FullName}",
                     $"Email: {user.Email}",
+                    $"Gender: {GetDisplayGender(Input.Gender)}",
                     $"Registered (UTC): {registeredUtc:yyyy-MM-dd HH:mm:ss}");
                 await _telegramNotifier.SendAdminAlertAsync(registerAlert);
 
@@ -249,6 +269,40 @@ namespace Library_Management_system.Areas.Identity.Pages.Account
                 throw new NotSupportedException("The default UI requires a user store with email support.");
 
             return (IUserEmailStore<ApplicationUser>)_userStore;
+        }
+
+        private static string NormalizeGenderForStore(string gender)
+        {
+            if (string.Equals(gender, "M", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(gender, "Male", StringComparison.OrdinalIgnoreCase))
+            {
+                return "M";
+            }
+
+            if (string.Equals(gender, "F", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(gender, "Female", StringComparison.OrdinalIgnoreCase))
+            {
+                return "F";
+            }
+
+            return "U";
+        }
+
+        private static string GetDisplayGender(string gender)
+        {
+            if (string.Equals(gender, "M", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(gender, "Male", StringComparison.OrdinalIgnoreCase))
+            {
+                return "Male";
+            }
+
+            if (string.Equals(gender, "F", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(gender, "Female", StringComparison.OrdinalIgnoreCase))
+            {
+                return "Female";
+            }
+
+            return "Unspecified";
         }
     }
 }

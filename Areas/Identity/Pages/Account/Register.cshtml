@@ -80,6 +80,20 @@
                     </div>
                     <span asp-validation-for="Input.Email" class="text-danger"></span>
 
+                    <!-- GENDER -->
+                    <div class="input-group">
+                        <div class="icon-email">
+                            <i class="fa-solid fa-venus-mars"></i>
+                        </div>
+                        <select asp-for="Input.Gender" aria-required="true" required>
+                            <option value="">Select Gender</option>
+                            <option value="M">Male</option>
+                            <option value="F">Female</option>
+                            <option value="U">Unspecified</option>
+                        </select>
+                    </div>
+                    <span asp-validation-for="Input.Gender" class="text-danger"></span>
+
                     <!-- PASSWORD -->
                     <div class="input-group">
                         <div class="icon-password">

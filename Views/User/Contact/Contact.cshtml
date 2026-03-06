@@ -10,8 +10,7 @@
 
     <!-- MAP -->
     <div class="contact-map contact-reveal">
-        <iframe src="https://www.google.com/maps?q=ACLEDA%20University%20of%20Business&output=embed"
-                loading="lazy">
+        <iframe src="https://www.google.com/maps?q=ACLEDA%20University%20of%20Business&output=embed"                loading="lazy">
         </iframe>
     </div>
 
@@ -75,6 +74,9 @@
         <a href="https://www.facebook.com/ACLEDAUniversity" target="_blank">
             <i class="bi bi-facebook"></i>
         </a>
+        <a href="https://t.me/acledauniversity" target="_blank">
+            <i class="bi bi-telegram"></i>
+        </a>
         <a href="https://www.instagram.com/acledauniversity" target="_blank">
             <i class="bi bi-instagram"></i>
         </a>
@@ -89,25 +91,25 @@
 
 @section Scripts {
     <script>
-        (function () {
-            const success = (document.getElementById('contact-success-message')?.value || '').trim();
-            const error = (document.getElementById('contact-error-message')?.value || '').trim();
+            (function () {
+                const success = (document.getElementById('contact-success-message')?.value || '').trim();
+                const error = (document.getElementById('contact-error-message')?.value || '').trim();
 
-            if (success) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Success',
-                    text: success,
-                    confirmButtonColor: '#264A73'
-                });
-            } else if (error) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Action Failed',
-                    text: error,
-                    confirmButtonColor: '#264A73'
-                });
-            }
-        })();
+                if (success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: success,
+                        confirmButtonColor: '#264A73'
+                    });
+                } else if (error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Action Failed',
+                        text: error,
+                        confirmButtonColor: '#264A73'
+                    });
+                }
+            })();
     </script>
 }
