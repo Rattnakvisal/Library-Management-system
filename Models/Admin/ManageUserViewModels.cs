@@ -34,6 +34,7 @@ public class ManageUserItemViewModel
     public string PhoneNumber { get; set; } = string.Empty;
     public string Gender { get; set; } = string.Empty;
     public string Role { get; set; } = string.Empty;
+    public string ApprovalStatus { get; set; } = "approved";
     public string CreatedBy { get; set; } = string.Empty;
     public DateTime? CreatedDate { get; set; }
     public bool IsStaff { get; set; }

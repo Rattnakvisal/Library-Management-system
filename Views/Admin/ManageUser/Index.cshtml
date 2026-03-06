@@ -110,6 +110,7 @@
                         <th>Phone</th>
                         <th>Gender</th>
                         <th>Role</th>
+                        <th>Access</th>
                         <th>Created By</th>
                         <th>Created Date</th>
                         <th>Action</th>
@@ -119,7 +120,7 @@
                     @if (Model.Students.Count == 0)
                     {
                         <tr>
-                            <td colspan="10" class="text-center py-4">No students found.</td>
+                            <td colspan="11" class="text-center py-4">No students found.</td>
                         </tr>
                     }
                     else
@@ -135,6 +136,17 @@
                                 <td>@student.PhoneNumber</td>
                                 <td>@student.Gender</td>
                                 <td>@student.Role</td>
+                                @{
+                                    var approvalStatus = Library_Management_system.Models.AccountApproval.Normalize(student.ApprovalStatus);
+                                    var approvalLabel = Library_Management_system.Models.AccountApproval.ToLabel(approvalStatus);
+                                    var approvalCss = approvalStatus switch
+                                    {
+                                        "pending" => "approval-badge approval-badge-pending",
+                                        "canceled" => "approval-badge approval-badge-canceled",
+                                        _ => "approval-badge approval-badge-approved"
+                                    };
+                                }
+                                <td><span class="@approvalCss">@approvalLabel</span></td>
                                 <td>@student.CreatedBy</td>
                                 <td>@(student.CreatedDate?.ToLocalTime().ToString("yyyy-MM-dd HH:mm") ?? "-")</td>
                                 <td>
@@ -146,6 +158,50 @@
                                                 data-gender="@student.Gender" data-role="User">
                                             <i class="bi bi-pencil-square"></i>
                                         </button>
+
+                                        <form method="post" asp-controller="ManageUser" asp-action="Approve"
+                                              class="approve-user-form" data-user-name="@student.FullName">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="UserId" value="@student.UserId" />
+                                            <input type="hidden" name="ReturnTab" value="students" class="return-tab-input" />
+                                            <input type="hidden" name="Search" value="@Model.Search"
+                                                   class="return-search-input" />
+                                            <input type="hidden" name="FilterGender" value="@Model.GenderFilter"
+                                                   class="return-gender-input" />
+                                            <input type="hidden" name="RoleFilter" value="@Model.RoleFilter"
+                                                   class="return-role-filter-input" />
+                                            <input type="hidden" name="Sort" value="@Model.Sort" class="return-sort-input" />
+                                            <input type="hidden" name="PageStudents" value="@Model.StudentsPage"
+                                                   class="return-page-students-input" />
+                                            <input type="hidden" name="PageStaffs" value="@Model.StaffsPage"
+                                                   class="return-page-staffs-input" />
+                                            <button type="submit" class="approve-user-btn" aria-label="Approve @student.FullName"
+                                                    @(approvalStatus == "approved" ? "disabled" : null)>
+                                                <i class="bi bi-check-circle"></i>
+                                            </button>
+                                        </form>
+
+                                        <form method="post" asp-controller="ManageUser" asp-action="Cancel"
+                                              class="cancel-user-form" data-user-name="@student.FullName">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="UserId" value="@student.UserId" />
+                                            <input type="hidden" name="ReturnTab" value="students" class="return-tab-input" />
+                                            <input type="hidden" name="Search" value="@Model.Search"
+                                                   class="return-search-input" />
+                                            <input type="hidden" name="FilterGender" value="@Model.GenderFilter"
+                                                   class="return-gender-input" />
+                                            <input type="hidden" name="RoleFilter" value="@Model.RoleFilter"
+                                                   class="return-role-filter-input" />
+                                            <input type="hidden" name="Sort" value="@Model.Sort" class="return-sort-input" />
+                                            <input type="hidden" name="PageStudents" value="@Model.StudentsPage"
+                                                   class="return-page-students-input" />
+                                            <input type="hidden" name="PageStaffs" value="@Model.StaffsPage"
+                                                   class="return-page-staffs-input" />
+                                            <button type="submit" class="cancel-user-btn" aria-label="Cancel @student.FullName"
+                                                    @(approvalStatus == "canceled" ? "disabled" : null)>
+                                                <i class="bi bi-x-circle"></i>
+                                            </button>
+                                        </form>
 
                                         <form method="post" asp-controller="ManageUser" asp-action="Delete"
                                               class="delete-user-form" data-user-name="@student.FullName">

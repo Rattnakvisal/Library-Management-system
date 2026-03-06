@@ -1,5 +1,6 @@
 using Library_Management_system.Data;
 using Library_Management_system.Models;
+using Library_Management_system.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -54,6 +55,8 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 builder.Services.AddScoped<DbHelper>();
 builder.Services.AddTransient<Microsoft.AspNetCore.Identity.UI.Services.IEmailSender, Library_Management_system.Services.EmailSender>();
+builder.Services.Configure<TelegramBotOptions>(builder.Configuration.GetSection(TelegramBotOptions.SectionName));
+builder.Services.AddHttpClient<ITelegramNotifier, TelegramNotifier>();
 
 var app = builder.Build();
 

@@ -252,6 +252,17 @@ body{
   font-size:13px;
 }
 
+.info-banner{
+  margin-bottom:12px;
+  border:1px solid #b6dcf6;
+  background:#eef8ff;
+  color:#0b4f77;
+  border-radius:10px;
+  padding:10px 12px;
+  font-size:13px;
+  font-weight:600;
+}
+
 /* =========================
    Responsive Breakpoints
 ========================= */

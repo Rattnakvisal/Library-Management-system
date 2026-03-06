@@ -3,6 +3,7 @@ using System.Text.RegularExpressions;
 using Library_Management_system.Data;
 using Library_Management_system.Models;
 using Library_Management_system.Models.Admin;
+using Library_Management_system.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services; // Add this namespace
@@ -20,19 +21,23 @@ public class ManageUserController : Controller
     private const string LibrarianRole = "Librarian";
     private const string GenderClaimType = "Gender";
     private const string UserCodeClaimType = "UserCode";
+    private const string AccountApprovalClaimType = AccountApproval.ClaimType;
 
     private readonly ApplicationDbContext _dbContext;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IEmailSender _emailSender;
+    private readonly ITelegramNotifier _telegramNotifier;
 
     public ManageUserController(
         ApplicationDbContext dbContext,
         UserManager<ApplicationUser> userManager,
-        IEmailSender emailSender)
+        IEmailSender emailSender,
+        ITelegramNotifier telegramNotifier)
     {
         _dbContext = dbContext;
         _userManager = userManager;
         _emailSender = emailSender;
+        _telegramNotifier = telegramNotifier;
     }
 
     [HttpGet("")]
@@ -70,7 +75,9 @@ public class ManageUserController : Controller
         var claims = await _dbContext.UserClaims
             .AsNoTracking()
             .Where(c => userIds.Contains(c.UserId)
-                        && (c.ClaimType == GenderClaimType || c.ClaimType == UserCodeClaimType))
+                        && (c.ClaimType == GenderClaimType ||
+                            c.ClaimType == UserCodeClaimType ||
+                            c.ClaimType == AccountApprovalClaimType))
             .ToListAsync();
 
         var rolesByUser = rolePairs
@@ -87,6 +94,11 @@ public class ManageUserController : Controller
             .GroupBy(c => c.UserId)
             .ToDictionary(g => g.Key, g => g.Last().ClaimValue ?? string.Empty);
 
+        var approvalByUser = claims
+            .Where(c => c.ClaimType == AccountApprovalClaimType)
+            .GroupBy(c => c.UserId)
+            .ToDictionary(g => g.Key, g => AccountApproval.Normalize(g.Last().ClaimValue));
+
         var items = users.Select(user =>
         {
             var roles = rolesByUser.TryGetValue(user.Id, out var mappedRoles) ? mappedRoles : new List<string>();
@@ -94,6 +106,9 @@ public class ManageUserController : Controller
             var isStaff = IsStaffRole(role);
             var rawGender = genderByUser.TryGetValue(user.Id, out var gender) ? gender : string.Empty;
             var rawCode = codeByUser.TryGetValue(user.Id, out var userCode) ? userCode : string.Empty;
+            var rawApprovalStatus = approvalByUser.TryGetValue(user.Id, out var approvalStatus)
+                ? approvalStatus
+                : AccountApproval.Approved;
 
             return new ManageUserItemViewModel
             {
@@ -104,6 +119,7 @@ public class ManageUserController : Controller
                 PhoneNumber = user.PhoneNumber ?? string.Empty,
                 Gender = NormalizeGender(rawGender),
                 Role = role == StudentRole ? "Student" : role,
+                ApprovalStatus = isStaff ? AccountApproval.Approved : AccountApproval.Normalize(rawApprovalStatus),
                 CreatedBy = string.IsNullOrWhiteSpace(user.CreatedBy) ? "-" : user.CreatedBy,
                 CreatedDate = user.CreatedDate,
                 IsStaff = isStaff
@@ -250,7 +266,21 @@ public class ManageUserController : Controller
             return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort, input.PageStudents, input.PageStaffs));
         }
 
-        await UpsertUserClaimsAsync(user, input.UserCode, input.Gender);
+        var claimsResult = await UpsertUserClaimsAsync(user, input.UserCode, input.Gender);
+        if (!claimsResult.Succeeded)
+        {
+            await _userManager.DeleteAsync(user);
+            TempData["ManageUserError"] = BuildIdentityErrorMessage(claimsResult);
+            return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort, input.PageStudents, input.PageStaffs));
+        }
+
+        var approvalResult = await SetApprovalStatusAsync(user, AccountApproval.Approved);
+        if (!approvalResult.Succeeded)
+        {
+            await _userManager.DeleteAsync(user);
+            TempData["ManageUserError"] = BuildIdentityErrorMessage(approvalResult);
+            return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort, input.PageStudents, input.PageStaffs));
+        }
 
         var successMessage = "User created successfully.";
 
@@ -355,9 +385,105 @@ public class ManageUserController : Controller
             return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort, input.PageStudents, input.PageStaffs));
         }
 
-        await UpsertUserClaimsAsync(user, input.UserCode, input.Gender);
+        var claimsResult = await UpsertUserClaimsAsync(user, input.UserCode, input.Gender);
+        if (!claimsResult.Succeeded)
+        {
+            TempData["ManageUserError"] = BuildIdentityErrorMessage(claimsResult);
+            return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort, input.PageStudents, input.PageStaffs));
+        }
 
         TempData["ManageUserSuccess"] = "User updated successfully.";
+        return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort, input.PageStudents, input.PageStaffs));
+    }
+
+    [HttpPost("approve")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Approve(ManageUserDeleteInput input)
+    {
+        if (!ModelState.IsValid)
+        {
+            TempData["ManageUserError"] = "Invalid approve request.";
+            return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort, input.PageStudents, input.PageStaffs));
+        }
+
+        var user = await _userManager.FindByIdAsync(input.UserId);
+        if (user == null)
+        {
+            TempData["ManageUserError"] = "User not found.";
+            return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort, input.PageStudents, input.PageStaffs));
+        }
+
+        if (!await IsStudentAsync(user))
+        {
+            TempData["ManageUserError"] = "Only student accounts can be approved or canceled.";
+            return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort, input.PageStudents, input.PageStaffs));
+        }
+
+        var syncResult = await SetApprovalStatusAsync(user, AccountApproval.Approved);
+        if (!syncResult.Succeeded)
+        {
+            TempData["ManageUserError"] = BuildIdentityErrorMessage(syncResult);
+            return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort, input.PageStudents, input.PageStaffs));
+        }
+
+        await _telegramNotifier.SendAdminAlertAsync(
+            string.Join('\n',
+                "User account approved.",
+                $"Name: {user.FullName}",
+                $"Email: {user.Email}",
+                $"Approved By: {GetCurrentActor()}",
+                $"Approved (UTC): {DateTime.UtcNow:yyyy-MM-dd HH:mm:ss}"));
+
+        TempData["ManageUserSuccess"] = "User approved successfully.";
+        return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort, input.PageStudents, input.PageStaffs));
+    }
+
+    [HttpPost("cancel")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Cancel(ManageUserDeleteInput input)
+    {
+        if (!ModelState.IsValid)
+        {
+            TempData["ManageUserError"] = "Invalid cancel request.";
+            return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort, input.PageStudents, input.PageStaffs));
+        }
+
+        var currentUserId = _userManager.GetUserId(User);
+        if (string.Equals(currentUserId, input.UserId, StringComparison.Ordinal))
+        {
+            TempData["ManageUserError"] = "You cannot cancel your own account.";
+            return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort, input.PageStudents, input.PageStaffs));
+        }
+
+        var user = await _userManager.FindByIdAsync(input.UserId);
+        if (user == null)
+        {
+            TempData["ManageUserError"] = "User not found.";
+            return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort, input.PageStudents, input.PageStaffs));
+        }
+
+        if (!await IsStudentAsync(user))
+        {
+            TempData["ManageUserError"] = "Only student accounts can be approved or canceled.";
+            return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort, input.PageStudents, input.PageStaffs));
+        }
+
+        var syncResult = await SetApprovalStatusAsync(user, AccountApproval.Canceled);
+        if (!syncResult.Succeeded)
+        {
+            TempData["ManageUserError"] = BuildIdentityErrorMessage(syncResult);
+            return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort, input.PageStudents, input.PageStaffs));
+        }
+
+        await _telegramNotifier.SendAdminAlertAsync(
+            string.Join('\n',
+                "User account canceled.",
+                $"Name: {user.FullName}",
+                $"Email: {user.Email}",
+                $"Canceled By: {GetCurrentActor()}",
+                $"Canceled (UTC): {DateTime.UtcNow:yyyy-MM-dd HH:mm:ss}"));
+
+        TempData["ManageUserSuccess"] = "User canceled successfully.";
         return RedirectToAction(nameof(Index), BuildIndexRouteValues(input.ReturnTab, input.Search, input.FilterGender, input.RoleFilter, input.Sort, input.PageStudents, input.PageStaffs));
     }
 
@@ -532,7 +658,7 @@ public class ManageUserController : Controller
         return source.Contains(value, StringComparison.OrdinalIgnoreCase);
     }
 
-    private static string ResolveRole(IReadOnlyCollection<string> roles)
+    private static string ResolveRole(IEnumerable<string> roles)
     {
         if (roles.Any(r => string.Equals(r, AdminRole, StringComparison.OrdinalIgnoreCase)))
         {
@@ -727,13 +853,49 @@ public class ManageUserController : Controller
         return IdentityResult.Success;
     }
 
-    private async Task UpsertUserClaimsAsync(ApplicationUser user, string userCode, string gender)
+    private async Task<bool> IsStudentAsync(ApplicationUser user)
     {
-        await UpsertClaimAsync(user, UserCodeClaimType, NormalizeUserCode(userCode, user.Id));
-        await UpsertClaimAsync(user, GenderClaimType, NormalizeGenderForStore(gender));
+        var roles = await _userManager.GetRolesAsync(user);
+        var resolvedRole = ResolveRole(roles);
+        return !IsStaffRole(resolvedRole);
     }
 
-    private async Task UpsertClaimAsync(ApplicationUser user, string claimType, string claimValue)
+    private async Task<IdentityResult> SetApprovalStatusAsync(ApplicationUser user, string status)
+    {
+        var normalizedStatus = AccountApproval.Normalize(status);
+
+        if (normalizedStatus == AccountApproval.Canceled || normalizedStatus == AccountApproval.Pending)
+        {
+            user.LockoutEnabled = true;
+            user.LockoutEnd = DateTimeOffset.MaxValue;
+        }
+        else
+        {
+            user.LockoutEnabled = true;
+            user.LockoutEnd = null;
+        }
+
+        var userUpdateResult = await _userManager.UpdateAsync(user);
+        if (!userUpdateResult.Succeeded)
+        {
+            return userUpdateResult;
+        }
+
+        return await UpsertClaimAsync(user, AccountApprovalClaimType, normalizedStatus);
+    }
+
+    private async Task<IdentityResult> UpsertUserClaimsAsync(ApplicationUser user, string userCode, string gender)
+    {
+        var codeResult = await UpsertClaimAsync(user, UserCodeClaimType, NormalizeUserCode(userCode, user.Id));
+        if (!codeResult.Succeeded)
+        {
+            return codeResult;
+        }
+
+        return await UpsertClaimAsync(user, GenderClaimType, NormalizeGenderForStore(gender));
+    }
+
+    private async Task<IdentityResult> UpsertClaimAsync(ApplicationUser user, string claimType, string claimValue)
     {
         var existingClaims = await _userManager.GetClaimsAsync(user);
         var existingClaim = existingClaims.FirstOrDefault(c => string.Equals(c.Type, claimType, StringComparison.Ordinal));
@@ -741,16 +903,15 @@ public class ManageUserController : Controller
 
         if (existingClaim == null)
         {
-            await _userManager.AddClaimAsync(user, nextClaim);
-            return;
+            return await _userManager.AddClaimAsync(user, nextClaim);
         }
 
         if (string.Equals(existingClaim.Value, claimValue, StringComparison.Ordinal))
         {
-            return;
+            return IdentityResult.Success;
         }
 
-        await _userManager.ReplaceClaimAsync(user, existingClaim, nextClaim);
+        return await _userManager.ReplaceClaimAsync(user, existingClaim, nextClaim);
     }
 
     private static string BuildIdentityErrorMessage(IdentityResult result)

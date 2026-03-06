@@ -39,6 +39,9 @@ namespace Library_Management_system.Areas.Identity.Pages.Account
         [TempData]
         public string ErrorMessage { get; set; }
 
+        [TempData]
+        public string InfoMessage { get; set; }
+
         public class InputModel
         {
             [Required]
@@ -80,6 +83,19 @@ namespace Library_Management_system.Areas.Identity.Pages.Account
             if (user == null)
             {
                 ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                return Page();
+            }
+
+            var approvalStatus = await GetApprovalStatusAsync(user);
+            if (approvalStatus == AccountApproval.Pending)
+            {
+                ModelState.AddModelError(string.Empty, "Your account is pending admin approval.");
+                return Page();
+            }
+
+            if (approvalStatus == AccountApproval.Canceled)
+            {
+                ModelState.AddModelError(string.Empty, "Your account access was canceled by admin.");
                 return Page();
             }
 
@@ -150,10 +166,23 @@ namespace Library_Management_system.Areas.Identity.Pages.Account
             }
 
             if (result.IsLockedOut)
-                return RedirectToPage("./Lockout");
+            {
+                ModelState.AddModelError(string.Empty, "Your account is currently locked. Please contact admin.");
+                return Page();
+            }
 
             ModelState.AddModelError(string.Empty, "Invalid login attempt.");
             return Page();
+        }
+
+        private async Task<string> GetApprovalStatusAsync(ApplicationUser user)
+        {
+            var claims = await _userManager.GetClaimsAsync(user);
+            var rawValue = claims
+                .FirstOrDefault(c => c.Type == AccountApproval.ClaimType)
+                ?.Value;
+
+            return AccountApproval.Normalize(rawValue);
         }
     }
 }

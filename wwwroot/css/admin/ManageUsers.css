@@ -363,6 +363,7 @@
     justify-content: center;
     align-items: center;
     gap: 10px;
+    flex-wrap: wrap;
 }
 
 .action-container form {
@@ -370,7 +371,9 @@
 }
 
 .edit-user-btn,
-.delete-user-btn {
+.delete-user-btn,
+.approve-user-btn,
+.cancel-user-btn {
     width: 38px;
     height: 38px;
     border-radius: 10px;
@@ -387,7 +390,9 @@
 }
 
 .edit-user-btn:hover,
-.delete-user-btn:hover {
+.delete-user-btn:hover,
+.approve-user-btn:hover,
+.cancel-user-btn:hover {
     transform: translateY(-1px);
     box-shadow: 0 12px 20px rgba(15, 33, 56, 0.14);
 }
@@ -400,6 +405,46 @@
 .delete-user-btn i {
     font-size: 18px;
     color: #dc3545;
+}
+
+.approve-user-btn i {
+    font-size: 18px;
+    color: #198754;
+}
+
+.cancel-user-btn i {
+    font-size: 18px;
+    color: #a32232;
+}
+
+.approval-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 84px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    border: 1px solid transparent;
+}
+
+.approval-badge-approved {
+    color: #146c43;
+    background: #eaf7ef;
+    border-color: #b9e4cc;
+}
+
+.approval-badge-pending {
+    color: #8a6300;
+    background: #fff6de;
+    border-color: #f2d98b;
+}
+
+.approval-badge-canceled {
+    color: #8b1f2b;
+    background: #ffecef;
+    border-color: #f4b9c1;
 }
 
 /* =========================

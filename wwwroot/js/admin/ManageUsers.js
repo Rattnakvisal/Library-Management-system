@@ -124,6 +124,48 @@ $(document).ready(function () {
         });
     });
 
+    $('.approve-user-form').on('submit', function (event) {
+        event.preventDefault();
+
+        const form = this;
+        const userName = $(form).data('user-name') || 'this user';
+
+        Swal.fire({
+            title: 'Approve user?',
+            text: `Allow ${userName} to log in now?`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#198754',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Yes, approve'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit();
+            }
+        });
+    });
+
+    $('.cancel-user-form').on('submit', function (event) {
+        event.preventDefault();
+
+        const form = this;
+        const userName = $(form).data('user-name') || 'this user';
+
+        Swal.fire({
+            title: 'Cancel user?',
+            text: `Block ${userName} from website login?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Yes, cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit();
+            }
+        });
+    });
+
     if (successMessage) {
         Swal.fire({
             icon: 'success',

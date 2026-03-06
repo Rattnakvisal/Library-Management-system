@@ -6,10 +6,12 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Security.Claims;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Library_Management_system.Models;
+using Library_Management_system.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -27,6 +29,7 @@ namespace Library_Management_system.Areas.Identity.Pages.Account
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IUserStore<ApplicationUser> _userStore;
         private readonly IUserEmailStore<ApplicationUser> _emailStore;
+        private readonly ITelegramNotifier _telegramNotifier;
         private readonly ILogger<RegisterModel> _logger;
 
         public RegisterModel(
@@ -34,6 +37,7 @@ namespace Library_Management_system.Areas.Identity.Pages.Account
             RoleManager<IdentityRole> roleManager,
             IUserStore<ApplicationUser> userStore,
             SignInManager<ApplicationUser> signInManager,
+            ITelegramNotifier telegramNotifier,
             ILogger<RegisterModel> logger)
         {
             _userManager = userManager;
@@ -41,6 +45,7 @@ namespace Library_Management_system.Areas.Identity.Pages.Account
             _userStore = userStore;
             _emailStore = GetEmailStore();
             _signInManager = signInManager;
+            _telegramNotifier = telegramNotifier;
             _logger = logger;
         }
 
@@ -94,6 +99,8 @@ namespace Library_Management_system.Areas.Identity.Pages.Account
 
             // Save Full Name (can contain spaces)
             user.FullName = (Input.Name ?? "").Trim();
+            user.CreatedBy = "Self Register";
+            user.CreatedDate = DateTime.UtcNow;
 
             if (string.IsNullOrWhiteSpace(user.FullName))
             {
@@ -161,15 +168,60 @@ namespace Library_Management_system.Areas.Identity.Pages.Account
                     return Page();
                 }
 
-                // Sign in directly
-                await _signInManager.SignInAsync(user, isPersistent: false);
+                var approvalClaimResult = await _userManager.AddClaimAsync(
+                    user,
+                    new Claim(AccountApproval.ClaimType, AccountApproval.Pending));
+                if (!approvalClaimResult.Succeeded)
+                {
+                    foreach (var error in approvalClaimResult.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
+
+                    await _userManager.DeleteAsync(user);
+                    return Page();
+                }
+
+                var lockoutEnabledResult = await _userManager.SetLockoutEnabledAsync(user, true);
+                if (!lockoutEnabledResult.Succeeded)
+                {
+                    foreach (var error in lockoutEnabledResult.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
+
+                    await _userManager.DeleteAsync(user);
+                    return Page();
+                }
+
+                var lockoutUntilApprovedResult = await _userManager.SetLockoutEndDateAsync(user, DateTimeOffset.MaxValue);
+                if (!lockoutUntilApprovedResult.Succeeded)
+                {
+                    foreach (var error in lockoutUntilApprovedResult.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
+
+                    await _userManager.DeleteAsync(user);
+                    return Page();
+                }
+
+                var registeredUtc = DateTime.UtcNow;
+                var registerAlert = string.Join('\n',
+                    "New user registration pending approval.",
+                    $"Name: {user.FullName}",
+                    $"Email: {user.Email}",
+                    $"Registered (UTC): {registeredUtc:yyyy-MM-dd HH:mm:ss}");
+                await _telegramNotifier.SendAdminAlertAsync(registerAlert);
+
+                TempData["InfoMessage"] = "Register completed. Please wait for admin approval before login.";
 
                 if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
                 {
-                    return LocalRedirect(returnUrl);
+                    return RedirectToPage("./Login", new { returnUrl });
                 }
 
-                return RedirectToAction("Index", "Home");
+                return RedirectToPage("./Login");
             }
 
             foreach (var error in result.Errors)

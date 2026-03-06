@@ -459,9 +459,10 @@
                     <i class="bi bi-book"></i><span>Manage Books</span>
                 </a>
 
-                <!-- NEW: Categories -->
-                <a class="nav-link @IsActive("ManageCategories")" asp-controller="ManageCategories" asp-action="Index">
-                    <i class="bi bi-tags"></i><span>Categories</span>
+                        <!-- NEW: Categories -->
+                <a class="nav-link @IsActive(CATEGORY_CONTROLLER)" asp-controller="@CATEGORY_CONTROLLER"    asp-action="Index">
+                            <i class="bi bi-tags"></i>
+                            <span>Categories & Authors</span>
                 </a>
 
                 <a class="nav-link @IsActive("ManageBorrowingBook")" asp-controller="ManageBorrowingBook" asp-action="Index">
