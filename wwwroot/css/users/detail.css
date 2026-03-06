@@ -529,6 +529,11 @@ body {
     transition: transform 0.42s ease;
 }
 
+.book-detail-page .detail-related-card .related-favorite-form {
+    position: relative;
+    z-index: 3;
+}
+
 .book-detail-page .detail-related-card:hover .related-card-img {
     transform: scale(1.03);
 }

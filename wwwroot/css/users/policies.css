@@ -23,7 +23,7 @@ body {
 
 .header h1 {
     color: #132a46;
-    font-size: 42px;
+    font-size: 36px;
     font-weight: 300;
     margin-bottom: 10px;
 }
@@ -46,26 +46,48 @@ body {
 }
 
 .nav-button {
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: 12px;
     width: 100%;
-    padding: 15px 20px;
+    padding: 14px 18px;
     margin-bottom: 10px;
     background: transparent;
     color: #132a46;
     border: none;
     text-align: left;
-    font-size: 20px;
+    font-size: clamp(1.1rem, 1rem + 0.4vw, 1.4rem);
+    font-weight: 500;
+    line-height: 1.25;
     cursor: pointer;
-    border-radius: 5px;
+    border-radius: 8px;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.nav-icon {
+    font-size: 1.1em;
+    width: 1.4em;
+    flex-shrink: 0;
+    color: #456487;
+}
+
+.nav-label {
+    display: inline-block;
 }
 
 .nav-button:hover {
     background: #e9eff7;
+    color: #0e2846;
 }
 
 .nav-button.active {
     background: #dce7f5;
-    font-weight: 500;
+    color: #0a2542;
+    font-weight: 600;
+}
+
+.nav-button.active .nav-icon {
+    color: #0d3b68;
 }
 
 .main-content {
@@ -112,7 +134,13 @@ body {
     }
 
     .nav-button {
-        font-size: 16px;
+        font-size: 1rem;
+        padding: 12px 14px;
+        gap: 10px;
+    }
+
+    .nav-icon {
+        width: 1.2em;
     }
 }
 

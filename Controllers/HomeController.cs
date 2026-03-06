@@ -69,6 +69,22 @@ namespace Library_Management_system.Controllers
                 .Take(newArrivalsLimit)
                 .ToListAsync();
 
+            var featuredBookIds = trendingBooks
+                .Select(b => b.Id)
+                .Concat(newArrivalBooks.Select(b => b.Id))
+                .Distinct()
+                .ToList();
+
+            var ownerKey = ResolveCartOwnerKey();
+            var favoriteBookIds = featuredBookIds.Count == 0
+                ? new HashSet<int>()
+                : (await _context.FavoriteBooks
+                    .AsNoTracking()
+                    .Where(x => x.OwnerKey == ownerKey && featuredBookIds.Contains(x.BookId))
+                    .Select(x => x.BookId)
+                    .ToListAsync())
+                .ToHashSet();
+
             // Get genres/categories for the genre section
             var genres = await _context.Categories
                 .AsNoTracking()
@@ -81,7 +97,8 @@ namespace Library_Management_system.Controllers
                 Categories = categories,
                 TrendingBooks = trendingBooks,
                 NewArrivalBooks = newArrivalBooks,
-                CategoryGenres = genres
+                CategoryGenres = genres,
+                FavoriteBookIds = favoriteBookIds
             };
 
             return View(model);
@@ -925,11 +942,25 @@ namespace Library_Management_system.Controllers
                 relatedBooks.AddRange(crossCategoryBooks);
             }
 
+            var relatedBookIds = relatedBooks
+                .Select(b => b.Id)
+                .Distinct()
+                .ToList();
+            var relatedFavoriteBookIds = relatedBookIds.Count == 0
+                ? new HashSet<int>()
+                : (await _context.FavoriteBooks
+                    .AsNoTracking()
+                    .Where(x => x.OwnerKey == ownerKey && relatedBookIds.Contains(x.BookId))
+                    .Select(x => x.BookId)
+                    .ToListAsync())
+                .ToHashSet();
+
             var model = new BookDetailViewModel
             {
                 Book = book,
                 RelatedBooks = relatedBooks,
-                IsFavorite = isFavorite
+                IsFavorite = isFavorite,
+                RelatedFavoriteBookIds = relatedFavoriteBookIds
             };
 
             return View("~/Views/User/Books/BookDetail.cshtml", model);

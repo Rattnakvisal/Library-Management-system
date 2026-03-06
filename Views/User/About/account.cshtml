@@ -25,16 +25,28 @@
             <!-- Sidebar -->
             <aside class="sidebar">
                 <a class="nav-button @(ViewContext.HttpContext.Request.Path == "/about/faq" ? "active" : "")"
-                   asp-controller="Home" asp-action="AboutFaq">General</a>
+                   asp-controller="Home" asp-action="AboutFaq">
+                    <i class="bi bi-grid-3x3-gap nav-icon" aria-hidden="true"></i>
+                    <span class="nav-label">General</span>
+                </a>
 
                 <a class="nav-button @(ViewContext.HttpContext.Request.Path == "/about/account" ? "active" : "")"
-                   asp-controller="Home" asp-action="AboutAccount">Account & Login</a>
+                   asp-controller="Home" asp-action="AboutAccount">
+                    <i class="bi bi-person-lock nav-icon" aria-hidden="true"></i>
+                    <span class="nav-label">Account & Login</span>
+                </a>
 
                 <a class="nav-button @(ViewContext.HttpContext.Request.Path == "/about/support" ? "active" : "")"
-                   asp-controller="Home" asp-action="AboutSupport">Support</a>
+                   asp-controller="Home" asp-action="AboutSupport">
+                    <i class="bi bi-life-preserver nav-icon" aria-hidden="true"></i>
+                    <span class="nav-label">Support</span>
+                </a>
 
                 <a class="nav-button @(ViewContext.HttpContext.Request.Path == "/about/policies" ? "active" : "")"
-                   asp-controller="Home" asp-action="AboutPolicies">Libraries Policy</a>
+                   asp-controller="Home" asp-action="AboutPolicies">
+                    <i class="bi bi-journal-text nav-icon" aria-hidden="true"></i>
+                    <span class="nav-label">Libraries Policy</span>
+                </a>
 
             </aside>
 

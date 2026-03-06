@@ -8,4 +8,5 @@ public class HomeViewModel
     public List<Book> TrendingBooks { get; set; } = new();
     public List<Book> NewArrivalBooks { get; set; } = new();
     public List<Category> CategoryGenres { get; set; } = new();
+    public HashSet<int> FavoriteBookIds { get; set; } = new();
 }

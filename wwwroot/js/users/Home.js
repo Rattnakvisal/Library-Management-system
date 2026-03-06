@@ -1,48 +1,80 @@
-(() => {
-    function setupWishlistButtons(root) {
-        const buttons = root.querySelectorAll(".wishlist-btn");
+﻿(() => {
+    function setupShareButtons(root) {
+        const buttons = root.querySelectorAll(".share-book-btn");
         if (!buttons.length) {
             return;
         }
 
-        buttons.forEach((button, index) => {
-            const configuredId = button.getAttribute("data-id");
-            const bookId = configuredId && configuredId.trim().length > 0
-                ? configuredId.trim()
-                : `wishlist-item-${index}`;
+        const toAbsoluteUrl = (url) => {
+            try {
+                return new URL(url, window.location.origin).href;
+            } catch {
+                return window.location.href;
+            }
+        };
 
-            if (!configuredId) {
-                button.setAttribute("data-id", bookId);
+        const flashShareState = (button, titleText) => {
+            const previousTitle = button.getAttribute("title") || "Share";
+            button.setAttribute("title", titleText);
+            button.classList.add("text-success");
+
+            window.setTimeout(() => {
+                button.setAttribute("title", previousTitle);
+                button.classList.remove("text-success");
+            }, 1400);
+        };
+
+        const copyToClipboard = async (text) => {
+            if (navigator.clipboard && window.isSecureContext) {
+                await navigator.clipboard.writeText(text);
+                return true;
             }
 
-            const icon = button.querySelector("i");
-            let favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
+            const helper = document.createElement("textarea");
+            helper.value = text;
+            helper.setAttribute("readonly", "");
+            helper.style.position = "fixed";
+            helper.style.opacity = "0";
+            document.body.appendChild(helper);
+            helper.select();
 
-            if (favorites.includes(bookId)) {
-                button.classList.add("active");
-                if (icon) {
-                    icon.classList.add("text-danger");
-                }
-            }
+            const copied = document.execCommand("copy");
+            document.body.removeChild(helper);
+            return copied;
+        };
 
-            button.addEventListener("click", function () {
-                favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
+        buttons.forEach((button) => {
+            button.addEventListener("click", async () => {
+                const shareUrl = toAbsoluteUrl(button.dataset.shareUrl || window.location.href);
+                const shareTitle = button.dataset.shareTitle || document.title;
+                const shareAuthor = button.dataset.shareAuthor;
+                const shareText = shareAuthor ? `${shareTitle} by ${shareAuthor}` : shareTitle;
 
-                if (favorites.includes(bookId)) {
-                    favorites = favorites.filter((id) => id !== bookId);
-                    this.classList.remove("active");
-                    if (icon) {
-                        icon.classList.remove("text-danger");
+                try {
+                    if (typeof navigator.share === "function") {
+                        await navigator.share({
+                            title: shareTitle,
+                            text: shareText,
+                            url: shareUrl
+                        });
+                        flashShareState(button, "Shared");
+                        return;
                     }
-                } else {
-                    favorites.push(bookId);
-                    this.classList.add("active");
-                    if (icon) {
-                        icon.classList.add("text-danger");
+
+                    const copied = await copyToClipboard(shareUrl);
+                    flashShareState(button, copied ? "Link copied" : "Copy failed");
+                } catch (error) {
+                    if (error && typeof error === "object" && "name" in error && error.name === "AbortError") {
+                        return;
+                    }
+
+                    try {
+                        const copied = await copyToClipboard(shareUrl);
+                        flashShareState(button, copied ? "Link copied" : "Copy failed");
+                    } catch {
+                        flashShareState(button, "Copy failed");
                     }
                 }
-
-                localStorage.setItem("favorites", JSON.stringify(favorites));
             });
         });
     }
@@ -94,7 +126,7 @@
             return;
         }
 
-        setupWishlistButtons(homeRoot);
+        setupShareButtons(homeRoot);
         setupHomeAnimations(homeRoot);
     });
 })();
