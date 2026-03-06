@@ -1,14 +1,16 @@
-﻿#nullable disable
+#nullable disable
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using Library_Management_system.Models;
+using Library_Management_system.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace Library_Management_system.Areas.Identity.Pages.Account
@@ -45,7 +47,7 @@ namespace Library_Management_system.Areas.Identity.Pages.Account
         public class InputModel
         {
             [Required]
-            [EmailAddress]
+            [Display(Name = "Email or Phone")]
             public string Email { get; set; }
 
             [Required]
@@ -78,8 +80,13 @@ namespace Library_Management_system.Areas.Identity.Pages.Account
             if (!ModelState.IsValid)
                 return Page();
 
-            var email = (Input.Email ?? string.Empty).Trim();
-            var user = await _userManager.FindByEmailAsync(email);
+            var loginIdentifier = (Input.Email ?? string.Empty).Trim();
+            var user = await _userManager.FindByEmailAsync(loginIdentifier);
+            if (user == null)
+            {
+                user = await FindUserByPhoneAsync(loginIdentifier);
+            }
+
             if (user == null)
             {
                 ModelState.AddModelError(string.Empty, "Invalid login attempt.");
@@ -173,6 +180,33 @@ namespace Library_Management_system.Areas.Identity.Pages.Account
 
             ModelState.AddModelError(string.Empty, "Invalid login attempt.");
             return Page();
+        }
+
+        private async Task<ApplicationUser> FindUserByPhoneAsync(string rawPhoneNumber)
+        {
+            if (!PhoneNumberHelper.LooksLikePhone(rawPhoneNumber))
+            {
+                return null;
+            }
+
+            var candidates = PhoneNumberHelper.BuildMatchCandidates(rawPhoneNumber).ToArray();
+            if (candidates.Length == 0)
+            {
+                return null;
+            }
+
+            var user = await _userManager.Users
+                .FirstOrDefaultAsync(u => u.PhoneNumber != null && candidates.Contains(u.PhoneNumber));
+            if (user != null)
+            {
+                return user;
+            }
+
+            var phoneCandidates = await _userManager.Users
+                .Where(u => u.PhoneNumber != null)
+                .ToListAsync();
+
+            return phoneCandidates.FirstOrDefault(u => PhoneNumberHelper.AreEquivalent(u.PhoneNumber, rawPhoneNumber));
         }
 
         private async Task<string> GetApprovalStatusAsync(ApplicationUser user)

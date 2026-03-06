@@ -15,6 +15,7 @@ public class ManageBorrowingBookController : Controller
     private const int DefaultBorrowingDays = 14;
     private const int MaxActiveBorrowingsPerUser = 3;
     private const decimal FinePerLateDay = 1.00m;
+    private const int DefaultPageSize = 10;
 
     private static readonly HashSet<string> BorrowingStatuses = new(StringComparer.OrdinalIgnoreCase)
     {
@@ -43,7 +44,9 @@ public class ManageBorrowingBookController : Controller
         string? bq = null,
         string? bs = null,
         string? rq = null,
-        string? rs = null)
+        string? rs = null,
+        int bp = 1,
+        int rp = 1)
     {
         var borrowingKeyword = (bq ?? string.Empty).Trim();
         var reservationKeyword = (rq ?? string.Empty).Trim();
@@ -101,6 +104,13 @@ public class ManageBorrowingBookController : Controller
                 (string.IsNullOrWhiteSpace(borrowingStatus) || x.Status == borrowingStatus))
             .ToList();
 
+        var borrowingTotalPages = Math.Max(1, (int)Math.Ceiling(borrowingRows.Count / (double)DefaultPageSize));
+        var borrowingPage = Math.Clamp(bp, 1, borrowingTotalPages);
+        var pagedBorrowingRows = borrowingRows
+            .Skip((borrowingPage - 1) * DefaultPageSize)
+            .Take(DefaultPageSize)
+            .ToList();
+
         var reservationCandidates = await _context.CartItems
             .AsNoTracking()
             .Include(ci => ci.Book)
@@ -145,6 +155,13 @@ public class ManageBorrowingBookController : Controller
                 (string.IsNullOrWhiteSpace(reservationStatus) || x.Status == reservationStatus))
             .ToList();
 
+        var reservationTotalPages = Math.Max(1, (int)Math.Ceiling(reservationRows.Count / (double)DefaultPageSize));
+        var reservationPage = Math.Clamp(rp, 1, reservationTotalPages);
+        var pagedReservationRows = reservationRows
+            .Skip((reservationPage - 1) * DefaultPageSize)
+            .Take(DefaultPageSize)
+            .ToList();
+
         var bookOptions = await _context.Books
             .AsNoTracking()
             .OrderBy(b => b.BookCode)
@@ -160,13 +177,18 @@ public class ManageBorrowingBookController : Controller
 
         var model = new ManageBorrowingViewModel
         {
-            Borrowings = borrowingRows,
-            Reservations = reservationRows,
+            Borrowings = pagedBorrowingRows,
+            Reservations = pagedReservationRows,
             BookOptions = bookOptions,
             BorrowingQuery = borrowingKeyword,
             BorrowingStatus = borrowingStatus,
             ReservationQuery = reservationKeyword,
-            ReservationStatus = reservationStatus
+            ReservationStatus = reservationStatus,
+            BorrowingPage = borrowingPage,
+            BorrowingTotalPages = borrowingTotalPages,
+            ReservationPage = reservationPage,
+            ReservationTotalPages = reservationTotalPages,
+            PageSize = DefaultPageSize
         };
 
         return View("~/Views/Admin/ManageBorrowingBook/Index.cshtml", model);

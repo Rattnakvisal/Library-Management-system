@@ -3,6 +3,22 @@
 @model ManageBorrowingViewModel
 @{
     ViewBag.Title = "Manage Borrowing Book";
+
+    object BuildIndexRouteValues(int borrowingPage, int reservationPage)
+    {
+        return new
+        {
+            bq = Model.BorrowingQuery,
+            bs = Model.BorrowingStatus,
+            rq = Model.ReservationQuery,
+            rs = Model.ReservationStatus,
+            bp = borrowingPage,
+            rp = reservationPage
+        };
+    }
+
+    var borrowingRowStart = ((Model.BorrowingPage - 1) * Model.PageSize) + 1;
+    var reservationRowStart = ((Model.ReservationPage - 1) * Model.PageSize) + 1;
 }
 
 @section Styles {
@@ -25,8 +41,11 @@
                        placeholder="Search borrowing..."
                        class="search-input"
                        id="search-borrowing-input" />
+                <input type="hidden" name="bs" value="@Model.BorrowingStatus" />
                 <input type="hidden" name="rq" value="@Model.ReservationQuery" />
                 <input type="hidden" name="rs" value="@Model.ReservationStatus" />
+                <input type="hidden" name="bp" value="1" />
+                <input type="hidden" name="rp" value="@Model.ReservationPage" />
             </form>
 
             <div class="action-controls">
@@ -44,6 +63,8 @@
                         <input type="hidden" name="bq" value="@Model.BorrowingQuery" />
                         <input type="hidden" name="rq" value="@Model.ReservationQuery" />
                         <input type="hidden" name="rs" value="@Model.ReservationStatus" />
+                        <input type="hidden" name="bp" value="1" />
+                        <input type="hidden" name="rp" value="@Model.ReservationPage" />
                         <select class="filter-btn form-select" name="bs" onchange="this.form.submit()">
                             @if (string.IsNullOrWhiteSpace(Model.BorrowingStatus))
                             {
@@ -125,7 +146,7 @@
                     <tbody>
                         @if (Model.Borrowings.Any())
                         {
-                            var rowNo = 0;
+                            var rowNo = borrowingRowStart - 1;
                             foreach (var borrowing in Model.Borrowings)
                             {
                                 rowNo++;
@@ -216,6 +237,30 @@
                     </tbody>
                 </table>
             </div>
+            @if (Model.BorrowingTotalPages > 1)
+            {
+                <div class="pagination-wrapper">
+                    <nav aria-label="Borrowing page navigation">
+                        <ul class="pagination justify-content-end">
+                            <li class="page-item @(Model.BorrowingPage <= 1 ? "disabled" : null)">
+                                <a class="page-link"
+                                   href="@Url.Action("Index", "ManageBorrowingBook", BuildIndexRouteValues(Model.BorrowingPage - 1, Model.ReservationPage))">Previous</a>
+                            </li>
+                            @for (var pageNumber = 1; pageNumber <= Model.BorrowingTotalPages; pageNumber++)
+                            {
+                                <li class="page-item @(pageNumber == Model.BorrowingPage ? "active" : null)">
+                                    <a class="page-link"
+                                       href="@Url.Action("Index", "ManageBorrowingBook", BuildIndexRouteValues(pageNumber, Model.ReservationPage))">@pageNumber</a>
+                                </li>
+                            }
+                            <li class="page-item @(Model.BorrowingPage >= Model.BorrowingTotalPages ? "disabled" : null)">
+                                <a class="page-link"
+                                   href="@Url.Action("Index", "ManageBorrowingBook", BuildIndexRouteValues(Model.BorrowingPage + 1, Model.ReservationPage))">Next</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            }
         </div>
     </section>
 
@@ -236,6 +281,9 @@
                        id="search-reservation-input" />
                 <input type="hidden" name="bq" value="@Model.BorrowingQuery" />
                 <input type="hidden" name="bs" value="@Model.BorrowingStatus" />
+                <input type="hidden" name="rs" value="@Model.ReservationStatus" />
+                <input type="hidden" name="bp" value="@Model.BorrowingPage" />
+                <input type="hidden" name="rp" value="1" />
             </form>
 
             <div class="action-controls">
@@ -244,6 +292,8 @@
                         <input type="hidden" name="bq" value="@Model.BorrowingQuery" />
                         <input type="hidden" name="bs" value="@Model.BorrowingStatus" />
                         <input type="hidden" name="rq" value="@Model.ReservationQuery" />
+                        <input type="hidden" name="bp" value="@Model.BorrowingPage" />
+                        <input type="hidden" name="rp" value="1" />
                         <select class="filter-btn form-select" name="rs" onchange="this.form.submit()">
                             @if (string.IsNullOrWhiteSpace(Model.ReservationStatus))
                             {
@@ -306,7 +356,7 @@
                     <tbody>
                         @if (Model.Reservations.Any())
                         {
-                            var rowNo = 0;
+                            var rowNo = reservationRowStart - 1;
                             foreach (var reservation in Model.Reservations)
                             {
                                 rowNo++;
@@ -369,6 +419,30 @@
                     </tbody>
                 </table>
             </div>
+            @if (Model.ReservationTotalPages > 1)
+            {
+                <div class="pagination-wrapper">
+                    <nav aria-label="Reservation page navigation">
+                        <ul class="pagination justify-content-end">
+                            <li class="page-item @(Model.ReservationPage <= 1 ? "disabled" : null)">
+                                <a class="page-link"
+                                   href="@Url.Action("Index", "ManageBorrowingBook", BuildIndexRouteValues(Model.BorrowingPage, Model.ReservationPage - 1))">Previous</a>
+                            </li>
+                            @for (var pageNumber = 1; pageNumber <= Model.ReservationTotalPages; pageNumber++)
+                            {
+                                <li class="page-item @(pageNumber == Model.ReservationPage ? "active" : null)">
+                                    <a class="page-link"
+                                       href="@Url.Action("Index", "ManageBorrowingBook", BuildIndexRouteValues(Model.BorrowingPage, pageNumber))">@pageNumber</a>
+                                </li>
+                            }
+                            <li class="page-item @(Model.ReservationPage >= Model.ReservationTotalPages ? "disabled" : null)">
+                                <a class="page-link"
+                                   href="@Url.Action("Index", "ManageBorrowingBook", BuildIndexRouteValues(Model.BorrowingPage, Model.ReservationPage + 1))">Next</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            }
         </div>
     </section>
 

@@ -53,6 +53,8 @@
                 "Use /contact to send feedback or support questions to library staff.",
             location:
                 "Library location: ACLEDA University campus library building.",
+            resetPassword:
+                "Open /Identity/Account/ForgotPassword, then use Telegram OTP to finish your reset.",
         };
 
         const intentKeywords = [
@@ -97,8 +99,20 @@
                 keywords: ["event", "events", "schedule", "activity"],
             },
             {
+                intent: "resetPassword",
+                keywords: [
+                    "reset password",
+                    "forgot password",
+                    "password reset",
+                    "telegram otp",
+                    "otp code",
+                    "send otp",
+                    "/start",
+                ],
+            },
+            {
                 intent: "account",
-                keywords: ["account", "login", "sign in", "register", "password"],
+                keywords: ["account", "login", "sign in", "register"],
             },
             {
                 intent: "profile",
@@ -127,14 +141,79 @@
         ];
 
         const fallbackReply =
-            "I can help with hours, reservations, borrow limits, fines, events, profile, policies, and support. Try asking: How do I reserve a book?";
+            "I can help with hours, reservations, borrow limits, reset password OTP, fines, events, profile, policies, and support. Try asking: How do I reset my password?";
+
+        const appendMessageElement = (item) => {
+            messages.appendChild(item);
+            messages.scrollTop = messages.scrollHeight;
+        };
 
         const addMessage = (text, type) => {
             const item = document.createElement("div");
             item.className = `home-chatbot__msg home-chatbot__msg--${type}`;
             item.textContent = text;
-            messages.appendChild(item);
-            messages.scrollTop = messages.scrollHeight;
+            appendMessageElement(item);
+        };
+
+        const addResetPasswordGuideMessage = () => {
+            const item = document.createElement("div");
+            item.className = "home-chatbot__msg home-chatbot__msg--bot home-chatbot__msg--guide";
+
+            const title = document.createElement("p");
+            title.className = "home-chatbot__guide-title";
+            title.textContent = "How to reset password with Telegram OTP:";
+            item.appendChild(title);
+
+            const steps = [
+                "Open Telegram bot @AUBLIBRARYCONTACT_BOT and tap /start.",
+                "Send your phone number (Cambodia local or +855 format).",
+                "Open /Identity/Account/ForgotPassword and submit your new password.",
+                "Enter the OTP sent to Telegram to complete reset.",
+            ];
+
+            const list = document.createElement("ol");
+            list.className = "home-chatbot__guide-list";
+            steps.forEach((step) => {
+                const li = document.createElement("li");
+                li.textContent = step;
+                list.appendChild(li);
+            });
+            item.appendChild(list);
+
+            const links = document.createElement("div");
+            links.className = "home-chatbot__guide-links";
+
+            const openBotLink = document.createElement("a");
+            openBotLink.href = "https://t.me/AUBLIBRARYCONTACT_BOT";
+            openBotLink.target = "_blank";
+            openBotLink.rel = "noopener noreferrer";
+            openBotLink.textContent = "Open Telegram Bot";
+            links.appendChild(openBotLink);
+
+            const openResetLink = document.createElement("a");
+            openResetLink.href = "/Identity/Account/ForgotPassword";
+            openResetLink.textContent = "Open Reset Password Page";
+            links.appendChild(openResetLink);
+
+            item.appendChild(links);
+
+            const image = document.createElement("img");
+            image.className = "home-chatbot__guide-image";
+            image.src = "/images/image.png";
+            image.alt = "Telegram /start QR for AUBLIBRARYCONTACT_BOT";
+            image.loading = "lazy";
+            item.appendChild(image);
+
+            appendMessageElement(item);
+        };
+
+        const sendBotReplyByIntent = (intent) => {
+            if (intent === "resetPassword") {
+                addResetPasswordGuideMessage();
+                return;
+            }
+
+            addMessage(staticReplies[intent] || fallbackReply, "bot");
         };
 
         const openPanel = () => {
@@ -144,7 +223,7 @@
 
             if (!chatbot.dataset.seeded) {
                 addMessage(
-                    "Hello, I am your library assistant. Ask about reservations, borrowing, fines, events, or support.",
+                    "Hello, I am your library assistant. Ask about reservations, borrowing, reset password OTP, fines, events, or support.",
                     "bot",
                 );
                 chatbot.dataset.seeded = "1";
@@ -183,7 +262,7 @@
 
             addMessage(cleaned, "user");
             const intent = getIntent(cleaned);
-            addMessage(staticReplies[intent] || fallbackReply, "bot");
+            sendBotReplyByIntent(intent);
         };
 
         toggleButton.addEventListener("click", () => {
@@ -209,7 +288,7 @@
                 ? target.textContent.trim()
                 : "Question";
             addMessage(label, "user");
-            addMessage(staticReplies[intent] || fallbackReply, "bot");
+            sendBotReplyByIntent(intent);
         });
 
         form.addEventListener("submit", (event) => {

@@ -74,18 +74,18 @@
 }
 
 .setting-body {
-  margin-top: 14px;
-  border: 1px solid rgba(16, 24, 40, 0.08);
-  border-radius: 14px;
+    margin-top: 14px;
+    border: 1px solid rgba(16, 24, 40, 0.08);
+    border-radius: 14px;
     padding: 14px;
     display: grid;
     grid-template-columns: 130px minmax(0, 1fr);
     gap: 18px;
-  background: #fdfdfd;
+    background: #fdfdfd;
 }
 
 .setting-body-security {
-  grid-template-columns: minmax(0, 1.6fr) minmax(220px, 0.8fr);
+    grid-template-columns: minmax(0, 1.6fr) minmax(220px, 0.8fr);
 }
 
 .avatar-column {
@@ -165,11 +165,11 @@
 }
 
 .setting-form {
-  max-width: 860px;
+    max-width: 860px;
 }
 
 .security-form {
-  max-width: none;
+    max-width: none;
 }
 
 .form-grid {
@@ -205,20 +205,20 @@
 }
 
 .section-caption {
-  margin: 14px 0 8px;
-  color: var(--set-text);
-  font-size: 1.05rem;
-  font-weight: 800;
+    margin: 14px 0 8px;
+    color: var(--set-text);
+    font-size: 1.05rem;
+    font-weight: 800;
 }
 
 .section-caption-first {
-  margin-top: 0;
+    margin-top: 0;
 }
 
 .security-help {
-  margin: -3px 0 12px;
-  color: var(--set-muted);
-  font-size: 0.9rem;
+    margin: -3px 0 12px;
+    color: var(--set-muted);
+    font-size: 0.9rem;
 }
 
 .form-actions {
@@ -240,39 +240,39 @@
 }
 
 .btn-save-profile:hover {
-  filter: brightness(1.04);
+    filter: brightness(1.04);
 }
 
 .security-side-panel {
-  border: 1px solid rgba(16, 24, 40, 0.08);
-  border-radius: 12px;
-  background: #fafaff;
-  padding: 14px;
-  height: fit-content;
+    border: 1px solid rgba(16, 24, 40, 0.08);
+    border-radius: 12px;
+    background: #fafaff;
+    padding: 14px;
+    height: fit-content;
 }
 
 .security-side-panel h3 {
-  margin: 0 0 8px;
-  font-size: 1rem;
-  font-weight: 800;
-  color: #1f1f35;
+    margin: 0 0 8px;
+    font-size: 1rem;
+    font-weight: 800;
+    color: #1f1f35;
 }
 
 .security-rules {
-  margin: 0;
-  padding-left: 18px;
-  color: #43495a;
-  font-size: 0.88rem;
+    margin: 0;
+    padding-left: 18px;
+    color: #43495a;
+    font-size: 0.88rem;
 }
 
-.security-rules li + li {
-  margin-top: 5px;
+.security-rules li+li {
+    margin-top: 5px;
 }
 
 @media (max-width: 900px) {
-  .setting-body {
-    grid-template-columns: 1fr;
-  }
+    .setting-body {
+        grid-template-columns: 1fr;
+    }
 
     .avatar-column {
         align-items: flex-start;

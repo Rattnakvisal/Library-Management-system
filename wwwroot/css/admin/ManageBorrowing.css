@@ -1,525 +1,525 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 
 :root {
-  --navy: #1f4a73;
-  --navy-dark: #163a5a;
-  --panel: #ffffff;
-  --text: #0f2138;
-  --muted: #64748b;
-  --line: #dfe6ee;
-  --shadow-sm: 0 4px 10px rgba(15, 33, 56, 0.08);
-  --shadow-lg: 0 18px 44px rgba(15, 33, 56, 0.18);
-  --radius: 14px;
-  --focus: 0 0 0 0.2rem rgba(31, 74, 115, 0.16);
+    --navy: #1f4a73;
+    --navy-dark: #163a5a;
+    --panel: #ffffff;
+    --text: #0f2138;
+    --muted: #64748b;
+    --line: #dfe6ee;
+    --shadow-sm: 0 4px 10px rgba(15, 33, 56, 0.08);
+    --shadow-lg: 0 18px 44px rgba(15, 33, 56, 0.18);
+    --radius: 14px;
+    --focus: 0 0 0 0.2rem rgba(31, 74, 115, 0.16);
 }
 
 *,
 *::before,
 *::after {
-  box-sizing: border-box;
+    box-sizing: border-box;
 }
 
 .borrowing-page {
-  max-width: 1280px;
-  font-family: "Inter", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  color: var(--text);
-  padding-top: 6px;
+    max-width: 1200px;
+    font-family: "Inter", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--text);
+    padding-top: 6px;
 }
 
 .borrowing-page .page-header {
-  margin-bottom: 16px;
+    margin-bottom: 16px;
 }
 
 .borrowing-page .page-title {
-  margin: 0;
-  font-size: 30px;
-  font-weight: 800;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
+    margin: 0;
+    font-size: 30px;
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
 }
 
 .borrowing-page .page-subtitle {
-  margin: 8px 0 0;
-  color: var(--muted);
-  font-size: 13px;
-  font-weight: 500;
+    margin: 8px 0 0;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 500;
 }
 
 .borrowing-page .module-section {
-  margin-top: 20px;
+    margin-top: 20px;
 }
 
 .borrowing-page .section-header {
-  margin-bottom: 12px;
+    margin-bottom: 12px;
 }
 
 .borrowing-page .section-title {
-  margin: 0;
-  font-size: 28px;
-  font-weight: 800;
-  color: #111827;
-  letter-spacing: -0.02em;
+    margin: 0;
+    font-size: 28px;
+    font-weight: 800;
+    color: #111827;
+    letter-spacing: -0.02em;
 }
 
 .borrowing-page .controls-section {
-  margin-bottom: 12px;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  gap: 12px;
-  flex-wrap: wrap;
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 12px;
+    flex-wrap: wrap;
 }
 
 .borrowing-page .action-controls {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
 }
 
 .borrowing-page .filters {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 10px;
-  flex-wrap: wrap;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    flex-wrap: wrap;
 }
 
 .borrowing-page .filters form {
-  margin: 0;
-  display: inline-flex;
-  align-items: center;
+    margin: 0;
+    display: inline-flex;
+    align-items: center;
 }
 
 .borrowing-page .search-form {
-  position: relative;
-  min-width: 320px;
-  flex: 1;
-  max-width: 520px;
+    position: relative;
+    min-width: 320px;
+    flex: 1;
+    max-width: 520px;
 }
 
 .borrowing-page .search-icon {
-  position: absolute;
-  left: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #94a3b8;
-  font-size: 18px;
-  pointer-events: none;
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    font-size: 18px;
+    pointer-events: none;
 }
 
 .borrowing-page .search-input {
-  width: 100%;
-  height: 46px;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background: #fff;
-  padding: 0 14px 0 42px;
-  font-size: 14px;
-  color: #334155;
-  outline: none;
-  transition:
-    border-color 0.15s ease,
-    box-shadow 0.15s ease;
+    width: 100%;
+    height: 46px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: #fff;
+    padding: 0 14px 0 42px;
+    font-size: 14px;
+    color: #334155;
+    outline: none;
+    transition:
+        border-color 0.15s ease,
+        box-shadow 0.15s ease;
 }
 
 .borrowing-page .search-input::placeholder {
-  color: #94a3b8;
+    color: #94a3b8;
 }
 
 .borrowing-page .search-input:focus {
-  border-color: rgba(31, 74, 115, 0.65);
-  box-shadow: var(--focus);
+    border-color: rgba(31, 74, 115, 0.65);
+    box-shadow: var(--focus);
 }
 
 .borrowing-page .filter-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  height: 46px;
-  padding: 0 14px;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background: #fff;
-  font-size: 14px;
-  font-weight: 700;
-  color: #0f2138;
-  transition:
-    border-color 0.15s ease,
-    color 0.15s ease,
-    background 0.15s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 46px;
+    padding: 0 14px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    color: #0f2138;
+    transition:
+        border-color 0.15s ease,
+        color 0.15s ease,
+        background 0.15s ease;
 }
 
 .borrowing-page select.filter-btn.form-select {
-  min-width: 170px;
-  padding-right: 36px;
+    min-width: 170px;
+    padding-right: 36px;
 }
 
 .borrowing-page .filter-btn i {
-  font-size: 16px;
-  color: #64748b;
+    font-size: 16px;
+    color: #64748b;
 }
 
 .borrowing-page .filter-btn:hover {
-  border-color: rgba(31, 74, 115, 0.6);
-  color: var(--navy);
-  background: rgba(31, 74, 115, 0.04);
+    border-color: rgba(31, 74, 115, 0.6);
+    color: var(--navy);
+    background: rgba(31, 74, 115, 0.04);
 }
 
 .borrowing-page .filters .dropdown-menu {
-  border: 1px solid #dbe4ee;
-  box-shadow: 0 12px 22px rgba(15, 33, 56, 0.12);
+    border: 1px solid #dbe4ee;
+    box-shadow: 0 12px 22px rgba(15, 33, 56, 0.12);
 }
 
 .borrowing-page .filters .dropdown-item {
-  font-size: 14px;
-  font-weight: 600;
+    font-size: 14px;
+    font-weight: 600;
 }
 
 .clear-filter-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  height: 46px;
-  padding: 0 14px;
-  border: 1px solid #f1c9cf;
-  border-radius: 12px;
-  background: #fff5f7;
-  font-size: 14px;
-  font-weight: 700;
-  color: #a32134;
-  text-decoration: none;
-  transition:
-    border-color 0.15s ease,
-    color 0.15s ease,
-    background 0.15s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 46px;
+    padding: 0 14px;
+    border: 1px solid #f1c9cf;
+    border-radius: 12px;
+    background: #fff5f7;
+    font-size: 14px;
+    font-weight: 700;
+    color: #a32134;
+    text-decoration: none;
+    transition:
+        border-color 0.15s ease,
+        color 0.15s ease,
+        background 0.15s ease;
 }
 
 .clear-filter-btn:hover {
-  border-color: #e79aa5;
-  color: #7f1727;
-  background: #ffecef;
+    border-color: #e79aa5;
+    color: #7f1727;
+    background: #ffecef;
 }
 
 .borrowing-page .new-borrowing-btn {
-  height: 46px;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: var(--navy);
-  border: 1px solid var(--navy);
-  border-radius: 12px;
-  padding: 0 16px;
-  cursor: pointer;
-  box-shadow: 0 10px 16px rgba(31, 74, 115, 0.16);
-  transition:
-    transform 0.15s ease,
-    background 0.15s ease,
-    box-shadow 0.15s ease;
+    height: 46px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--navy);
+    border: 1px solid var(--navy);
+    border-radius: 12px;
+    padding: 0 16px;
+    cursor: pointer;
+    box-shadow: 0 10px 16px rgba(31, 74, 115, 0.16);
+    transition:
+        transform 0.15s ease,
+        background 0.15s ease,
+        box-shadow 0.15s ease;
 }
 
 .borrowing-page .new-borrowing-btn:hover {
-  background: var(--navy-dark);
-  border-color: var(--navy-dark);
-  transform: translateY(-1px);
-  box-shadow: 0 14px 22px rgba(31, 74, 115, 0.22);
+    background: var(--navy-dark);
+    border-color: var(--navy-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 14px 22px rgba(31, 74, 115, 0.22);
 }
 
 .borrowing-page .new-borrowing-btn i,
 .borrowing-page .new-borrowing-btn span {
-  color: #fff;
+    color: #fff;
 }
 
 .borrowing-page .new-borrowing-btn i {
-  font-size: 18px;
+    font-size: 18px;
 }
 
 .borrowing-page .new-borrowing-btn span {
-  font-size: 14px;
-  font-weight: 800;
+    font-size: 14px;
+    font-weight: 800;
 }
 
 .borrowing-page .table-container {
-  background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-sm);
-  overflow: hidden;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
 }
 
 .borrowing-page .borrowing-book-table,
 .borrowing-page .reservation-book-table {
-  margin: 0;
-  width: 100%;
+    margin: 0;
+    width: 100%;
 }
 
 .borrowing-page .borrowing-book-table thead th,
 .borrowing-page .reservation-book-table thead th {
-  background: #f3f6fa;
-  color: #1f2937;
-  font-size: 13px;
-  font-weight: 800;
-  padding: 12px;
-  border-bottom: 1px solid #dbe3ec;
-  white-space: nowrap;
+    background: #f3f6fa;
+    color: #1f2937;
+    font-size: 13px;
+    font-weight: 800;
+    padding: 12px;
+    border-bottom: 1px solid #dbe3ec;
+    white-space: nowrap;
 }
 
 .borrowing-page .borrowing-book-table tbody td,
 .borrowing-page .borrowing-book-table tbody th,
 .borrowing-page .reservation-book-table tbody td,
 .borrowing-page .reservation-book-table tbody th {
-  font-size: 13.5px;
-  padding: 12px;
-  border-bottom: 1px solid rgba(15, 33, 56, 0.09);
-  vertical-align: middle;
-  color: #0f172a;
+    font-size: 13.5px;
+    padding: 12px;
+    border-bottom: 1px solid rgba(15, 33, 56, 0.09);
+    vertical-align: middle;
+    color: #0f172a;
 }
 
 .borrowing-page .borrowing-book-table tbody tr:hover,
 .borrowing-page .reservation-book-table tbody tr:hover {
-  background: rgba(31, 74, 115, 0.03);
+    background: rgba(31, 74, 115, 0.03);
 }
 
 .borrowing-page .borrowing-book-table tbody tr:last-child td,
 .borrowing-page .borrowing-book-table tbody tr:last-child th,
 .borrowing-page .reservation-book-table tbody tr:last-child td,
 .borrowing-page .reservation-book-table tbody tr:last-child th {
-  border-bottom: none;
+    border-bottom: none;
 }
 
 .borrowing-page .table-status,
 .borrowing-page .reservation-table-status {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 120px;
-  border-radius: 999px;
-  padding: 6px 12px;
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.02em;
-  border: 1px solid transparent;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 120px;
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    border: 1px solid transparent;
 }
 
 .borrowing-page .status-active,
 .borrowing-page .reservation-approved {
-  background: #dcfce7;
-  border-color: #86efac;
-  color: #166534;
+    background: #dcfce7;
+    border-color: #86efac;
+    color: #166534;
 }
 
 .borrowing-page .status-overdue,
 .borrowing-page .reservation-rejected {
-  background: #fee2e2;
-  border-color: #fca5a5;
-  color: #991b1b;
+    background: #fee2e2;
+    border-color: #fca5a5;
+    color: #991b1b;
 }
 
 .borrowing-page .reservation-pending {
-  background: #fff7ed;
-  border-color: #fdba74;
-  color: #9a3412;
+    background: #fff7ed;
+    border-color: #fdba74;
+    color: #9a3412;
 }
 
 .borrowing-page .status-returned {
-  background: #e2e8f0;
-  border-color: #cbd5e1;
-  color: #334155;
+    background: #e2e8f0;
+    border-color: #cbd5e1;
+    color: #334155;
 }
 
 .borrowing-page .status-rejected {
-  background: #fef3c7;
-  border-color: #fcd34d;
-  color: #92400e;
+    background: #fef3c7;
+    border-color: #fcd34d;
+    color: #92400e;
 }
 
 .borrowing-page .action-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
 }
 
 .borrowing-page .action-container>button {
-  width: 38px;
-  height: 38px;
-  border-radius: 10px;
-  border: 1px solid rgba(15, 33, 56, 0.12);
-  background: #fff;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition:
-    transform 0.12s ease,
-    box-shadow 0.12s ease,
-    border-color 0.12s ease;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    border: 1px solid rgba(15, 33, 56, 0.12);
+    background: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition:
+        transform 0.12s ease,
+        box-shadow 0.12s ease,
+        border-color 0.12s ease;
 }
 
 .borrowing-page .action-container>button:hover {
-  transform: translateY(-1px);
-  border-color: rgba(31, 74, 115, 0.55);
-  box-shadow: 0 12px 20px rgba(31, 74, 115, 0.14);
+    transform: translateY(-1px);
+    border-color: rgba(31, 74, 115, 0.55);
+    box-shadow: 0 12px 20px rgba(31, 74, 115, 0.14);
 }
 
 .borrowing-page .action-container>button>i {
-  font-size: 18px;
-  color: #0f2d4d;
+    font-size: 18px;
+    color: #0f2d4d;
 }
 
-.borrowing-page .action-container > button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  box-shadow: none;
-  transform: none;
+.borrowing-page .action-container>button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
 }
 
 /* =========================
    PAGINATION
 ========================= */
 .borrowing-page .pagination-wrapper {
-  padding: 12px;
+    padding: 12px;
 }
 
 .borrowing-page .pagination {
-  margin: 0;
+    margin: 0;
 }
 
 .borrowing-page .page-link {
-  border: 1px solid #3a3a3a;
-  color: #2b2b2b;
-  font-size: 12px;
-  padding: 6px 12px;
-  border-radius: 0 !important;
+    border: 1px solid #3a3a3a;
+    color: #2b2b2b;
+    font-size: 12px;
+    padding: 6px 12px;
+    border-radius: 0 !important;
 }
 
 .borrowing-page .page-item.active .page-link {
-  background: var(--navy);
-  border-color: #3a3a3a;
-  color: #fff;
+    background: var(--navy);
+    border-color: #3a3a3a;
+    color: #fff;
 }
 
 .borrowing-page .page-item .page-link:hover {
-  background: #f4f6f8;
+    background: #f4f6f8;
 }
 
 .borrowing-page .modal-content {
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-lg);
-  overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
 }
 
 .borrowing-page .modal-header {
-  background: #f7f9fc;
-  border-bottom: 1px solid var(--line);
+    background: #f7f9fc;
+    border-bottom: 1px solid var(--line);
 }
 
 .borrowing-page .modal-title {
-  color: var(--text);
-  font-weight: 800;
+    color: var(--text);
+    font-weight: 800;
 }
 
 .borrowing-page .modal-footer {
-  background: #fbfcfe;
-  border-top: 1px solid var(--line);
+    background: #fbfcfe;
+    border-top: 1px solid var(--line);
 }
 
 .borrowing-page .form-label {
-  font-weight: 700;
-  color: #0f172a;
-  font-size: 13px;
+    font-weight: 700;
+    color: #0f172a;
+    font-size: 13px;
 }
 
 .borrowing-page .form-control,
 .borrowing-page .form-select {
-  border: 1px solid #d8e0e8;
-  border-radius: 12px;
-  min-height: 44px;
+    border: 1px solid #d8e0e8;
+    border-radius: 12px;
+    min-height: 44px;
 }
 
 .borrowing-page .form-control:focus,
 .borrowing-page .form-select:focus {
-  border-color: rgba(31, 74, 115, 0.7);
-  box-shadow: var(--focus);
+    border-color: rgba(31, 74, 115, 0.7);
+    box-shadow: var(--focus);
 }
 
 .borrowing-page .custom-select-wrapper {
-  position: relative;
+    position: relative;
 }
 
 .borrowing-page .custom-select-wrapper select {
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  padding-right: 36px;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    padding-right: 36px;
 }
 
 .borrowing-page .custom-select-wrapper::after {
-  content: "\F282";
-  font-family: "bootstrap-icons";
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  pointer-events: none;
-  font-size: 14px;
-  color: #64748b;
+    content: "\F282";
+    font-family: "bootstrap-icons";
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    font-size: 14px;
+    color: #64748b;
 }
 
 @media (max-width: 992px) {
-  .borrowing-page .section-title {
-    font-size: 24px;
-  }
+    .borrowing-page .section-title {
+        font-size: 24px;
+    }
 
-  .borrowing-page .controls-section {
-    align-items: stretch;
-  }
+    .borrowing-page .controls-section {
+        align-items: stretch;
+    }
 
-  .borrowing-page .search-form {
-    min-width: 0;
-    max-width: none;
-    width: 100%;
-  }
+    .borrowing-page .search-form {
+        min-width: 0;
+        max-width: none;
+        width: 100%;
+    }
 
-  .borrowing-page .action-controls {
-    width: 100%;
-  }
+    .borrowing-page .action-controls {
+        width: 100%;
+    }
 
-  .borrowing-page .filters {
-    width: 100%;
-    justify-content: stretch;
-  }
+    .borrowing-page .filters {
+        width: 100%;
+        justify-content: stretch;
+    }
 
-  .borrowing-page .filters form {
-    width: 100%;
-  }
+    .borrowing-page .filters form {
+        width: 100%;
+    }
 
-  .borrowing-page .filters,
-  .borrowing-page .filters .filter-btn,
-  .borrowing-page .new-borrowing-btn {
-    width: 100%;
-    justify-content: center;
-  }
+    .borrowing-page .filters,
+    .borrowing-page .filters .filter-btn,
+    .borrowing-page .new-borrowing-btn {
+        width: 100%;
+        justify-content: center;
+    }
 
-  .borrowing-page .clear-filter-btn {
-    width: 100%;
-    justify-content: center;
-  }
+    .borrowing-page .clear-filter-btn {
+        width: 100%;
+        justify-content: center;
+    }
 }
 
 @media (max-width: 768px) {
-  .borrowing-page .page-title {
-    font-size: 26px;
-  }
+    .borrowing-page .page-title {
+        font-size: 26px;
+    }
 
-  .borrowing-page .page-subtitle {
-    font-size: 12px;
-  }
+    .borrowing-page .page-subtitle {
+        font-size: 12px;
+    }
 
-  .borrowing-page .search-input,
-  .borrowing-page .filter-btn,
-  .borrowing-page .new-borrowing-btn {
-    font-size: 13px;
-  }
+    .borrowing-page .search-input,
+    .borrowing-page .filter-btn,
+    .borrowing-page .new-borrowing-btn {
+        font-size: 13px;
+    }
 }

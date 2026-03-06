@@ -9,6 +9,11 @@ namespace Library_Management_system.Models.Admin
         public string BorrowingStatus { get; set; } = string.Empty;
         public string ReservationQuery { get; set; } = string.Empty;
         public string ReservationStatus { get; set; } = string.Empty;
+        public int BorrowingPage { get; set; } = 1;
+        public int BorrowingTotalPages { get; set; } = 1;
+        public int ReservationPage { get; set; } = 1;
+        public int ReservationTotalPages { get; set; } = 1;
+        public int PageSize { get; set; } = 10;
     }
 
     public sealed class BorrowingRowViewModel
