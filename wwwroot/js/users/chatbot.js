@@ -15,16 +15,26 @@
         const form = chatbot.querySelector("#homeChatbotForm");
         const input = chatbot.querySelector("#homeChatbotInput");
 
-        if (!toggleButton || !panel || !closeButton || !messages || !quickActions || !form || !input) {
+        if (
+            !toggleButton ||
+            !panel ||
+            !closeButton ||
+            !messages ||
+            !quickActions ||
+            !form ||
+            !input
+        ) {
             return;
         }
 
         const staticReplies = {
             hours: "Library hours: Monday-Friday 8:00 AM-8:00 PM, Saturday-Sunday 9:00 AM-5:00 PM.",
-            borrow: "Borrowing limit: up to 5 books at a time. The standard borrowing period is 14 days.",
+            borrow: "Borrowing limit: up to 5 books at a time. The standard borrowing period is 7 days.",
             fine: "Late return fee is $1.00 per late day.",
-            contact: "Support: use the Contact page or ask library staff at the front desk during opening hours.",
-            location: "Library location: ACLEDA University campus library building."
+            contact:
+                "Support: use the Contact page or ask library staff at the front desk during opening hours.",
+            location:
+                "Library location: ACLEDA University campus library building.",
         };
 
         const fallbackReply =
@@ -44,7 +54,10 @@
             toggleButton.setAttribute("aria-expanded", "true");
 
             if (!chatbot.dataset.seeded) {
-                addMessage("Hello, I am your static library assistant. Ask me a quick question.", "bot");
+                addMessage(
+                    "Hello, I am your static library assistant. Ask me a quick question.",
+                    "bot",
+                );
                 chatbot.dataset.seeded = "1";
             }
         };
@@ -61,23 +74,43 @@
                 return "";
             }
 
-            if (normalized.includes("hour") || normalized.includes("time") || normalized.includes("open")) {
+            if (
+                normalized.includes("hour") ||
+                normalized.includes("time") ||
+                normalized.includes("open")
+            ) {
                 return "hours";
             }
 
-            if (normalized.includes("borrow") || normalized.includes("limit") || normalized.includes("book")) {
+            if (
+                normalized.includes("borrow") ||
+                normalized.includes("limit") ||
+                normalized.includes("book")
+            ) {
                 return "borrow";
             }
 
-            if (normalized.includes("fine") || normalized.includes("late") || normalized.includes("fee")) {
+            if (
+                normalized.includes("fine") ||
+                normalized.includes("late") ||
+                normalized.includes("fee")
+            ) {
                 return "fine";
             }
 
-            if (normalized.includes("contact") || normalized.includes("support") || normalized.includes("help")) {
+            if (
+                normalized.includes("contact") ||
+                normalized.includes("support") ||
+                normalized.includes("help")
+            ) {
                 return "contact";
             }
 
-            if (normalized.includes("where") || normalized.includes("location") || normalized.includes("address")) {
+            if (
+                normalized.includes("where") ||
+                normalized.includes("location") ||
+                normalized.includes("address")
+            ) {
                 return "location";
             }
 
@@ -114,7 +147,9 @@
             }
 
             const intent = target.dataset.intent || "";
-            const label = target.textContent ? target.textContent.trim() : "Question";
+            const label = target.textContent
+                ? target.textContent.trim()
+                : "Question";
             addMessage(label, "user");
             addMessage(staticReplies[intent] || fallbackReply, "bot");
         });

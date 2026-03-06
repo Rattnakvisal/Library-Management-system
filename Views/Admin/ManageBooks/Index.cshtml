@@ -8,7 +8,8 @@
     int availableCopies = ViewBag.AvailableCopies ?? 0;
     int unavailableBooks = ViewBag.UnavailableBooks ?? 0;
     var bookCategories = ViewBag.BookCategories as IEnumerable<string> ?? Enumerable.Empty<string>();
-    var bookAuthors = ViewBag.BookAuthors as IEnumerable<Library_Management_system.Models.Author> ?? Enumerable.Empty<Library_Management_system.Models.Author>();
+    var bookAuthors = ViewBag.BookAuthors as IEnumerable<Library_Management_system.Models.Author> ??
+Enumerable.Empty<Library_Management_system.Models.Author>();
     var selectedStatus = (Context.Request.Query["status"].ToString() ?? string.Empty).Trim().ToLowerInvariant();
 }
 
@@ -109,17 +110,10 @@
                         var statusLabel = System.Globalization.CultureInfo.InvariantCulture.TextInfo.ToTitleCase(statusValue);
                         var isbnText = string.IsNullOrWhiteSpace(book.Isbn) ? "-" : book.Isbn;
 
-                        <tr data-book-id="@book.Id"
-                            data-book-code="@book.BookCode"
-                            data-author-id="@book.AuthorId"
-                            data-category-name="@book.CategoryName"
-                            data-isbn="@book.Isbn"
-                            data-quantity="@book.Quantity"
-                            data-pages="@book.Pages"
-                            data-year="@book.Year"
-                            data-status="@statusValue"
-                            data-rating="@book.Rating"
-                            data-description="@book.Description">
+                        <tr data-book-id="@book.Id" data-book-code="@book.BookCode" data-author-id="@book.AuthorId"
+                            data-category-name="@book.CategoryName" data-isbn="@book.Isbn" data-quantity="@book.Quantity"
+                            data-pages="@book.Pages" data-year="@book.Year" data-status="@statusValue"
+                            data-rating="@book.Rating" data-description="@book.Description">
                             <td>
                                 <img class="book-cover" src="@imagePath" alt="Book cover" />
                             </td>
@@ -127,7 +121,7 @@
                                 <div style="font-weight:800;">@book.Title</div>
                                 <div style="color:#64748b; font-size:12px;">Category: @book.CategoryName</div>
                             </td>
-                            <td>@book.Author</td>
+                            <td>@book.AuthorId</td>
                             <td>@isbnText</td>
                             <td>@book.Quantity</td>
                             <td>
@@ -258,12 +252,14 @@
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label">Book Code <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="bookCodeInput" placeholder="eg. 1010" required />
+                                <input type="text" class="form-control" id="bookCodeInput" placeholder="eg. 1010"
+                                       required />
                             </div>
 
                             <div class="col-md-6">
                                 <label class="form-label">Book Title <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="bookTitleInput" placeholder="eg. Me" required />
+                                <input type="text" class="form-control" id="bookTitleInput" placeholder="eg. Me"
+                                       required />
                             </div>
 
                             <div class="col-md-6">
@@ -277,22 +273,27 @@
                                         }
                                         <option value="__new__">+ Add New Category</option>
                                     </select>
-                                    <button type="button" class="btn btn-outline-primary" id="showAddCategoryBtn">Add</button>
+                                    <button type="button" class="btn btn-outline-primary"
+                                            id="showAddCategoryBtn">Add</button>
                                 </div>
                                 <div class="input-group mt-2 d-none" id="newCategoryGroup">
-                                    <input type="text" class="form-control" id="newCategoryInput" placeholder="New category name" />
-                                    <button type="button" class="btn btn-primary" id="addCategoryOptionBtn">Save</button>
+                                    <input type="text" class="form-control" id="newCategoryInput"
+                                           placeholder="New category name" />
+                                    <button type="button" class="btn btn-primary"
+                                            id="addCategoryOptionBtn">Save</button>
                                 </div>
                             </div>
 
                             <div class="col-md-6">
                                 <label class="form-label">Quantity <span class="text-danger">*</span></label>
-                                <input type="number" class="form-control" id="quantityInput" placeholder="eg. 10" min="0" required />
+                                <input type="number" class="form-control" id="quantityInput" placeholder="eg. 10"
+                                       min="0" required />
                             </div>
 
                             <div class="col-md-6">
                                 <label class="form-label">ISBN</label>
-                                <input type="text" class="form-control" id="isbnInput" placeholder="eg. 978-3-16-148410-0" />
+                                <input type="text" class="form-control" id="isbnInput"
+                                       placeholder="eg. 978-3-16-148410-0" />
                             </div>
 
                             <div class="col-md-6">
@@ -306,22 +307,26 @@
                                         }
                                         <option value="__new__">+ Add New Author</option>
                                     </select>
-                                    <button type="button" class="btn btn-outline-primary" id="showAddAuthorBtn">Add</button>
+                                    <button type="button" class="btn btn-outline-primary"
+                                            id="showAddAuthorBtn">Add</button>
                                 </div>
                                 <div class="input-group mt-2 d-none" id="newAuthorGroup">
-                                    <input type="text" class="form-control" id="newAuthorInput" placeholder="New author name" />
+                                    <input type="text" class="form-control" id="newAuthorInput"
+                                           placeholder="New author name" />
                                     <button type="button" class="btn btn-primary" id="addAuthorOptionBtn">Save</button>
                                 </div>
                             </div>
 
                             <div class="col-md-6">
                                 <label class="form-label">Pages <span class="text-danger">*</span></label>
-                                <input type="number" class="form-control" id="pagesInput" placeholder="eg. 250" min="1" required />
+                                <input type="number" class="form-control" id="pagesInput" placeholder="eg. 250" min="1"
+                                       required />
                             </div>
 
                             <div class="col-md-6">
                                 <label class="form-label">Year <span class="text-danger">*</span></label>
-                                <input type="number" class="form-control" id="yearInput" placeholder="eg. 2024" min="1000" max="9999" required />
+                                <input type="number" class="form-control" id="yearInput" placeholder="eg. 2024"
+                                       min="1000" max="9999" required />
                             </div>
 
                             <div class="col-md-6">
@@ -387,7 +392,8 @@
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label">Book Code <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="edit-bookCodeInput" placeholder="eg. 1010" required />
+                                <input type="text" class="form-control" id="edit-bookCodeInput" placeholder="eg. 1010"
+                                       required />
                             </div>
 
                             <div class="col-md-6">
@@ -438,7 +444,8 @@
 
                             <div class="col-md-6">
                                 <label class="form-label">Year <span class="text-danger">*</span></label>
-                                <input type="number" class="form-control" id="edit-yearInput" min="1000" max="9999" required />
+                                <input type="number" class="form-control" id="edit-yearInput" min="1000" max="9999"
+                                       required />
                             </div>
 
                             <div class="col-md-6">
@@ -494,4 +501,3 @@
 @section Scripts {
     <script src="~/js/admin/ManageBooks.js" asp-append-version="true"></script>
 }
-
