@@ -1,106 +1,106 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
+// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 #nullable disable
 
 using System;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using Library_Management_system.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Library_Management_system.Areas.Identity.Pages.Account
 {
+    [AllowAnonymous]
     public class ResetPasswordModel : PageModel
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IMemoryCache _memoryCache;
 
-        public ResetPasswordModel(UserManager<ApplicationUser> userManager)
+        public ResetPasswordModel(UserManager<ApplicationUser> userManager, IMemoryCache memoryCache)
         {
             _userManager = userManager;
+            _memoryCache = memoryCache;
         }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         [BindProperty]
         public InputModel Input { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
+        public string PhoneNumberMask { get; set; }
+
         public class InputModel
         {
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
             [Required]
-            [EmailAddress]
-            public string Email { get; set; }
+            public string RequestId { get; set; }
 
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
             [Required]
-            [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
-            [DataType(DataType.Password)]
-            public string Password { get; set; }
-
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
-            [DataType(DataType.Password)]
-            [Display(Name = "Confirm password")]
-            [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
-            public string ConfirmPassword { get; set; }
-
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
-            [Required]
-            public string Code { get; set; }
-
+            [Display(Name = "OTP Code")]
+            [RegularExpression(@"^[0-9]{6}$", ErrorMessage = "OTP code must be 6 digits.")]
+            public string OtpCode { get; set; }
         }
 
-        public IActionResult OnGet(string code = null)
+        public IActionResult OnGet(string requestId = null)
         {
+            if (!TryGetPendingRequest(requestId, out var resetRequest))
+            {
+                TempData["ErrorMessage"] = "Reset request is invalid or expired. Please try again.";
+                return RedirectToPage("./ForgotPassword");
+            }
+
             Input = new InputModel
             {
-                Code = code
+                RequestId = resetRequest.RequestId
             };
+
+            PhoneNumberMask = MaskPhoneNumber(resetRequest.PhoneNumber);
             return Page();
         }
 
         public async Task<IActionResult> OnPostAsync()
         {
+            if (TryGetPendingRequest(Input?.RequestId, out var pendingForDisplay))
+            {
+                PhoneNumberMask = MaskPhoneNumber(pendingForDisplay.PhoneNumber);
+            }
+
             if (!ModelState.IsValid)
             {
                 return Page();
             }
 
-            var user = await _userManager.FindByEmailAsync(Input.Email);
+            if (!TryGetPendingRequest(Input.RequestId, out var resetRequest))
+            {
+                ModelState.AddModelError(string.Empty, "OTP has expired. Please request a new code.");
+                return Page();
+            }
+
+            PhoneNumberMask = MaskPhoneNumber(resetRequest.PhoneNumber);
+
+            if (!string.Equals(resetRequest.OtpCode, Input.OtpCode?.Trim(), StringComparison.Ordinal))
+            {
+                ModelState.AddModelError(nameof(Input.OtpCode), "OTP code is incorrect.");
+                return Page();
+            }
+
+            var user = await _userManager.FindByIdAsync(resetRequest.UserId);
             if (user == null)
             {
-                // Don't reveal that the user does not exist
+                _memoryCache.Remove(PendingPasswordResetRequest.BuildCacheKey(resetRequest.RequestId));
                 return RedirectToPage("./ResetPasswordConfirmation");
             }
 
-            // Decode the code here
-            var decodedCode = System.Text.Encoding.UTF8.GetString(Microsoft.AspNetCore.WebUtilities.WebEncoders.Base64UrlDecode(Input.Code));
-            
-            var result = await _userManager.ResetPasswordAsync(user, decodedCode, Input.Password);
+            var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var result = await _userManager.ResetPasswordAsync(user, resetToken, resetRequest.NewPassword);
             if (result.Succeeded)
             {
+                user.ResetPasswordToken = null;
+                user.ResetPasswordTokenExpiry = null;
+                await _userManager.UpdateAsync(user);
+
+                _memoryCache.Remove(PendingPasswordResetRequest.BuildCacheKey(resetRequest.RequestId));
                 return RedirectToPage("./ResetPasswordConfirmation");
             }
 
@@ -108,7 +108,43 @@ namespace Library_Management_system.Areas.Identity.Pages.Account
             {
                 ModelState.AddModelError(string.Empty, error.Description);
             }
+
             return Page();
+        }
+
+        private bool TryGetPendingRequest(string requestId, out PendingPasswordResetRequest resetRequest)
+        {
+            resetRequest = null;
+            if (string.IsNullOrWhiteSpace(requestId))
+            {
+                return false;
+            }
+
+            var cacheKey = PendingPasswordResetRequest.BuildCacheKey(requestId);
+            if (!_memoryCache.TryGetValue(cacheKey, out PendingPasswordResetRequest cached) || cached == null)
+            {
+                return false;
+            }
+
+            if (cached.ExpiresUtc <= DateTime.UtcNow)
+            {
+                _memoryCache.Remove(cacheKey);
+                return false;
+            }
+
+            resetRequest = cached;
+            return true;
+        }
+
+        private static string MaskPhoneNumber(string phoneNumber)
+        {
+            if (string.IsNullOrWhiteSpace(phoneNumber) || phoneNumber.Length <= 4)
+            {
+                return phoneNumber ?? string.Empty;
+            }
+
+            var suffix = phoneNumber[^4..];
+            return $"***{suffix}";
         }
     }
 }

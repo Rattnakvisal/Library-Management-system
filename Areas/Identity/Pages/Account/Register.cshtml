@@ -80,6 +80,17 @@
                     </div>
                     <span asp-validation-for="Input.Email" class="text-danger"></span>
 
+                    <!-- PHONE -->
+                    <div class="input-group">
+                        <div class="icon-email">
+                            <i class="fa-solid fa-phone"></i>
+                        </div>
+
+                        <input asp-for="Input.PhoneNumber" type="text" placeholder="Phone Number" autocomplete="tel"
+                               aria-required="true" required />
+                    </div>
+                    <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
+
                     <!-- GENDER -->
                     <div class="input-group">
                         <div class="icon-email">

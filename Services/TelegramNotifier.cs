@@ -1,3 +1,4 @@
+using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using Library_Management_system.Models;
@@ -23,20 +24,66 @@ public sealed class TelegramNotifier : ITelegramNotifier
 
     public async Task<bool> SendAdminAlertAsync(string message, CancellationToken cancellationToken = default)
     {
+        if (!_options.Enabled || string.IsNullOrWhiteSpace(message))
+        {
+            return false;
+        }
+
+        return await SendMessageAsync(
+            _options.BotToken,
+            _options.AdminChatId,
+            message,
+            cancellationToken);
+    }
+
+    public async Task<bool> SendPasswordOtpAsync(
+        string phoneNumber,
+        string otpCode,
+        DateTime expiresUtc,
+        CancellationToken cancellationToken = default)
+    {
         if (!_options.Enabled ||
-            string.IsNullOrWhiteSpace(_options.BotToken) ||
-            string.IsNullOrWhiteSpace(_options.AdminChatId) ||
+            string.IsNullOrWhiteSpace(phoneNumber) ||
+            string.IsNullOrWhiteSpace(otpCode))
+        {
+            return false;
+        }
+
+        var botToken = string.IsNullOrWhiteSpace(_options.OtpBotToken)
+            ? _options.BotToken
+            : _options.OtpBotToken;
+        var chatId = string.IsNullOrWhiteSpace(_options.OtpChatId)
+            ? _options.AdminChatId
+            : _options.OtpChatId;
+
+        var message = string.Join('\n',
+            "AUB Library OTP request.",
+            $"Phone: {phoneNumber.Trim()}",
+            $"OTP: {otpCode.Trim()}",
+            $"Expires (UTC): {expiresUtc:yyyy-MM-dd HH:mm:ss}");
+
+        return await SendMessageAsync(botToken, chatId, message, cancellationToken);
+    }
+
+    private async Task<bool> SendMessageAsync(
+        string botToken,
+        string chatId,
+        string message,
+        CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(botToken) ||
+            string.IsNullOrWhiteSpace(chatId) ||
             string.IsNullOrWhiteSpace(message))
         {
             return false;
         }
 
-        var endpoint = $"https://api.telegram.org/bot{_options.BotToken}/sendMessage";
+        var endpoint = $"https://api.telegram.org/bot{botToken.Trim()}/sendMessage";
         using var request = new HttpRequestMessage(HttpMethod.Post, endpoint)
         {
             Content = new FormUrlEncodedContent(new Dictionary<string, string>
             {
-                ["chat_id"] = _options.AdminChatId.Trim(),
+                ["chat_id"] = chatId.Trim(),
                 ["text"] = message.Trim()
             })
         };

@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace Library_Management_system.Areas.Identity.Pages.Account
@@ -69,6 +70,11 @@ namespace Library_Management_system.Areas.Identity.Pages.Account
             public string Email { get; set; }
 
             [Required]
+            [Display(Name = "Phone Number")]
+            [RegularExpression(@"^\+?[0-9]{8,15}$", ErrorMessage = "Phone number must contain 8 to 15 digits.")]
+            public string PhoneNumber { get; set; }
+
+            [Required]
             [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
             [DataType(DataType.Password)]
             [Display(Name = "Password")]
@@ -112,6 +118,25 @@ namespace Library_Management_system.Areas.Identity.Pages.Account
                 ModelState.AddModelError(string.Empty, "Name is required.");
                 return Page();
             }
+
+            var normalizedPhone = NormalizePhone(Input.PhoneNumber);
+            if (string.IsNullOrWhiteSpace(normalizedPhone))
+            {
+                ModelState.AddModelError(nameof(Input.PhoneNumber), "Phone number is required.");
+                return Page();
+            }
+
+            var existingPhoneUser = await _userManager.Users
+                .AsNoTracking()
+                .FirstOrDefaultAsync(u => u.PhoneNumber == normalizedPhone);
+            if (existingPhoneUser != null)
+            {
+                ModelState.AddModelError(nameof(Input.PhoneNumber), "Phone number is already registered.");
+                return Page();
+            }
+
+            user.PhoneNumber = normalizedPhone;
+            user.PhoneNumberConfirmed = true;
 
             // Create valid UserName: letters + digits ONLY
             // "Chun Rattnakvisal" -> "ChunRattnakvisal"
@@ -230,6 +255,7 @@ namespace Library_Management_system.Areas.Identity.Pages.Account
                     "New user registration pending approval.",
                     $"Name: {user.FullName}",
                     $"Email: {user.Email}",
+                    $"Phone: {user.PhoneNumber}",
                     $"Gender: {GetDisplayGender(Input.Gender)}",
                     $"Registered (UTC): {registeredUtc:yyyy-MM-dd HH:mm:ss}");
                 await _telegramNotifier.SendAdminAlertAsync(registerAlert);
@@ -303,6 +329,11 @@ namespace Library_Management_system.Areas.Identity.Pages.Account
             }
 
             return "Unspecified";
+        }
+
+        private static string NormalizePhone(string phoneNumber)
+        {
+            return new string((phoneNumber ?? string.Empty).Where(char.IsDigit).ToArray());
         }
     }
 }
