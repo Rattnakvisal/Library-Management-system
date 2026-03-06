@@ -59,6 +59,11 @@ builder.Services.AddTransient<Microsoft.AspNetCore.Identity.UI.Services.IEmailSe
 builder.Services.Configure<TelegramBotOptions>(builder.Configuration.GetSection(TelegramBotOptions.SectionName));
 builder.Services.AddHttpClient<ITelegramNotifier, TelegramNotifier>();
 
+var seedAdminEmail = builder.Configuration["SeedAdmin:Email"] ?? "admin@library.com";
+var seedAdminPassword = builder.Configuration["SeedAdmin:Password"] ?? "Admin@123";
+var resetSeedAdminPasswordOnStartup =
+    builder.Configuration.GetValue("SeedAdmin:ResetPasswordOnStartup", builder.Environment.IsDevelopment());
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -98,23 +103,64 @@ await using (var scope = app.Services.CreateAsyncScope())
     await EnsureRoleExistsAsync(roleManager, "User");
 
     // Seed Admin User
-    var adminEmail = "admin@library.com";
-    var adminUser = await userManager.FindByEmailAsync(adminEmail);
+    var adminUser = await userManager.FindByEmailAsync(seedAdminEmail);
     if (adminUser == null)
     {
         adminUser = new ApplicationUser
         {
-            UserName = adminEmail,
-            Email = adminEmail,
+            UserName = seedAdminEmail,
+            Email = seedAdminEmail,
             FullName = "System Admin",
             EmailConfirmed = true
         };
-        await userManager.CreateAsync(adminUser, "Admin@123");
+
+        var createAdminResult = await userManager.CreateAsync(adminUser, seedAdminPassword);
+        if (!createAdminResult.Succeeded)
+        {
+            var errors = string.Join("; ", createAdminResult.Errors.Select(e => e.Description));
+            throw new InvalidOperationException($"Failed to create admin user '{seedAdminEmail}': {errors}");
+        }
     }
 
-    if (adminUser != null && !await userManager.IsInRoleAsync(adminUser, "Admin"))
+    if (adminUser == null)
     {
-        await userManager.AddToRoleAsync(adminUser, "Admin");
+        throw new InvalidOperationException($"Seed admin user '{seedAdminEmail}' could not be loaded.");
+    }
+
+    if (!adminUser.EmailConfirmed)
+    {
+        adminUser.EmailConfirmed = true;
+        var confirmEmailResult = await userManager.UpdateAsync(adminUser);
+        if (!confirmEmailResult.Succeeded)
+        {
+            var errors = string.Join("; ", confirmEmailResult.Errors.Select(e => e.Description));
+            throw new InvalidOperationException($"Failed to confirm seed admin email '{seedAdminEmail}': {errors}");
+        }
+    }
+
+    if (resetSeedAdminPasswordOnStartup)
+    {
+        var hasExpectedPassword = await userManager.CheckPasswordAsync(adminUser, seedAdminPassword);
+        if (!hasExpectedPassword)
+        {
+            var resetToken = await userManager.GeneratePasswordResetTokenAsync(adminUser);
+            var resetPasswordResult = await userManager.ResetPasswordAsync(adminUser, resetToken, seedAdminPassword);
+            if (!resetPasswordResult.Succeeded)
+            {
+                var errors = string.Join("; ", resetPasswordResult.Errors.Select(e => e.Description));
+                throw new InvalidOperationException($"Failed to reset seed admin password '{seedAdminEmail}': {errors}");
+            }
+        }
+    }
+
+    if (!await userManager.IsInRoleAsync(adminUser, "Admin"))
+    {
+        var addRoleResult = await userManager.AddToRoleAsync(adminUser, "Admin");
+        if (!addRoleResult.Succeeded)
+        {
+            var errors = string.Join("; ", addRoleResult.Errors.Select(e => e.Description));
+            throw new InvalidOperationException($"Failed to assign Admin role to '{seedAdminEmail}': {errors}");
+        }
     }
 }
 
