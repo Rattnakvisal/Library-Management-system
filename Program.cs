@@ -57,8 +57,6 @@ builder.Services.AddScoped<DbHelper>();
 builder.Services.AddTransient<Microsoft.AspNetCore.Identity.UI.Services.IEmailSender, Library_Management_system.Services.EmailSender>();
 builder.Services.Configure<TelegramBotOptions>(builder.Configuration.GetSection(TelegramBotOptions.SectionName));
 builder.Services.AddHttpClient<ITelegramNotifier, TelegramNotifier>();
-builder.Services.Configure<TelegramContactBotOptions>(builder.Configuration.GetSection(TelegramContactBotOptions.SectionName));
-builder.Services.AddHttpClient<IContactTelegramNotifier, ContactTelegramNotifier>();
 
 var app = builder.Build();
 
