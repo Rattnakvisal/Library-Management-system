@@ -16,6 +16,14 @@ namespace Library_Management_system.Models
 
         public string? ResetPasswordToken { get; set; }
 
-        public DateTime? ResetPasswordTokenExpiry { get; set; }  
+        public DateTime? ResetPasswordTokenExpiry { get; set; }
+
+        [StringLength(64)]
+        public string? TelegramChatId { get; set; }
+
+        [StringLength(20)]
+        public string? TelegramLinkedPhone { get; set; }
+
+        public DateTime? TelegramLinkedAtUtc { get; set; }
     }
 }

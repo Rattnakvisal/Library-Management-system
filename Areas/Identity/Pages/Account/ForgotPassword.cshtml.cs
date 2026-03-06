@@ -85,6 +85,15 @@ namespace Library_Management_system.Areas.Identity.Pages.Account
                 return RedirectToPage("./ForgotPasswordConfirmation");
             }
 
+            var linkedChatId = await ResolveLinkedTelegramChatIdAsync(user, normalizedPhone);
+            if (string.IsNullOrWhiteSpace(linkedChatId))
+            {
+                ModelState.AddModelError(
+                    string.Empty,
+                    "Telegram account is not linked for this phone number. Open the OTP bot, tap Start, then send your phone number (Cambodia local or +855 format).");
+                return Page();
+            }
+
             var otpCode = RandomNumberGenerator.GetInt32(0, 1_000_000).ToString("D6");
             var requestId = Guid.NewGuid().ToString("N");
             var expiresUtc = DateTime.UtcNow.Add(OtpLifetime);
@@ -104,6 +113,9 @@ namespace Library_Management_system.Areas.Identity.Pages.Account
 
             user.ResetPasswordToken = otpCode;
             user.ResetPasswordTokenExpiry = expiresUtc;
+            user.TelegramChatId = linkedChatId;
+            user.TelegramLinkedPhone = NormalizePhone(normalizedPhone);
+            user.TelegramLinkedAtUtc ??= DateTime.UtcNow;
             var updateResult = await _userManager.UpdateAsync(user);
             if (!updateResult.Succeeded)
             {
@@ -117,7 +129,8 @@ namespace Library_Management_system.Areas.Identity.Pages.Account
                 return Page();
             }
 
-            var sent = await _telegramNotifier.SendPasswordOtpAsync(
+            var sent = await _telegramNotifier.SendPasswordOtpToChatAsync(
+                linkedChatId,
                 normalizedPhone,
                 otpCode,
                 expiresUtc);
@@ -137,7 +150,14 @@ namespace Library_Management_system.Areas.Identity.Pages.Account
 
         private async Task<ApplicationUser> FindUserByPhoneAsync(string normalizedPhone)
         {
-            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.PhoneNumber == normalizedPhone);
+            var candidates = PhoneNumberHelper.BuildMatchCandidates(normalizedPhone).ToArray();
+            if (candidates.Length == 0)
+            {
+                return null;
+            }
+
+            var user = await _userManager.Users
+                .FirstOrDefaultAsync(u => u.PhoneNumber != null && candidates.Contains(u.PhoneNumber));
             if (user != null)
             {
                 return user;
@@ -147,12 +167,24 @@ namespace Library_Management_system.Areas.Identity.Pages.Account
                 .Where(u => u.PhoneNumber != null)
                 .ToListAsync();
 
-            return phoneCandidates.FirstOrDefault(u => NormalizePhone(u.PhoneNumber) == normalizedPhone);
+            return phoneCandidates.FirstOrDefault(u => PhoneNumberHelper.AreEquivalent(u.PhoneNumber, normalizedPhone));
+        }
+
+        private async Task<string> ResolveLinkedTelegramChatIdAsync(ApplicationUser user, string normalizedPhone)
+        {
+            if (!string.IsNullOrWhiteSpace(user.TelegramChatId) &&
+                (string.IsNullOrWhiteSpace(user.TelegramLinkedPhone) ||
+                 PhoneNumberHelper.AreEquivalent(user.TelegramLinkedPhone, normalizedPhone)))
+            {
+                return user.TelegramChatId;
+            }
+
+            return await _telegramNotifier.FindUserChatIdByPhoneAsync(normalizedPhone) ?? string.Empty;
         }
 
         private static string NormalizePhone(string phoneNumber)
         {
-            return new string((phoneNumber ?? string.Empty).Where(char.IsDigit).ToArray());
+            return PhoneNumberHelper.NormalizeForCambodia(phoneNumber);
         }
     }
 }

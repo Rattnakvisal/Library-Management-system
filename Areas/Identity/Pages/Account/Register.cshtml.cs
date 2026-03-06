@@ -128,8 +128,12 @@ namespace Library_Management_system.Areas.Identity.Pages.Account
 
             var existingPhoneUser = await _userManager.Users
                 .AsNoTracking()
-                .FirstOrDefaultAsync(u => u.PhoneNumber == normalizedPhone);
-            if (existingPhoneUser != null)
+                .Where(u => u.PhoneNumber != null)
+                .ToListAsync();
+
+            var duplicatePhoneUser = existingPhoneUser
+                .FirstOrDefault(u => PhoneNumberHelper.AreEquivalent(u.PhoneNumber, normalizedPhone));
+            if (duplicatePhoneUser != null)
             {
                 ModelState.AddModelError(nameof(Input.PhoneNumber), "Phone number is already registered.");
                 return Page();
@@ -333,7 +337,7 @@ namespace Library_Management_system.Areas.Identity.Pages.Account
 
         private static string NormalizePhone(string phoneNumber)
         {
-            return new string((phoneNumber ?? string.Empty).Where(char.IsDigit).ToArray());
+            return PhoneNumberHelper.NormalizeForCambodia(phoneNumber);
         }
     }
 }

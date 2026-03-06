@@ -82,6 +82,17 @@ namespace Library_Management_system.Data.Migrations
                     b.Property<DateTime?>("ResetPasswordTokenExpiry")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("TelegramChatId")
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<DateTime?>("TelegramLinkedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("TelegramLinkedPhone")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 

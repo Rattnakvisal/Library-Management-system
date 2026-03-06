@@ -1,271 +1,271 @@
 ﻿:root {
-  --navy: #1f4a73;
-  --navy-dark: #163a5a;
-  --bg: #f4f6f8;
-  --text: #1c2b36;
-  --muted: #7b8a97;
-  --line: #e6edf5;
-  --shadow: 0 10px 24px rgba(22, 58, 90, 0.08);
+    --navy: #1f4a73;
+    --navy-dark: #163a5a;
+    --bg: #f4f6f8;
+    --text: #1c2b36;
+    --muted: #7b8a97;
+    --line: #e6edf5;
+    --shadow: 0 10px 24px rgba(22, 58, 90, 0.08);
 }
 
 /* =========================
    PAGE BASE
 ========================= */
 .dashboard-page {
-  max-width: 1280px;
-  font-family: "Inter", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  font-weight: 400;
-  color: var(--text);
-  padding-top: 6px;
+    max-width: 1280px;
+    font-family: "Inter", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    font-weight: 400;
+    color: var(--text);
+    padding-top: 6px;
 }
 
 /* =========================
    HEADER
 ========================= */
 .page-header {
-  margin-bottom: 16px;
+    margin-bottom: 16px;
 }
 
 .page-title {
-  margin: 0;
-  font-size: 28px;
-  font-weight: 800;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
+    margin: 0;
+    font-size: 28px;
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
 }
 
 .page-subtitle {
-  margin: 6px 0 0;
-  color: var(--muted);
-  font-size: 13px;
-  font-weight: 500;
+    margin: 6px 0 0;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 500;
 }
 
 .page-title {
-  font-weight: 800;
-  color: var(--text);
-  margin: 0;
+    font-weight: 800;
+    color: var(--text);
+    margin: 0;
 }
 
 .controls-row {
-  margin-top: 8px;
+    margin-top: 8px;
 }
 
 .custom-select,
 .export-select {
-  position: relative;
-  width: 320px;
-  /* like screenshot */
-  max-width: 100%;
+    position: relative;
+    width: 320px;
+    /* like screenshot */
+    max-width: 100%;
 }
 
 .export-select {
-  width: 180px;
+    width: 180px;
 }
 
 .select-btn {
-  width: 100%;
-  height: 38px;
-  border: none;
-  background: var(--navy);
-  color: #fff;
-  font-weight: 700;
-  font-size: 13px;
-  padding: 0 12px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-radius: 0;
-  /* square corners like screenshot */
-  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.1);
+    width: 100%;
+    height: 38px;
+    border: none;
+    background: var(--navy);
+    color: #fff;
+    font-weight: 700;
+    font-size: 13px;
+    padding: 0 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: 0;
+    /* square corners like screenshot */
+    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.1);
 }
 
 .select-btn .caret {
-  font-size: 14px;
-  opacity: 0.95;
+    font-size: 14px;
+    opacity: 0.95;
 }
 
 .custom-select.open .select-btn,
 .export-select.open .select-btn {
-  background: var(--navy);
+    background: var(--navy);
 }
 
 /* Dropdown list */
 .options {
-  position: absolute;
-  top: 40px;
-  left: 0;
-  width: 100%;
-  background: #fff;
-  border: 1px solid #cfd8e3;
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
-  margin: 0;
-  padding: 6px 0;
-  list-style: none;
-  z-index: 50;
-  display: none;
+    position: absolute;
+    top: 40px;
+    left: 0;
+    width: 100%;
+    background: #fff;
+    border: 1px solid #cfd8e3;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
+    margin: 0;
+    padding: 6px 0;
+    list-style: none;
+    z-index: 50;
+    display: none;
 }
 
 .custom-select.open .options,
 .export-select.open .options {
-  display: block;
+    display: block;
 }
 
 /* right dropdown align */
 .options.right {
-  left: auto;
-  right: 0;
-  width: 180px;
+    left: auto;
+    right: 0;
+    width: 180px;
 }
 
 .options li {
-  padding: 10px 12px;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--navy);
-  cursor: pointer;
+    padding: 10px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--navy);
+    cursor: pointer;
 }
 
 .options li:hover {
-  background: #f1f6ff;
+    background: #f1f6ff;
 }
 
 /* =========================
    DATE INPUTS (From/To)
 ========================= */
 .date-row .form-label {
-  font-weight: 700;
-  font-size: 12px;
-  color: var(--text);
-  margin-bottom: 6px;
+    font-weight: 700;
+    font-size: 12px;
+    color: var(--text);
+    margin-bottom: 6px;
 }
 
 .date-row .form-control {
-  height: 28px;
-  font-size: 12px;
-  padding: 2px 10px;
-  border: 1px solid var(--navy);
-  border-radius: 3px;
-  width: 120px;
-  background: #fff;
+    height: 28px;
+    font-size: 12px;
+    padding: 2px 10px;
+    border: 1px solid var(--navy);
+    border-radius: 3px;
+    width: 120px;
+    background: #fff;
 }
 
 /* =========================
    TABLE WRAPPER
 ========================= */
 .report-table-wrapper {
-  background: #fff;
-  border: 1px solid var(--line);
-  box-shadow: var(--shadow);
-  padding: 0;
-  max-height: 520px;
-  overflow: auto;
+    background: #fff;
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow);
+    padding: 0;
+    max-height: 520px;
+    overflow: auto;
 }
 
 /* Table header blue bar */
 .report-table {
-  margin: 0;
-  border-collapse: separate;
-  border-spacing: 0;
+    margin: 0;
+    border-collapse: separate;
+    border-spacing: 0;
 }
 
 .report-table thead th {
-  background: var(--navy);
-  color: #fff;
-  font-size: 12px;
-  font-weight: 800;
-  padding: 10px 12px;
-  border: none;
-  position: sticky;
-  top: 0;
-  z-index: 5;
+    background: var(--navy);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 800;
+    padding: 10px 12px;
+    border: none;
+    position: sticky;
+    top: 0;
+    z-index: 5;
 }
 
 .report-table thead th:first-child {
-  border-top-left-radius: 8px;
+    border-top-left-radius: 8px;
 }
 
 .report-table thead th:last-child {
-  border-top-right-radius: 8px;
+    border-top-right-radius: 8px;
 }
 
 /* Table body */
 .report-table tbody td {
-  padding: 16px 12px;
-  font-size: 14px;
-  vertical-align: middle;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+    padding: 16px 12px;
+    font-size: 14px;
+    vertical-align: middle;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.3);
 }
 
 .book-title {
-  font-size: 14px;
-  line-height: 1.15;
-  color: #22313a;
-  max-width: 280px;
+    font-size: 14px;
+    line-height: 1.15;
+    color: #22313a;
+    max-width: 280px;
 }
 
 /* Status pill */
 .status-pill {
-  display: inline-block;
-  padding: 4px 10px;
-  border-radius: 999px;
-  font-size: 14px;
-  font-weight: 700;
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 700;
 }
 
 .status-pill.borrowed {
-  background: #86a8da;
-  color: #0f2f50;
+    background: #86a8da;
+    color: #0f2f50;
 }
 
 .status-pill.returned {
-  background: #b5e1c8;
-  color: #0e5a2f;
+    background: #b5e1c8;
+    color: #0e5a2f;
 }
 
 .status-pill.overdue {
-  background: #f6c0c0;
-  color: #8c1d1d;
+    background: #f6c0c0;
+    color: #8c1d1d;
 }
 
 /* =========================
    PAGINATION
 ========================= */
 .pagination-wrapper {
-  padding: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
 }
 
 .report-meta {
-  font-size: 12px;
-  color: var(--muted);
-  font-weight: 600;
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 600;
 }
 
 .pagination {
-  margin: 0;
+    margin: 0;
 }
 
 .page-link {
-  border: 1px solid #3a3a3a;
-  color: #2b2b2b;
-  font-size: 12px;
-  padding: 6px 12px;
-  border-radius: 0 !important;
+    border: 1px solid #3a3a3a;
+    color: #2b2b2b;
+    font-size: 12px;
+    padding: 6px 12px;
+    border-radius: 0 !important;
 }
 
 .page-item.active .page-link {
-  background: var(--navy);
-  border-color: #3a3a3a;
-  color: #fff;
+    background: var(--navy);
+    border-color: #3a3a3a;
+    color: #fff;
 }
 
 .page-item .page-link:hover {
-  background: #f4f6f8;
+    background: #f4f6f8;
 }
 
 /* =========================
@@ -273,22 +273,22 @@
 ========================= */
 @media (max-width: 768px) {
 
-  .custom-select,
-  .export-select {
-    width: 100%;
-  }
+    .custom-select,
+    .export-select {
+        width: 100%;
+    }
 
-  .options.right {
-    width: 100%;
-  }
+    .options.right {
+        width: 100%;
+    }
 
-  .date-row .form-control {
-    width: 100%;
-    height: 38px;
-    font-size: 13px;
-  }
+    .date-row .form-control {
+        width: 100%;
+        height: 38px;
+        font-size: 13px;
+    }
 
-  .book-title {
-    max-width: 100%;
-  }
+    .book-title {
+        max-width: 100%;
+    }
 }
