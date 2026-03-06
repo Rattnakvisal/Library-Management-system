@@ -16,6 +16,16 @@ namespace Library_Management_system.Controllers.Admin
             _context = context;
         }
 
+        [HttpGet("contacts/unread-summary")]
+        public async Task<IActionResult> GetUnreadContactsSummary()
+        {
+            var unreadCount = await _context.ContactMessages
+                .AsNoTracking()
+                .CountAsync(x => !x.IsRead);
+
+            return Ok(new { success = true, unreadCount });
+        }
+
         [HttpPost("contacts/{id:int}/mark-read")]
         public async Task<IActionResult> MarkContactAsRead(int id)
         {

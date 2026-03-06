@@ -39,13 +39,17 @@
 
         <div class="home-chatbot__quick-actions" id="homeChatbotQuickActions">
             <button type="button" data-intent="hours">Opening hours</button>
-            <button type="button" data-intent="borrow">Borrow limit</button>
-            <button type="button" data-intent="fine">Late fee</button>
+            <button type="button" data-intent="reserve">Reserve book</button>
+            <button type="button" data-intent="borrow">Borrow rules</button>
+            <button type="button" data-intent="fine">Fines</button>
+            <button type="button" data-intent="history">My history</button>
+            <button type="button" data-intent="event">Events</button>
             <button type="button" data-intent="contact">Contact support</button>
         </div>
 
         <form id="homeChatbotForm" class="home-chatbot__input-row">
-            <input id="homeChatbotInput" type="text" maxlength="140" placeholder="Type a short question..."
+            <input id="homeChatbotInput" type="text" maxlength="140"
+                   placeholder="Ask about borrow, reserve, fine, event..."
                    autocomplete="off" />
             <button type="submit" aria-label="Send message">
                 <i class="bi bi-send-fill"></i>

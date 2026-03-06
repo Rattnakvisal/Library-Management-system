@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Library_Management_system.Controllers.Admin;
 
-[Authorize(Roles = "Admin")]
+[Authorize(Roles = "Admin,Librarian")]
 [Route("admin/manageauthor")]
 public class ManageAuthorController : Controller
 {

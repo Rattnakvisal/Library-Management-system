@@ -85,6 +85,52 @@ document.addEventListener("DOMContentLoaded", function () {
         window.location.href = url.toString();
     }
 
+    function getAlertColor(icon) {
+        switch (icon) {
+            case "success":
+                return "#16a34a";
+            case "warning":
+                return "#f59e0b";
+            case "error":
+                return "#dc2626";
+            default:
+                return "#2563eb";
+        }
+    }
+
+    async function showAlert(title, text, icon = "info") {
+        if (window.Swal && typeof window.Swal.fire === "function") {
+            return window.Swal.fire({
+                title,
+                text,
+                icon,
+                confirmButtonColor: getAlertColor(icon),
+            });
+        }
+
+        window.alert(`${title}\n\n${text}`);
+        return Promise.resolve();
+    }
+
+    async function showConfirm(title, text, confirmButtonText) {
+        if (window.Swal && typeof window.Swal.fire === "function") {
+            const result = await window.Swal.fire({
+                title,
+                text,
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#dc2626",
+                cancelButtonColor: "#6b7280",
+                confirmButtonText,
+                cancelButtonText: "Cancel",
+            });
+
+            return result.isConfirmed;
+        }
+
+        return window.confirm(text);
+    }
+
     if (categoryTabBtn) {
         categoryTabBtn.addEventListener("click", function () {
             setActiveTab("category");
@@ -164,7 +210,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const authorName = authorNameInput.value.trim();
         if (!authorName) {
-            showAlert("Error", "Author name is required.", "danger");
+            await showAlert(
+                "Missing Author Name",
+                "Author name is required.",
+                "warning",
+            );
             return;
         }
 
@@ -173,6 +223,8 @@ document.addEventListener("DOMContentLoaded", function () {
             formData.append("authorId", editingAuthorId);
         }
         formData.append("name", authorName);
+
+        submitAuthorBtn.disabled = true;
 
         try {
             const response = await fetch(
@@ -188,26 +240,30 @@ document.addEventListener("DOMContentLoaded", function () {
             const result = await response.json();
 
             if (response.ok && result.success) {
-                showAlert("Success", result.message, "success");
+                await showAlert(
+                    "Success",
+                    result.message || "Author saved successfully.",
+                    "success",
+                );
                 authorModal.hide();
                 authorForm.reset();
-                setTimeout(() => {
-                    reloadWithActiveTab();
-                }, 1200);
+                reloadWithActiveTab();
             } else {
-                showAlert(
+                await showAlert(
                     "Error",
                     result.message || "Failed to save author.",
-                    "danger",
+                    "error",
                 );
             }
         } catch (error) {
-            showAlert(
+            await showAlert(
                 "Error",
                 "Failed to save author. Please try again.",
-                "danger",
+                "error",
             );
             console.error("Error:", error);
+        } finally {
+            submitAuthorBtn.disabled = false;
         }
     });
 
@@ -217,42 +273,52 @@ document.addEventListener("DOMContentLoaded", function () {
             const authorId = this.getAttribute("data-author-id");
             const authorName = this.getAttribute("data-author-name");
 
-            if (
-                confirm(
-                    `Are you sure you want to delete the author "${authorName}"? Related books will be moved to "Unknown Author".`,
-                )
-            ) {
-                try {
-                    const response = await fetch("/admin/manageauthor/delete", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify({ authorId: Number(authorId) }),
-                    });
+            const isConfirmed = await showConfirm(
+                "Delete Author?",
+                `Are you sure you want to delete "${authorName}"? Related books will be moved to "Unknown Author".`,
+                "Yes, delete author",
+            );
 
-                    const result = await response.json();
+            if (!isConfirmed) {
+                return;
+            }
 
-                    if (response.ok && result.success) {
-                        showAlert("Success", result.message, "success");
-                        setTimeout(() => {
-                            reloadWithActiveTab();
-                        }, 1200);
-                    } else {
-                        showAlert(
-                            "Error",
-                            result.message || "Failed to delete author.",
-                            "danger",
-                        );
-                    }
-                } catch (error) {
-                    showAlert(
-                        "Error",
-                        "Failed to delete author. Please try again.",
-                        "danger",
+            this.disabled = true;
+
+            try {
+                const response = await fetch("/admin/manageauthor/delete", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ authorId: Number(authorId) }),
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    await showAlert(
+                        "Deleted",
+                        result.message || "Author deleted successfully.",
+                        "success",
                     );
-                    console.error("Error:", error);
+                    reloadWithActiveTab();
+                } else {
+                    await showAlert(
+                        "Delete Failed",
+                        result.message || "Failed to delete author.",
+                        "error",
+                    );
                 }
+            } catch (error) {
+                await showAlert(
+                    "Network Error",
+                    "Failed to delete author. Please try again.",
+                    "error",
+                );
+                console.error("Error:", error);
+            } finally {
+                this.disabled = false;
             }
         });
     });
@@ -274,13 +340,23 @@ document.addEventListener("DOMContentLoaded", function () {
     categoryForm.addEventListener("submit", async function (e) {
         e.preventDefault();
 
+        const categoryName = categoryNameInput.value.trim();
+        if (!categoryName) {
+            await showAlert(
+                "Missing Category Name",
+                "Category name is required.",
+                "warning",
+            );
+            return;
+        }
+
         const formData = new FormData();
 
         if (isEditMode) {
             formData.append("oldName", editingCategoryName);
-            formData.append("newName", categoryNameInput.value.trim());
+            formData.append("newName", categoryName);
         } else {
-            formData.append("name", categoryNameInput.value.trim());
+            formData.append("name", categoryName);
         }
 
         if (categoryImageInput.files.length > 0) {
@@ -293,6 +369,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 categoryDescriptionInput.value.trim(),
             );
         }
+
+        submitBtn.disabled = true;
 
         try {
             const url = isEditMode
@@ -307,26 +385,30 @@ document.addEventListener("DOMContentLoaded", function () {
             const result = await response.json();
 
             if (response.ok && result.success) {
-                showAlert("Success", result.message, "success");
+                await showAlert(
+                    "Success",
+                    result.message || "Category saved successfully.",
+                    "success",
+                );
                 categoryModal.hide();
                 categoryForm.reset();
-                setTimeout(() => {
-                    reloadWithActiveTab();
-                }, 1500);
+                reloadWithActiveTab();
             } else {
-                showAlert(
+                await showAlert(
                     "Error",
                     result.message || "An error occurred.",
-                    "danger",
+                    "error",
                 );
             }
         } catch (error) {
-            showAlert(
+            await showAlert(
                 "Error",
                 "Failed to save category. Please try again.",
-                "danger",
+                "error",
             );
             console.error("Error:", error);
+        } finally {
+            submitBtn.disabled = false;
         }
     });
 
@@ -335,63 +417,53 @@ document.addEventListener("DOMContentLoaded", function () {
         btn.addEventListener("click", async function () {
             const categoryName = this.getAttribute("data-category-name");
 
-            if (
-                confirm(
-                    `Are you sure you want to delete the category "${categoryName}"? Books in this category will be moved to "Uncategorized".`,
-                )
-            ) {
-                try {
-                    const response = await fetch(
-                        "/admin/managecategory/delete",
-                        {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                            },
-                            body: JSON.stringify({ name: categoryName }),
-                        },
-                    );
+            const isConfirmed = await showConfirm(
+                "Delete Category?",
+                `Are you sure you want to delete "${categoryName}"? Books in this category will be moved to "Uncategorized".`,
+                "Yes, delete category",
+            );
 
-                    const result = await response.json();
+            if (!isConfirmed) {
+                return;
+            }
 
-                    if (response.ok && result.success) {
-                        showAlert("Success", result.message, "success");
-                        setTimeout(() => {
-                            reloadWithActiveTab();
-                        }, 1500);
-                    } else {
-                        showAlert(
-                            "Error",
-                            result.message || "An error occurred.",
-                            "danger",
-                        );
-                    }
-                } catch (error) {
-                    showAlert(
-                        "Error",
-                        "Failed to delete category. Please try again.",
-                        "danger",
+            this.disabled = true;
+
+            try {
+                const response = await fetch("/admin/managecategory/delete", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ name: categoryName }),
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    await showAlert(
+                        "Deleted",
+                        result.message || "Category deleted successfully.",
+                        "success",
                     );
-                    console.error("Error:", error);
+                    reloadWithActiveTab();
+                } else {
+                    await showAlert(
+                        "Delete Failed",
+                        result.message || "An error occurred.",
+                        "error",
+                    );
                 }
+            } catch (error) {
+                await showAlert(
+                    "Network Error",
+                    "Failed to delete category. Please try again.",
+                    "error",
+                );
+                console.error("Error:", error);
+            } finally {
+                this.disabled = false;
             }
         });
     });
-
-    function showAlert(title, message, type) {
-        const alertDiv = document.createElement("div");
-        alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
-        alertDiv.setAttribute("role", "alert");
-        alertDiv.innerHTML = `
-            <strong>${title}:</strong> ${message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        `;
-
-        const container = document.querySelector(".dashboard-page");
-        container.insertBefore(alertDiv, container.firstChild);
-
-        setTimeout(() => {
-            alertDiv.remove();
-        }, 5000);
-    }
 });

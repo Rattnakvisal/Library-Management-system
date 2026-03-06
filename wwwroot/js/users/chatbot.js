@@ -28,17 +28,106 @@
         }
 
         const staticReplies = {
+            greeting:
+                "Hi. I can help with hours, reservations, borrowing, fines, events, profile, and policies.",
             hours: "Library hours: Monday-Friday 8:00 AM-8:00 PM, Saturday-Sunday 9:00 AM-5:00 PM.",
-            borrow: "Borrowing limit: up to 5 books at a time. The standard borrowing period is 7 days.",
-            fine: "Late return fee is $1.00 per late day.",
+            borrow:
+                "Borrowing limit is up to 5 books at a time. The default borrowing duration is 14 days.",
+            reserve:
+                "To reserve a book: open a book detail page, add it to cart, then go to /cart and click Proceed Request.",
+            fine:
+                "Late return fee is $1.00 per late day. You can check overdue and fine details in /history.",
+            history:
+                "Open /history to see borrowed, overdue, and returned books with fine payment status.",
+            event: "Open /event to see upcoming library events and schedules.",
+            account:
+                "Use /login to sign in. After login, you can manage account details from /profile.",
+            profile:
+                "Use /profile to update your profile and /bookmark to manage favorite books.",
+            review:
+                "You can submit a 1-5 star review from each book detail page using the Feedback button.",
+            policy: "Library policy is available at /about/policies.",
+            search:
+                "Use /book to browse or search by title, author, and category. Category filters are available on the Book page.",
             contact:
-                "Support: use the Contact page or ask library staff at the front desk during opening hours.",
+                "Use /contact to send feedback or support questions to library staff.",
             location:
                 "Library location: ACLEDA University campus library building.",
         };
 
+        const intentKeywords = [
+            {
+                intent: "greeting",
+                keywords: ["hello", "hi", "hey", "good morning", "good afternoon"],
+            },
+            {
+                intent: "hours",
+                keywords: ["hour", "opening", "open time", "close time"],
+            },
+            {
+                intent: "reserve",
+                keywords: [
+                    "reserve",
+                    "reservation",
+                    "request book",
+                    "proceed request",
+                    "cart request",
+                ],
+            },
+            {
+                intent: "borrow",
+                keywords: [
+                    "borrow limit",
+                    "borrowing limit",
+                    "how many books",
+                    "borrow period",
+                    "duration",
+                ],
+            },
+            {
+                intent: "fine",
+                keywords: ["fine", "late fee", "late return", "penalty", "overdue fee"],
+            },
+            {
+                intent: "history",
+                keywords: ["history", "borrow history", "overdue", "returned books"],
+            },
+            {
+                intent: "event",
+                keywords: ["event", "events", "schedule", "activity"],
+            },
+            {
+                intent: "account",
+                keywords: ["account", "login", "sign in", "register", "password"],
+            },
+            {
+                intent: "profile",
+                keywords: ["profile", "bookmark", "favorite", "avatar", "cover image"],
+            },
+            {
+                intent: "review",
+                keywords: ["review", "rating", "star", "book feedback"],
+            },
+            {
+                intent: "policy",
+                keywords: ["policy", "rules", "terms", "copyright"],
+            },
+            {
+                intent: "contact",
+                keywords: ["contact", "support", "help", "feedback message"],
+            },
+            {
+                intent: "location",
+                keywords: ["where", "location", "address", "campus"],
+            },
+            {
+                intent: "search",
+                keywords: ["search", "find book", "book list", "category", "browse"],
+            },
+        ];
+
         const fallbackReply =
-            "I can help with opening hours, borrow limit, late fee, contact support, and location.";
+            "I can help with hours, reservations, borrow limits, fines, events, profile, policies, and support. Try asking: How do I reserve a book?";
 
         const addMessage = (text, type) => {
             const item = document.createElement("div");
@@ -55,7 +144,7 @@
 
             if (!chatbot.dataset.seeded) {
                 addMessage(
-                    "Hello, I am your static library assistant. Ask me a quick question.",
+                    "Hello, I am your library assistant. Ask about reservations, borrowing, fines, events, or support.",
                     "bot",
                 );
                 chatbot.dataset.seeded = "1";
@@ -74,44 +163,13 @@
                 return "";
             }
 
-            if (
-                normalized.includes("hour") ||
-                normalized.includes("time") ||
-                normalized.includes("open")
-            ) {
-                return "hours";
-            }
-
-            if (
-                normalized.includes("borrow") ||
-                normalized.includes("limit") ||
-                normalized.includes("book")
-            ) {
-                return "borrow";
-            }
-
-            if (
-                normalized.includes("fine") ||
-                normalized.includes("late") ||
-                normalized.includes("fee")
-            ) {
-                return "fine";
-            }
-
-            if (
-                normalized.includes("contact") ||
-                normalized.includes("support") ||
-                normalized.includes("help")
-            ) {
-                return "contact";
-            }
-
-            if (
-                normalized.includes("where") ||
-                normalized.includes("location") ||
-                normalized.includes("address")
-            ) {
-                return "location";
+            for (const entry of intentKeywords) {
+                const isMatch = entry.keywords.some((keyword) =>
+                    normalized.includes(keyword),
+                );
+                if (isMatch) {
+                    return entry.intent;
+                }
             }
 
             return "";
