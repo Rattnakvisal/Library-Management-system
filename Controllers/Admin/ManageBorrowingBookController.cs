@@ -175,11 +175,44 @@ public class ManageBorrowingBookController : Controller
             })
             .ToListAsync();
 
+        var userOptions = (await _context.Users
+                .AsNoTracking()
+                .OrderBy(u => u.FullName)
+                .ThenBy(u => u.UserName)
+                .Select(u => new { u.FullName, u.UserName })
+                .ToListAsync())
+            .Select(u =>
+            {
+                var fullName = (u.FullName ?? string.Empty).Trim();
+                var userName = (u.UserName ?? string.Empty).Trim();
+                var selectedUsername = !string.IsNullOrWhiteSpace(fullName) ? fullName : userName;
+                if (string.IsNullOrWhiteSpace(selectedUsername))
+                {
+                    return null;
+                }
+
+                var displayName = !string.IsNullOrWhiteSpace(userName) &&
+                                  !string.Equals(fullName, userName, StringComparison.OrdinalIgnoreCase)
+                    ? $"{selectedUsername} ({userName})"
+                    : selectedUsername;
+
+                return new UserOptionViewModel
+                {
+                    Username = selectedUsername,
+                    DisplayName = displayName
+                };
+            })
+            .Where(u => u != null)
+            .Select(u => u!)
+            .DistinctBy(u => u.Username, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
         var model = new ManageBorrowingViewModel
         {
             Borrowings = pagedBorrowingRows,
             Reservations = pagedReservationRows,
             BookOptions = bookOptions,
+            UserOptions = userOptions,
             BorrowingQuery = borrowingKeyword,
             BorrowingStatus = borrowingStatus,
             ReservationQuery = reservationKeyword,
@@ -197,11 +230,17 @@ public class ManageBorrowingBookController : Controller
     [HttpPost("borrowing/create")]
     public async Task<IActionResult> CreateBorrowing([FromForm] CreateBorrowingRequest request)
     {
-        var normalizedUsername = NormalizeUsername(request.Username);
+        var userResolution = await ResolveBorrowingUsernameAsync(request.Username);
+        var normalizedUsername = userResolution.Username;
         if (string.IsNullOrWhiteSpace(normalizedUsername) ||
             string.IsNullOrWhiteSpace(request.BookCode))
         {
             return BadRequest(new { success = false, message = "Username and Book Code are required." });
+        }
+
+        if (!userResolution.Exists)
+        {
+            return BadRequest(new { success = false, message = "Selected user was not found." });
         }
 
         var userBorrowingState = await GetBorrowingStateAsync(normalizedUsername);
@@ -600,7 +639,7 @@ public class ManageBorrowingBookController : Controller
         reservation.IsReservationNotificationSeen = false;
 
         await _context.SaveChangesAsync();
-        return Ok(new { success = true, message = "Reservation approved and stored in borrowing with a 1-week due date." });
+        return Ok(new { success = true, message = "Reservation approved and stored in borrowing with a 2-week due date." });
     }
 
     [HttpPost("reservation/reject/{id:int}")]
@@ -804,6 +843,34 @@ public class ManageBorrowingBookController : Controller
     {
         var ownerNames = await ResolveOwnerDisplayNamesAsync(new[] { ownerKey });
         return ResolveReservationUsername(ownerKey, ownerNames);
+    }
+
+    private async Task<(string Username, bool Exists)> ResolveBorrowingUsernameAsync(string? username)
+    {
+        var normalized = NormalizeUsername(username);
+        if (string.IsNullOrWhiteSpace(normalized))
+        {
+            return (string.Empty, false);
+        }
+
+        var matchedUser = await _context.Users
+            .AsNoTracking()
+            .Where(u => u.FullName == normalized || u.UserName == normalized)
+            .Select(u => new { u.FullName, u.UserName })
+            .FirstOrDefaultAsync();
+
+        if (matchedUser == null)
+        {
+            return (normalized, false);
+        }
+
+        var resolvedName = NormalizeUsername(matchedUser.FullName);
+        if (string.IsNullOrWhiteSpace(resolvedName))
+        {
+            resolvedName = NormalizeUsername(matchedUser.UserName);
+        }
+
+        return (resolvedName, !string.IsNullOrWhiteSpace(resolvedName));
     }
 
     private static string BuildReservationBorrowingSource(int reservationId)

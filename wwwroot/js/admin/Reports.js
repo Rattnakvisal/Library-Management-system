@@ -18,7 +18,7 @@
                 { key: "title", label: "Book Title" },
                 { key: "borrowDate", label: "Borrow Date" },
                 { key: "dueDate", label: "Due Date" },
-                { key: "duration", label: "Duration / 1 week" },
+                { key: "duration", label: "Duration / 2 weeks" },
                 { key: "status", label: "Status", align: "text-end" },
             ],
             rowHtml: function (row) {

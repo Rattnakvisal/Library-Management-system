@@ -457,8 +457,16 @@
                     <form id="addNewBorrowingForm">
                         <div class="row g-3">
                             <div class="col-md-6">
-                                <label class="form-label" for="usernameInput">Username <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="usernameInput" placeholder="eg. Ly" required />
+                                <label class="form-label" for="usernameSelect">Username <span class="text-danger">*</span></label>
+                                <div class="custom-select-wrapper">
+                                    <select class="form-select" id="usernameSelect" required>
+                                        <option value="">Select user</option>
+                                        @foreach (var user in Model.UserOptions)
+                                        {
+                                            <option value="@user.Username">@user.DisplayName</option>
+                                        }
+                                    </select>
+                                </div>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label" for="bookCodeSelect">Book Code <span class="text-danger">*</span></label>

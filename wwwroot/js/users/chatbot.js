@@ -31,12 +31,10 @@
             greeting:
                 "Hi. I can help with hours, reservations, borrowing, fines, events, profile, and policies.",
             hours: "Library hours: Monday-Friday 8:00 AM-8:00 PM, Saturday-Sunday 9:00 AM-5:00 PM.",
-            borrow:
-                "Borrowing limit is up to 5 books at a time. The default borrowing duration is 14 days.",
+            borrow: "Borrowing limit is up to 3 books at a time. The default borrowing duration is 14 days.",
             reserve:
                 "To reserve a book: open a book detail page, add it to cart, then go to /cart and click Proceed Request.",
-            fine:
-                "Late return fee is $1.00 per late day. You can check overdue and fine details in /history.",
+            fine: "Late return fee is $1.00 per late day. You can check overdue and fine details in /history.",
             history:
                 "Open /history to see borrowed, overdue, and returned books with fine payment status.",
             event: "Open /event to see upcoming library events and schedules.",
@@ -44,11 +42,9 @@
                 "Use /login to sign in. After login, you can manage account details from /profile.",
             profile:
                 "Use /profile to update your profile and /bookmark to manage favorite books.",
-            review:
-                "You can submit a 1-5 star review from each book detail page using the Feedback button.",
+            review: "You can submit a 1-5 star review from each book detail page using the Feedback button.",
             policy: "Library policy is available at /about/policies.",
-            search:
-                "Use /book to browse or search by title, author, and category. Category filters are available on the Book page.",
+            search: "Use /book to browse or search by title, author, and category. Category filters are available on the Book page.",
             contact:
                 "Use /contact to send feedback or support questions to library staff.",
             location:
@@ -60,7 +56,13 @@
         const intentKeywords = [
             {
                 intent: "greeting",
-                keywords: ["hello", "hi", "hey", "good morning", "good afternoon"],
+                keywords: [
+                    "hello",
+                    "hi",
+                    "hey",
+                    "good morning",
+                    "good afternoon",
+                ],
             },
             {
                 intent: "hours",
@@ -88,11 +90,22 @@
             },
             {
                 intent: "fine",
-                keywords: ["fine", "late fee", "late return", "penalty", "overdue fee"],
+                keywords: [
+                    "fine",
+                    "late fee",
+                    "late return",
+                    "penalty",
+                    "overdue fee",
+                ],
             },
             {
                 intent: "history",
-                keywords: ["history", "borrow history", "overdue", "returned books"],
+                keywords: [
+                    "history",
+                    "borrow history",
+                    "overdue",
+                    "returned books",
+                ],
             },
             {
                 intent: "event",
@@ -116,7 +129,13 @@
             },
             {
                 intent: "profile",
-                keywords: ["profile", "bookmark", "favorite", "avatar", "cover image"],
+                keywords: [
+                    "profile",
+                    "bookmark",
+                    "favorite",
+                    "avatar",
+                    "cover image",
+                ],
             },
             {
                 intent: "review",
@@ -136,7 +155,13 @@
             },
             {
                 intent: "search",
-                keywords: ["search", "find book", "book list", "category", "browse"],
+                keywords: [
+                    "search",
+                    "find book",
+                    "book list",
+                    "category",
+                    "browse",
+                ],
             },
         ];
 
@@ -157,7 +182,8 @@
 
         const addResetPasswordGuideMessage = () => {
             const item = document.createElement("div");
-            item.className = "home-chatbot__msg home-chatbot__msg--bot home-chatbot__msg--guide";
+            item.className =
+                "home-chatbot__msg home-chatbot__msg--bot home-chatbot__msg--guide";
 
             const title = document.createElement("p");
             title.className = "home-chatbot__guide-title";

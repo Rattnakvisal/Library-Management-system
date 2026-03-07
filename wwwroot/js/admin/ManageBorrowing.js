@@ -195,7 +195,7 @@ function initializeEditReservationButton() {
 
 function initializeAddBorrowingButton() {
     $("#confirmBorrowing").on("click", async function () {
-        const username = $("#usernameInput").val().trim();
+        const username = ($("#usernameSelect").val() || "").toString().trim();
         const bookCode = ($("#bookCodeSelect").val() || "").toString().trim();
         const borrowDate = $("#borrowingDateInput").val();
 
