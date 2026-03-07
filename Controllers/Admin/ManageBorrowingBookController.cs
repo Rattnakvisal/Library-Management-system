@@ -86,7 +86,6 @@ public class ManageBorrowingBookController : Controller
                     DurationDays = x.DurationDays <= 0 ? DefaultBorrowingDays : x.DurationDays,
                     ReturnDate = x.ReturnDate,
                     ReturnUserId = x.ReturnUserId,
-                    Reason = x.Reason,
                     CreatedBy = string.IsNullOrWhiteSpace(x.CreatedBy) ? "System" : x.CreatedBy,
                     CreatedDate = x.CreatedDate == default ? x.BorrowDate : x.CreatedDate,
                     Status = status,
@@ -297,7 +296,6 @@ public class ManageBorrowingBookController : Controller
             Status = status,
             ReturnDate = null,
             ReturnUserId = null,
-            Reason = null,
             Source = source,
             CreatedBy = User?.Identity?.Name,
             CreatedDate = DateTime.UtcNow
@@ -390,7 +388,6 @@ public class ManageBorrowingBookController : Controller
         borrowing.DurationDays = durationDays;
         borrowing.ReturnDate = null;
         borrowing.ReturnUserId = null;
-        borrowing.Reason = null;
         borrowing.Status = ComputeOpenBorrowingStatus(dueDate);
 
         await _context.SaveChangesAsync();
@@ -422,7 +419,6 @@ public class ManageBorrowingBookController : Controller
         borrowing.Status = "returned";
         borrowing.ReturnDate = returnedAt;
         borrowing.ReturnUserId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User?.Identity?.Name;
-        borrowing.Reason = null;
 
         if (borrowing.Book != null)
         {
@@ -683,7 +679,6 @@ public class ManageBorrowingBookController : Controller
                 !string.Equals(linkedBorrowing.Status, "rejected", StringComparison.OrdinalIgnoreCase))
             {
                 linkedBorrowing.Status = "rejected";
-                linkedBorrowing.Reason = rejectionReason;
                 linkedBorrowing.ReturnDate = DateTime.UtcNow;
                 linkedBorrowing.ReturnUserId = currentUserId;
             }

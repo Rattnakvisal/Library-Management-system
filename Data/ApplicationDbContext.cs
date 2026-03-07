@@ -78,7 +78,6 @@ namespace Library_Management_system.Data
                 entity.ToTable("Borrowing");
                 entity.Property(x => x.DurationDays).HasDefaultValue(14);
                 entity.Property(x => x.ReturnUserId).HasMaxLength(450);
-                entity.Property(x => x.Reason).HasMaxLength(100);
 
                 entity.HasOne(x => x.Reservation)
                     .WithMany()

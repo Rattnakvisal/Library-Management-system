@@ -299,10 +299,6 @@ namespace Library_Management_system.Data.Migrations
                         .HasColumnType("int")
                         .HasDefaultValue(14);
 
-                    b.Property<string>("Reason")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
                     b.Property<int?>("ReservationId")
                         .HasColumnType("int");
 

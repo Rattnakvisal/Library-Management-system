@@ -136,7 +136,6 @@
                             <th scope="col">Fine</th>
                             <th scope="col">Paid</th>
                             <th scope="col">Paid Date</th>
-                            <th scope="col">Reason</th>
                             <th scope="col">Created By</th>
                             <th scope="col">Created Date</th>
                             <th scope="col">Status</th>
@@ -194,7 +193,6 @@
                                         }
                                     </td>
                                     <td>@(borrowing.FinePaidDate?.ToString("yyyy-MM-dd") ?? "-")</td>
-                                    <td>@(string.IsNullOrWhiteSpace(borrowing.Reason) ? "-" : borrowing.Reason)</td>
                                     <td>@borrowing.CreatedBy</td>
                                     <td>@borrowing.CreatedDate.ToString("yyyy-MM-dd")</td>
                                     <td><span class="table-status @statusClass">@statusLabel</span></td>
@@ -231,7 +229,7 @@
                         else
                         {
                             <tr>
-                                <td colspan="15" class="text-center text-muted py-4">No borrowing records found.</td>
+                                <td colspan="14" class="text-center text-muted py-4">No borrowing records found.</td>
                             </tr>
                         }
                     </tbody>

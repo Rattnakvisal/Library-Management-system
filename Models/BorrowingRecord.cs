@@ -24,9 +24,6 @@ namespace Library_Management_system.Models
         [MaxLength(450)]
         public string? ReturnUserId { get; set; }
 
-        [MaxLength(100)]
-        public string? Reason { get; set; }
-
         [MaxLength(30)]
         public string Status { get; set; } = "active";
 
