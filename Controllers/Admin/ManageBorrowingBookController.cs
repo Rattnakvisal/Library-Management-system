@@ -282,7 +282,7 @@ public class ManageBorrowingBookController : Controller
         var borrowDate = (request.BorrowDate ?? DateTime.UtcNow).Date;
         var durationDays = DefaultBorrowingDays;
         var dueDate = borrowDate.AddDays(durationDays);
-        var status = ComputeBorrowingStatus("active", dueDate, null);
+        var status = ComputeOpenBorrowingStatus(dueDate);
         var reservationId = reservationPriority.MatchedReservation?.Id;
         var source = reservationId.HasValue ? BuildReservationBorrowingSource(reservationId.Value) : "in_person";
 
@@ -295,6 +295,9 @@ public class ManageBorrowingBookController : Controller
             DueDate = dueDate,
             DurationDays = durationDays,
             Status = status,
+            ReturnDate = null,
+            ReturnUserId = null,
+            Reason = null,
             Source = source,
             CreatedBy = User?.Identity?.Name,
             CreatedDate = DateTime.UtcNow
@@ -385,7 +388,10 @@ public class ManageBorrowingBookController : Controller
         borrowing.BorrowDate = borrowDate;
         borrowing.DueDate = dueDate;
         borrowing.DurationDays = durationDays;
-        borrowing.Status = ComputeBorrowingStatus("active", dueDate, borrowing.ReturnDate);
+        borrowing.ReturnDate = null;
+        borrowing.ReturnUserId = null;
+        borrowing.Reason = null;
+        borrowing.Status = ComputeOpenBorrowingStatus(dueDate);
 
         await _context.SaveChangesAsync();
         return Ok(new { success = true, message = "Borrowing updated successfully." });
@@ -749,11 +755,23 @@ public class ManageBorrowingBookController : Controller
             return "rejected";
         }
 
-        if (returnDate.HasValue || string.Equals(currentStatus, "returned", StringComparison.OrdinalIgnoreCase))
+        if (string.Equals(currentStatus, "returned", StringComparison.OrdinalIgnoreCase))
         {
             return "returned";
         }
 
+        if (returnDate.HasValue &&
+            !string.Equals(currentStatus, "active", StringComparison.OrdinalIgnoreCase) &&
+            !string.Equals(currentStatus, "overdue", StringComparison.OrdinalIgnoreCase))
+        {
+            return "returned";
+        }
+
+        return ComputeOpenBorrowingStatus(dueDate);
+    }
+
+    private static string ComputeOpenBorrowingStatus(DateTime dueDate)
+    {
         return dueDate.Date < DateTime.UtcNow.Date ? "overdue" : "active";
     }
 
