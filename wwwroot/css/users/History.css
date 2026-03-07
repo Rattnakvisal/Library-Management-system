@@ -101,6 +101,7 @@ body {
     color: var(--muted);
     font-size: 0.92rem;
     line-height: 1.4;
+    width: 200px;
 }
 
 .stars {
@@ -111,6 +112,7 @@ body {
 .status-box {
     border-left: 1px solid rgba(0, 0, 0, 0.08);
     height: 100%;
+    width: fit-content;
 }
 
 .history-date-list {
