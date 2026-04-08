@@ -1,125 +1,182 @@
-#  Library Management System
+# Library Management System
 
-A web-based library management system built with **ASP.NET Core 9**, **Entity Framework Core**, and **Bootstrap 5**.
+Library Management System is an ASP.NET Core 9 web app for managing books, reservations, borrowing, returns, fines, and user accounts with role-based access.
 
----
+## Core Features
 
-##  Features
+- ASP.NET Core Identity authentication with email confirmation
+- Role-based access (`Admin`, `Librarian`, `User`)
+- Book catalog management (books, categories, authors, images)
+- Reservation workflow with approval/rejection and FIFO priority checks
+- Borrowing lifecycle (create, update, return) with fine tracking
+- Student-facing pages for search, cart, bookmark, history, and reviews
+- Admin reporting (`borrowing`, `returns`, `most-borrowed`, `fine-collection`)
+- Contact inbox and feedback/review moderation
+- Optional Telegram notifications for admin alerts and OTP delivery
 
-**Authentication & Security**
-- Email verification required for all new accounts
-- Role-based access control (Admin, Librarian, Student)
-- Secure password enforcement and HTTPS
+## Tech Stack
 
-**Admin**
-- Dashboard with borrowing trends, stats, and overdue fines
-- Manage users, roles, books, and borrowing records
+| Layer         | Technology                           |
+| ------------- | ------------------------------------ |
+| Framework     | ASP.NET Core 9 (MVC + Razor Pages)   |
+| Language      | C# / .NET 9                          |
+| Data          | Entity Framework Core 9 + SQL Server |
+| Identity      | ASP.NET Core Identity                |
+| UI            | Razor Views, Bootstrap 5, JavaScript |
+| Email         | MailKit (SMTP)                       |
+| Notifications | Telegram Bot API (optional)          |
 
-**Librarian**
-- View dashboard statistics
-- Manage and update borrowing records
+## Project Structure
 
-**Student**
-- Search books by title, author, or category
-- View borrowing history and account info
+```text
+.
+|-- Controllers/
+|   |-- Admin/
+|   |-- User/
+|   |-- AccountController.cs
+|   |-- HomeController.cs
+|-- Data/
+|   |-- ApplicationDbContext.cs
+|   |-- Migrations/
+|-- Models/
+|   |-- Admin/
+|   |-- ApplicationUser.cs
+|-- Services/
+|   |-- EmailSender.cs
+|   |-- TelegramNotifier.cs
+|-- Views/
+|-- Areas/Identity/Pages/
+|-- wwwroot/
+|-- Program.cs
+|-- appsettings.json
+```
 
----
+## Prerequisites
 
-## 🛠 Tech Stack
-
-| Layer | Technology |
-|---|---|
-| Backend | ASP.NET Core 9, Razor Pages |
-| Database | SQL Server, Entity Framework Core |
-| Auth | ASP.NET Core Identity |
-| Frontend | Bootstrap 5, HTML5, CSS3, JS |
-| Email | SMTP via Gmail |
-
----
-
-##  Getting Started
-
-### Prerequisites
 - .NET 9 SDK
-- SQL Server 2019+
-- Visual Studio 2022+
-- Gmail account with App Password
+- SQL Server (2019+ recommended)
+- EF Core CLI: `dotnet tool install --global dotnet-ef`
 
-### Installation
+## Quick Start
+
 ```bash
 git clone https://github.com/Rattnakvisal/Library-Management-system.git
 cd Library-Management-system
 dotnet restore
+dotnet build
 dotnet ef database update
-dotnet run
+dotnet run --launch-profile https
 ```
 
-Then open https://localhost:7004
+Open:
 
-### Configuration
+- `https://localhost:7004`
+- `http://localhost:5083`
 
-In `appsettings.json`:
+## Configuration
+
+Use `appsettings.Development.json` or user-secrets for local sensitive values.
+
+### Required keys
+
 ```json
-"ConnectionStrings": {
-  "DefaultConnection": "Server=YOUR_SERVER;Database=LibraryManagementDB;Trusted_Connection=true;"
-},
-"EmailSettings": {
-  "SmtpServer": "smtp.gmail.com",
-  "Port": 587,
-  "SenderEmail": "your-email@gmail.com",
-  "Password": "your-16-char-app-password"
+{
+    "ConnectionStrings": {
+        "DefaultConnection": "Server=YOUR_SERVER;Database=LIBRARY_DB;User ID=YOUR_USER;Password=YOUR_PASSWORD;TrustServerCertificate=True;"
+    },
+    "TelegramBot": {
+        "Enabled": false,
+        "BotToken": "",
+        "AdminChatId": "",
+        "OtpBotToken": "",
+        "OtpChatId": ""
+    },
+    "SeedAdmin": {
+        "Email": "admin@library.com",
+        "Password": "Admin@123",
+        "ResetPasswordOnStartup": false
+    }
 }
 ```
 
----
+### User-secrets example
 
-##  Default Admin Account
+```bash
+dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Server=YOUR_SERVER;Database=LIBRARY_DB;User ID=YOUR_USER;Password=YOUR_PASSWORD;TrustServerCertificate=True;"
+dotnet user-secrets set "EmailSettings:SenderEmail" "you@example.com"
+dotnet user-secrets set "EmailSettings:Password" "your-app-password"
+dotnet user-secrets set "SeedAdmin:Email" "admin@library.com"
+dotnet user-secrets set "SeedAdmin:Password" "Admin@123"
+```
 
-| Field | Value |
-|---|---|
-| Email | admin@library.com |
-| Password | Admin@123 |
+## Database and Seeding
 
->  Change these credentials immediately after first login.
+On startup, the app automatically:
 
----
+- Applies pending EF Core migrations
+- Ensures roles exist: `Admin`, `Librarian`, `User`
+- Ensures a seed admin account exists and is in `Admin` role
+- Optionally resets seed admin password in Development mode
 
-## 👥 Roles
+Manual migration commands:
 
-| Role | Access |
-|---|---|
-| Admin | Full access — users, books, borrowing, dashboard |
-| Librarian | Dashboard + borrowing records |
-| Student | Book search + borrowing history |
+```bash
+dotnet ef migrations add YourMigrationName
+dotnet ef database update
+dotnet ef migrations list
+```
 
----
+## Roles and Access
 
-## 📧 Email Verification Flow
+| Role      | Access                                                                   |
+| --------- | ------------------------------------------------------------------------ |
+| Admin     | Full management: users, books, category/author/event, reports, dashboard |
+| Librarian | Operational management: dashboard, borrowing, catalog operations         |
+| User      | Browse/search books, reserve via cart, bookmark, review, history/profile |
 
-1. User registers or Admin creates an account
-2. Verification email is sent automatically
-3. User clicks the confirmation link
-4. Account is activated and user can log in
+## Main Routes
 
----
+| Area             | Route                        |
+| ---------------- | ---------------------------- |
+| Home             | `/`                          |
+| Login            | `/login`                     |
+| Book list        | `/book`                      |
+| Book detail      | `/book/{id}`                 |
+| Cart             | `/cart`                      |
+| Bookmark         | `/bookmark`                  |
+| History          | `/history`                   |
+| Admin dashboard  | `/admin/dashboard`           |
+| Manage users     | `/admin/manageuser`          |
+| Manage borrowing | `/admin/manageborrowingbook` |
+| Reports          | `/admin/managereport`        |
 
-##  Contributing
+## Development Notes
+
+- Default launch profile is configured in `Properties/launchSettings.json`
+- Static assets are under `wwwroot/`
+- Admin report data endpoint: `GET /admin/managereport/data`
+- Fine calculation uses a fixed rate of `$1.00/day` in current logic
+
+## Security Notes
+
+- Do not commit real credentials/tokens in `appsettings.json`
+- Prefer environment variables or `dotnet user-secrets` for local development
+- Rotate any leaked connection strings, SMTP passwords, or bot tokens immediately
+
+## Contributing
+
 ```bash
 git checkout -b feature/your-feature
 git commit -m "feat: your description"
 git push origin feature/your-feature
 ```
 
-Then open a Pull Request on GitHub.
+Then open a pull request.
 
----
+## License
 
-##  License
+MIT License - see [LICENSE](LICENSE).
 
-MIT License — see [LICENSE](LICENSE) for details.
-
----
-
-##  Contact
+## Contact
 
 GitHub: [@Rattnakvisal](https://github.com/Rattnakvisal)
