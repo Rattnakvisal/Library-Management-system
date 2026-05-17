@@ -17,4 +17,10 @@ public interface ITelegramNotifier
         string otpCode,
         DateTime expiresUtc,
         CancellationToken cancellationToken = default);
+    Task<bool> SendLoginOtpToChatAsync(
+        string chatId,
+        string phoneNumber,
+        string otpCode,
+        DateTime expiresUtc,
+        CancellationToken cancellationToken = default);
 }

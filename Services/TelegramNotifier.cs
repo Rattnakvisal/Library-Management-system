@@ -93,6 +93,42 @@ public sealed class TelegramNotifier : ITelegramNotifier
         return false;
     }
 
+    public async Task<bool> SendLoginOtpToChatAsync(
+        string chatId,
+        string phoneNumber,
+        string otpCode,
+        DateTime expiresUtc,
+        CancellationToken cancellationToken = default)
+    {
+        if (!_options.Enabled ||
+            string.IsNullOrWhiteSpace(chatId) ||
+            string.IsNullOrWhiteSpace(phoneNumber) ||
+            string.IsNullOrWhiteSpace(otpCode))
+        {
+            return false;
+        }
+
+        var expiresKh = DateTime.SpecifyKind(expiresUtc, DateTimeKind.Utc).ToUniversalTime().AddHours(7);
+
+        var message = string.Join('\n',
+            "AUB Library login OTP.",
+            $"Phone: {phoneNumber.Trim()}",
+            $"OTP: {otpCode.Trim()}",
+            $"Expires (Cambodia UTC+7): {expiresKh:yyyy-MM-dd HH:mm:ss}",
+            $"Expires (UTC): {expiresUtc:yyyy-MM-dd HH:mm:ss}");
+
+        foreach (var botToken in GetLookupBotTokens())
+        {
+            var sent = await SendMessageAsync(botToken, chatId, message, cancellationToken);
+            if (sent)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public async Task<string?> FindUserChatIdByPhoneAsync(string phoneNumber, CancellationToken cancellationToken = default)
     {
         if (!_options.Enabled || string.IsNullOrWhiteSpace(phoneNumber))

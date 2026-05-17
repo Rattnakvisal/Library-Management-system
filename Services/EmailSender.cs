@@ -17,12 +17,17 @@ public class EmailSender : IEmailSender
     public async Task SendEmailAsync(string email, string subject, string htmlMessage)
     {
         var emailSettings = _configuration.GetSection("EmailSettings");
+        var senderEmail = emailSettings["SenderEmail"]
+            ?? throw new InvalidOperationException("EmailSettings:SenderEmail is required.");
+        var smtpServer = emailSettings["SmtpServer"]
+            ?? throw new InvalidOperationException("EmailSettings:SmtpServer is required.");
+        var password = emailSettings["Password"]
+            ?? throw new InvalidOperationException("EmailSettings:Password is required.");
 
         var message = new MimeMessage();
-        // Uses the SenderName and SenderEmail from your appsettings.json
         message.From.Add(new MailboxAddress(
             emailSettings["SenderName"] ?? "Library System",
-            emailSettings["SenderEmail"]));
+            senderEmail));
 
         message.To.Add(MailboxAddress.Parse(email));
         message.Subject = subject;
@@ -34,14 +39,13 @@ public class EmailSender : IEmailSender
         try
         {
             await smtp.ConnectAsync(
-                emailSettings["SmtpServer"],
+                smtpServer,
                 int.Parse(emailSettings["SmtpPort"] ?? "587"),
                 SecureSocketOptions.StartTls);
 
-            // IMPORTANT: Use your Google App Password here, not your regular Gmail password
             await smtp.AuthenticateAsync(
-                emailSettings["SenderEmail"],
-                emailSettings["Password"]);
+                senderEmail,
+                password);
 
             await smtp.SendAsync(message);
             await smtp.DisconnectAsync(true);

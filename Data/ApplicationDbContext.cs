@@ -75,7 +75,7 @@ namespace Library_Management_system.Data
 
             builder.Entity<BorrowingRecord>(entity =>
             {
-                entity.ToTable("Borrowing");
+                entity.ToTable("BorrowingRecords");
                 entity.Property(x => x.DurationDays).HasDefaultValue(14);
                 entity.Property(x => x.ReturnUserId).HasMaxLength(450);
 

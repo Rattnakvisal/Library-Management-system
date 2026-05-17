@@ -1,0 +1,82 @@
+@page
+@model LoginOtpModel
+@{
+    Layout = null;
+    ViewData["Title"] = "Verify Login OTP";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - ACLEDA University Library</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/Login/login.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/users/reset-password.css" asp-append-version="true" />
+</head>
+
+<body>
+    <div class="container">
+        <div class="card reset-card">
+            <div class="left">
+                <div class="logo">
+                    <img src="~/images/Login/logo.png" alt="ACLEDA Logo" />
+                </div>
+
+                <div class="illustration">
+                    <img src="~/images/Login/bookicon.png" alt="Books Illustration" />
+                </div>
+            </div>
+
+            <div class="right">
+                <h2>ACLEDA UNIVERSITY LIBRARY</h2>
+
+                <div class="btn-login-student reset-banner">
+                    <img class="logoac" src="~/images/Login/logoac.png" alt="Library Icon" />
+                    Enter login OTP sent to Telegram@(string.IsNullOrWhiteSpace(Model.PhoneNumberMask) ? "." : $" for {Model.PhoneNumberMask}.")
+                </div>
+
+                <form method="post" class="reset-form" novalidate>
+                    <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+                    <input asp-for="Input.RequestId" type="hidden" />
+
+                    <div class="input-group">
+                        <div class="icon-email">
+                            <i class="fa-solid fa-key"></i>
+                        </div>
+                        <input asp-for="Input.OtpCode"
+                               type="text"
+                               placeholder="6-digit OTP"
+                               autocomplete="one-time-code"
+                               aria-required="true"
+                               maxlength="6"
+                               required />
+                    </div>
+                    <span asp-validation-for="Input.OtpCode" class="text-danger"></span>
+
+                    <button type="submit" class="btn-signin">
+                        <span class="btn-text">Verify and sign in</span>
+                    </button>
+                </form>
+
+                <div class="links reset-links">
+                    <div class="forgot">
+                        <a asp-page="./Login">Back to login</a>
+                    </div>
+                    <p>
+                        Need a new login code?
+                        <a asp-page="./Login">Sign in again</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <partial name="_ValidationScriptsPartial" />
+</body>
+
+</html>

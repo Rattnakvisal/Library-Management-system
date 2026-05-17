@@ -330,7 +330,7 @@ namespace Library_Management_system.Data.Migrations
 
                     b.HasIndex("ReservationId");
 
-                    b.ToTable("Borrowing");
+                    b.ToTable("BorrowingRecords");
                 });
 
             modelBuilder.Entity("Library_Management_system.Models.CartItem", b =>

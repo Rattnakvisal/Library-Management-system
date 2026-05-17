@@ -3,12 +3,13 @@
 @{
     ViewBag.Title = "Dashboard";
     var now = DateTime.Now;
-    var categoryLabelsJson = JsonSerializer.Serialize(Model?.CategoryDistribution?.Select(x => x.CategoryName) ?? new List<string>());
-    var categoryDataJson = JsonSerializer.Serialize(Model?.CategoryDistribution?.Select(x => x.BookCount) ?? new List<int>());
+    var dashboard = Model ?? new Library_Management_system.Models.Admin.DashboardViewModel();
+    var categoryLabelsJson = JsonSerializer.Serialize(dashboard.CategoryDistribution.Select(x => x.CategoryName).ToArray());
+    var categoryDataJson = JsonSerializer.Serialize(dashboard.CategoryDistribution.Select(x => x.BookCount).ToArray());
     var borrowingTrendLabelsJson = JsonSerializer.Serialize(
-        Model.BorrowingTrends.Select(x => x.Label).ToArray());
+        dashboard.BorrowingTrends.Select(x => x.Label).ToArray());
     var borrowingTrendCountsJson = JsonSerializer.Serialize(
-        Model.BorrowingTrends.Select(x => x.Count).ToArray());
+        dashboard.BorrowingTrends.Select(x => x.Count).ToArray());
 }
 
 @section Styles {
@@ -31,7 +32,7 @@
             <div class="sum-icon"><i class="bi bi-book"></i></div>
             <div class="sum-info">
                 <span class="sum-title">Total Books</span>
-                <span class="sum-value">@Model.TotalBooks</span>
+                <span class="sum-value">@dashboard.TotalBooks</span>
             </div>
         </article>
 
@@ -39,7 +40,7 @@
             <div class="sum-icon"><i class="bi bi-journal-bookmark"></i></div>
             <div class="sum-info">
                 <div class="sum-title">Borrowed Books</div>
-                <div class="sum-value">@Model.BorrowedBooks</div>
+                <div class="sum-value">@dashboard.BorrowedBooks</div>
             </div>
         </article>
 
@@ -47,7 +48,7 @@
             <div class="sum-icon"><i class="bi bi-people"></i></div>
             <div class="sum-info">
                 <div class="sum-title">Total Users</div>
-                <div class="sum-value">@Model.TotalUsers</div>
+                <div class="sum-value">@dashboard.TotalUsers</div>
             </div>
         </article>
 
@@ -55,7 +56,7 @@
             <div class="sum-icon"><i class="bi bi-currency-dollar"></i></div>
             <div class="sum-info">
                 <div class="sum-title">Total Fines</div>
-                <div class="sum-value">$ @Model.TotalFines.ToString("N2")</div>
+                <div class="sum-value">$ @dashboard.TotalFines.ToString("N2")</div>
             </div>
         </article>
     </section>
@@ -65,9 +66,9 @@
 
         <nav class="quick-tabs" aria-label="Quick action tabs">
             <button type="button" class="qtab active" data-target="#panel-overview">Overview</button>
-            <button type="button" class="qtab" data-target="#panel-members">New Member(s) <span class="qtab-badge">@Model.NewMembers.Count</span></button>
-            <button type="button" class="qtab" data-target="#panel-books">New Book(s) <span class="qtab-badge">@Model.NewBooks.Count</span></button>
-            <button type="button" class="qtab" data-target="#panel-borrow">Borrowing Book(s) <span class="qtab-badge">@Model.RecentBorrowings.Count</span></button>
+            <button type="button" class="qtab" data-target="#panel-members">New Member(s) <span class="qtab-badge">@dashboard.NewMembers.Count</span></button>
+            <button type="button" class="qtab" data-target="#panel-books">New Book(s) <span class="qtab-badge">@dashboard.NewBooks.Count</span></button>
+            <button type="button" class="qtab" data-target="#panel-borrow">Borrowing Book(s) <span class="qtab-badge">@dashboard.RecentBorrowings.Count</span></button>
         </nav>
 
         <div class="quick-panel">
@@ -87,9 +88,9 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @if (Model.OverdueBorrowings.Any())
+                            @if (dashboard.OverdueBorrowings.Any())
                             {
-                                foreach (var row in Model.OverdueBorrowings)
+                                foreach (var row in dashboard.OverdueBorrowings)
                                 {
                                     <tr>
                                         <td>@row.BookTitle</td>
@@ -141,9 +142,9 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @if (Model.NewMembers != null && Model.NewMembers.Any())
+                            @if (dashboard.NewMembers.Any())
                             {
-                                @foreach (var member in Model.NewMembers)
+                                @foreach (var member in dashboard.NewMembers)
                                 {
                                     <tr>
                                         <td>@member.FullName</td>
@@ -186,9 +187,9 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @if (Model.NewBooks != null && Model.NewBooks.Any())
+                            @if (dashboard.NewBooks.Any())
                             {
-                                @foreach (var book in Model.NewBooks)
+                                @foreach (var book in dashboard.NewBooks)
                                 {
                                     var imagePath = string.IsNullOrWhiteSpace(book.ImageUrl)
                                         ? Url.Content("~/images/User/Book/book2.png")
@@ -230,9 +231,9 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @if (Model.RecentBorrowings.Any())
+                            @if (dashboard.RecentBorrowings.Any())
                             {
-                                foreach (var row in Model.RecentBorrowings)
+                                foreach (var row in dashboard.RecentBorrowings)
                                 {
                                     var statusClass = row.Status switch
                                     {
@@ -307,7 +308,7 @@
                 <h4 class="panel-title">Restricted Members</h4>
                 <span class="pill danger">
                     <i class="bi bi-shield-exclamation"></i>
-                    @Model.RestrictedMembersCount restricted
+                    @dashboard.RestrictedMembersCount restricted
                 </span>
             </div>
 
@@ -323,9 +324,9 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @if (Model.RestrictedMembers.Any())
+                        @if (dashboard.RestrictedMembers.Any())
                         {
-                            foreach (var member in Model.RestrictedMembers)
+                            foreach (var member in dashboard.RestrictedMembers)
                             {
                                 <tr>
                                     <td>@member.MemberId</td>
